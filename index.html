@@ -548,7 +548,7 @@ const E = [
   { e: 'Glycogen phos.', from: 'Glycogen', to: 'G1P' },
   { e: 'PGM', from: 'G1P', to: 'Glucose-6-P' },
   { e: 'UDP-Glc PPase', from: 'G1P', to: 'UDP-Glucose', curved: true },
-  { e: 'Glycogen synthase', from: 'UDP-Glucose', to: 'Glycogen', curved: true },
+  { e: 'Glycogen synthase', from: 'UDP-Glucose', to: 'Glycogen', curved: true, labelOff: 28, labelT: 0.45 },
 
   // ==== PPP (oxidative) ====
   { e: 'G6PD', from: 'Glucose-6-P', to: '6-PG' },
@@ -557,9 +557,9 @@ const E = [
   { e: '+NADPH', from: '6-PG', to: 'NADPH', noLabel: true, cofactor: true, curved: true },
 
   // ==== GLYCOLYSIS ====
-  { e: 'Hexokinase', from: 'Glucose', to: 'Glucose-6-P' },
+  { e: 'Hexokinase', from: 'Glucose', to: 'Glucose-6-P', labelOff: 40 },
   { e: 'PGI', from: 'Glucose-6-P', to: 'Fructose-6-P' },
-  { e: 'PFK-1', from: 'Fructose-6-P', to: 'Fructose-1,6-BP' },
+  { e: 'PFK-1', from: 'Fructose-6-P', to: 'Fructose-1,6-BP', labelOff: 32 },
   { e: 'Aldolase', from: 'Fructose-1,6-BP', to: 'DHAP' },
   { e: 'Aldolase', from: 'Fructose-1,6-BP', to: 'GAP', noLabel: true },
   { e: 'TPI', from: 'DHAP', to: 'GAP' },
@@ -572,8 +572,8 @@ const E = [
   { e: 'PDH', from: 'Pyruvate', to: 'Acetyl-CoA' },
 
   // ==== GLUCONEOGENESIS BYPASS ====
-  { e: 'G6Pase', from: 'Glucose-6-P', to: 'Glucose', gluconeogenesis: true, curved: true },
-  { e: 'FBPase-1', from: 'Fructose-1,6-BP', to: 'Fructose-6-P', gluconeogenesis: true, curved: true },
+  { e: 'G6Pase', from: 'Glucose-6-P', to: 'Glucose', gluconeogenesis: true, curved: true, labelOff: 28 },
+  { e: 'FBPase-1', from: 'Fructose-1,6-BP', to: 'Fructose-6-P', gluconeogenesis: true, curved: true, labelOff: 34 },
   { e: 'PC', from: 'Pyruvate', to: 'OAA', gluconeogenesis: true, curved: true },
   { e: 'PEPCK', from: 'OAA', to: 'PEP', gluconeogenesis: true, curved: true },
 
@@ -594,11 +594,11 @@ const E = [
   // ==== TCA CYCLE ====
   { e: 'Citrate synthase', from: 'Acetyl-CoA', to: 'Citrate' },
   { e: 'Citrate synthase', from: 'OAA', to: 'Citrate', noLabel: true },
-  { e: 'Aconitase', from: 'Citrate', to: 'Isocitrate' },
+  { e: 'Aconitase', from: 'Citrate', to: 'Isocitrate', labelDX: 30, labelDY: -28 },
   { e: 'IDH', from: 'Isocitrate', to: 'α-KG' },
   { e: 'α-KGDH', from: 'α-KG', to: 'Succinyl-CoA' },
   { e: 'SCS', from: 'Succinyl-CoA', to: 'Succinate' },
-  { e: 'SDH (CII)', from: 'Succinate', to: 'Fumarate' },
+  { e: 'SDH (CII)', from: 'Succinate', to: 'Fumarate', labelDX: -34, labelDY: 46 },
   { e: 'Fumarase', from: 'Fumarate', to: 'Malate' },
   { e: 'MDH', from: 'Malate', to: 'OAA' },
 
@@ -1103,8 +1103,9 @@ function renderEdges() {
     }
 
     if (!edge.noLabel && !labelDrawn.has(edge.e)) {
-      const lx = (start.x + end.x) / 2;
-      const ly = (start.y + end.y) / 2;
+      const t = edge.labelT != null ? edge.labelT : 0.5;
+      const lx = start.x + (end.x - start.x) * t;
+      const ly = start.y + (end.y - start.y) * t;
       const dx = end.x - start.x, dy = end.y - start.y;
       const len = Math.sqrt(dx*dx + dy*dy) || 1;
       let offsetMag = 11;
@@ -1112,8 +1113,11 @@ function renderEdges() {
         const curveAmt = Math.min(50, len * 0.18);
         offsetMag = curveAmt * 0.55 + 6;
       }
-      const ox = -dy / len * offsetMag;
-      const oy = dx / len * offsetMag;
+      if (edge.labelOff != null) offsetMag = edge.labelOff; // signed override: flips side + sets magnitude
+      let ox = -dy / len * offsetMag;
+      let oy = dx / len * offsetMag;
+      if (edge.labelDX != null) ox = edge.labelDX; // absolute nudge (for degenerate short edges)
+      if (edge.labelDY != null) oy = edge.labelDY;
       const labelText = edge.e;
       const textW = labelText.length * 5.8 + 8;
       let labelCls = `edge-label ${status}`;
