@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Metabolism — Glycolysis · TCA · ETC · PPP · Glycogen · Lipid · Protein · Urea · Heme · Nucleotides · Cholesterol</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --panel-2: #1c2128;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-2: #8b949e;
+  --accent: #58a6ff;
+  --up: #56d364;
+  --up2: #2ea043;
+  --down: #f85149;
+  --down2: #da3633;
+  --neutral: #6e7681;
+  --gluco: #d29922;
+  --purple: #bc8cff;
+}
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  font-size: 13px;
+}
+header {
+  height: 60px;
+  padding: 0 20px;
+  background: linear-gradient(180deg, #1c2128 0%, #161b22 100%);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
+header h1 .accent { color: var(--accent); margin-left: 4px; font-weight: 400; }
+.subtitle { color: var(--text-2); font-size: 11px; margin-top: 2px; }
+.btn {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--border); }
+.count-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  background: var(--accent);
+  color: white;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+.count-badge.zero { background: var(--border); color: var(--text-2); }
+
+.layout {
+  display: grid;
+  grid-template-columns: 310px 1fr 310px;
+  height: calc(100vh - 60px);
+}
+
+aside {
+  background: var(--panel);
+  overflow-y: auto;
+  padding: 16px;
+  border-right: 1px solid var(--border);
+}
+aside.right { border-right: none; border-left: 1px solid var(--border); }
+aside h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-2);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.category-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--accent);
+  letter-spacing: 0.8px;
+  margin: 14px 0 6px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.category-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.perturbation {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 3px;
+  border: 1px solid transparent;
+  transition: all 0.12s;
+  user-select: none;
+}
+.perturbation:hover { background: var(--panel-2); }
+.perturbation.active {
+  background: rgba(88, 166, 255, 0.10);
+  border-color: rgba(88, 166, 255, 0.4);
+}
+.perturbation .checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+.perturbation.active .checkbox {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.perturbation.active .checkbox::after {
+  content: "✓";
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+}
+.perturbation .info { flex: 1; min-width: 0; }
+.perturbation .name { font-size: 12.5px; font-weight: 500; line-height: 1.3; }
+.perturbation .desc { font-size: 10.5px; color: var(--text-2); margin-top: 2px; line-height: 1.35; }
+
+main {
+  overflow: auto;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(88, 166, 255, 0.04), transparent 40%),
+    radial-gradient(circle at 75% 70%, rgba(86, 211, 100, 0.04), transparent 40%),
+    radial-gradient(circle at 50% 95%, rgba(210, 153, 34, 0.04), transparent 40%);
+}
+
+svg { display: block; min-width: 2400px; }
+
+.node { cursor: pointer; }
+.node rect {
+  stroke: var(--border);
+  stroke-width: 1.5;
+  fill: var(--panel-2);
+  transition: fill 0.2s, stroke 0.2s;
+}
+.node text.label {
+  fill: var(--text);
+  font-size: 11px;
+  font-family: inherit;
+  pointer-events: none;
+  font-weight: 500;
+  dominant-baseline: middle;
+}
+.node text.delta {
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+  dominant-baseline: middle;
+  fill: var(--neutral);
+}
+.node.cofactor rect {
+  stroke-dasharray: 3 2;
+}
+
+.node.up rect { fill: rgba(86, 211, 100, 0.18); stroke: var(--up); }
+.node.up text.delta { fill: var(--up); }
+.node.up2 rect { fill: rgba(46, 160, 67, 0.30); stroke: var(--up2); stroke-width: 2.5; }
+.node.up2 text.delta { fill: var(--up); }
+.node.down rect { fill: rgba(248, 81, 73, 0.18); stroke: var(--down); }
+.node.down text.delta { fill: var(--down); }
+.node.down2 rect { fill: rgba(218, 54, 51, 0.30); stroke: var(--down2); stroke-width: 2.5; }
+.node.down2 text.delta { fill: var(--down); }
+
+.node.selected rect {
+  stroke: var(--accent);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px rgba(88, 166, 255, 0.5));
+}
+
+.edge { fill: none; stroke: #4d5560; stroke-width: 1.4; }
+.edge.inhibited { stroke: var(--down); stroke-dasharray: 5 3; stroke-width: 2.5; }
+.edge.activated { stroke: var(--up); stroke-width: 2.5; }
+.edge.gluconeogenesis { stroke: var(--gluco); stroke-dasharray: 6 3; opacity: 0.85; }
+.edge.gluconeogenesis.inhibited { stroke: var(--down); }
+.edge.gluconeogenesis.activated { stroke: var(--up); }
+
+.edge-label {
+  font-size: 9.5px;
+  fill: var(--text-2);
+  font-family: inherit;
+  pointer-events: none;
+  font-weight: 500;
+}
+.edge-label.inhibited { fill: var(--down); font-weight: 700; }
+.edge-label.activated { fill: var(--up); font-weight: 700; }
+.edge-label.gluconeogenesis { fill: var(--gluco); }
+
+.pathway-label {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--accent);
+  letter-spacing: 2px;
+  font-family: "SF Mono", "Menlo", monospace;
+  opacity: 0.55;
+}
+.pathway-label.faint { opacity: 0.13; font-size: 26px; }
+.pathway-label.gluco { fill: var(--gluco); }
+.pathway-label.purple { fill: var(--purple); }
+
+.metabolite-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+.metabolite-row:hover { background: var(--panel-2); }
+.metabolite-row.selected { background: rgba(88,166,255,0.15); }
+.metabolite-row .name { flex: 1; }
+.metabolite-row .change {
+  font-weight: 700;
+  font-family: "SF Mono", monospace;
+  font-size: 13px;
+  margin-left: 8px;
+}
+.change.up { color: var(--up); }
+.change.up2 { color: var(--up); }
+.change.down { color: var(--down); }
+.change.down2 { color: var(--down); }
+.change.unchanged { color: var(--text-2); opacity: 0.5; }
+
+.sub-header {
+  font-size: 11px;
+  color: var(--text-2);
+  margin: 12px 0 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.legend {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px;
+  background: var(--panel-2);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 10.5px; }
+.legend-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1.5px solid;
+}
+
+.detail-box {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.detail-box h4 {
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.detail-box .label-pair {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-top: 1px solid var(--border);
+  font-size: 11.5px;
+}
+.detail-box .label-pair:first-of-type { border-top: none; }
+.detail-box .label-pair .k { color: var(--text-2); }
+.muted { color: var(--text-2); font-size: 11.5px; font-style: italic; }
+
+.driver-row {
+  font-size: 11px;
+  padding: 3px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neutral); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Metabolism Pathway<span class="accent">// Interactive</span></h1>
+    <div class="subtitle">Glycolysis · TCA · ETC · PPP · Glycogen · β-Oxidation · Ketones · Urea cycle · Gluconeogenesis</div>
+  </div>
+  <div>
+    <button class="btn" id="reset-btn">Reset <span class="count-badge zero" id="active-count">0</span></button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside id="perturbations-aside">
+    <h2>Perturbations / Integrations</h2>
+    <div id="perturbations-list"></div>
+  </aside>
+
+  <main>
+    <svg id="pathway-svg" width="2400" height="1700" viewBox="0 0 2400 1700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+          <polygon points="0 0, 10 5, 0 10" fill="#4d5560" />
+        </marker>
+        <marker id="arrow-down" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+          <polygon points="0 0, 10 5, 0 10" fill="#f85149" />
+        </marker>
+        <marker id="arrow-up" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+          <polygon points="0 0, 10 5, 0 10" fill="#56d364" />
+        </marker>
+        <marker id="arrow-gluco" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+          <polygon points="0 0, 10 5, 0 10" fill="#d29922" />
+        </marker>
+      </defs>
+
+      <text x="20" y="42" class="pathway-label">GLYCOGEN</text>
+      <text x="170" y="42" class="pathway-label" style="font-size:10px;opacity:0.4">// synthesis</text>
+      <text x="20" y="240" class="pathway-label purple">PPP</text>
+      <text x="320" y="42" class="pathway-label">GLYCOLYSIS</text>
+      <text x="320" y="60" class="pathway-label gluco" style="font-size:10px">// gluconeogenesis</text>
+      <text x="480" y="450" class="pathway-label" style="fill:#e6a86c">LIPIDS</text>
+      <text x="480" y="468" class="pathway-label" style="font-size:9px;opacity:0.5;fill:#e6a86c">lipolysis · β-ox · lipogenesis</text>
+      <text x="660" y="540" class="pathway-label gluco">β-OXIDATION</text>
+      <text x="880" y="995" class="pathway-label faint" text-anchor="middle">TCA</text>
+      <text x="380" y="1180" class="pathway-label purple">KETOGENESIS</text>
+      <text x="1140" y="650" class="pathway-label gluco">UREA CYCLE</text>
+      <text x="1170" y="1220" class="pathway-label" style="fill:#bc8cff">AMINO ACIDS</text>
+      <text x="1655" y="92" class="pathway-label" text-anchor="middle">ETC / OXPHOS</text>
+      <text x="1090" y="160" class="pathway-label" style="fill:#f0a0c8">CHOLESTEROL / STEROIDS</text>
+      <text x="1010" y="1220" class="pathway-label" style="fill:#e0526b">HEME SYNTHESIS</text>
+      <text x="1990" y="90" class="pathway-label" style="fill:#5fd0c5">PURINES</text>
+      <text x="2030" y="630" class="pathway-label" style="fill:#5fd0c5">PYRIMIDINES</text>
+
+      <g id="edges"></g>
+      <g id="nodes"></g>
+    </svg>
+  </main>
+
+  <aside class="right">
+    <h2>Metabolite States</h2>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-box" style="background:rgba(46,160,67,0.30);border-color:#2ea043"></div>↑↑</div>
+      <div class="legend-item"><div class="legend-box" style="background:rgba(86,211,100,0.18);border-color:#56d364"></div>↑</div>
+      <div class="legend-item"><div class="legend-box" style="background:var(--panel-2);border-color:var(--border)"></div>=</div>
+      <div class="legend-item"><div class="legend-box" style="background:rgba(248,81,73,0.18);border-color:#f85149"></div>↓</div>
+      <div class="legend-item"><div class="legend-box" style="background:rgba(218,54,51,0.30);border-color:#da3633"></div>↓↓</div>
+    </div>
+
+    <div class="sub-header">Glycolysis</div>
+    <div id="list-glycolysis"></div>
+    <div class="sub-header">Glycogen · PPP</div>
+    <div id="list-glycogen-ppp"></div>
+    <div class="sub-header">TCA · Acetyl-CoA hub</div>
+    <div id="list-tca"></div>
+    <div class="sub-header">Lipids · β-Ox · Ketones</div>
+    <div id="list-fa-ketones"></div>
+    <div class="sub-header">Amino acids · Protein</div>
+    <div id="list-protein"></div>
+    <div class="sub-header">Urea cycle</div>
+    <div id="list-urea"></div>
+    <div class="sub-header">Cholesterol · Steroids</div>
+    <div id="list-sterol"></div>
+    <div class="sub-header">Heme synthesis</div>
+    <div id="list-heme"></div>
+    <div class="sub-header">Purines · Pyrimidines</div>
+    <div id="list-nucleotide"></div>
+    <div class="sub-header">ETC / Cofactors</div>
+    <div id="list-etc"></div>
+
+    <div class="sub-header" style="margin-top:18px">Detail</div>
+    <div id="detail" class="detail-box">
+      <p class="muted">Click a metabolite in the pathway or list, or any perturbation, for details.</p>
+    </div>
+  </aside>
+</div>
+
+<script>
+// ============================================
+// METABOLITES — positions and metadata
+// ============================================
+
+const M = {
+  // ==== GLYCOGEN ====
+  'Glycogen':        { x: 70, y: 80, pathway: 'glycogen-ppp', info: 'Branched polymer of glucose (α-1,4 with α-1,6 branches). Liver glycogen → blood glucose; muscle glycogen → muscle ATP only.' },
+  'G1P':             { x: 70, y: 160, pathway: 'glycogen-ppp', info: 'Glucose-1-phosphate. Interconverts with G6P via phosphoglucomutase. Product of glycogen phosphorylase; substrate of UDP-Glc PPase.' },
+  'UDP-Glucose':     { x: 190, y: 80, pathway: 'glycogen-ppp', info: 'Activated glucose donor for glycogen synthesis. Made from G1P + UTP by UDP-Glc pyrophosphorylase (releases PPi → drives reaction forward).' },
+
+  // ==== PPP (oxidative branch) ====
+  '6-PG':            { x: 70, y: 280, pathway: 'glycogen-ppp', info: '6-Phosphogluconate. Intermediate in oxidative PPP.' },
+  'Ribulose-5-P':    { x: 70, y: 360, pathway: 'glycogen-ppp', info: 'Ru5P. Product of 6PGD; entry to non-oxidative PPP (which interconnects with F6P/GAP).' },
+  'Ribose-5-P':      { x: 70, y: 440, pathway: 'glycogen-ppp', info: 'R5P. Precursor for nucleotide and nucleic acid synthesis.' },
+  'NADPH':           { x: 185, y: 310, pathway: 'glycogen-ppp', cofactor: true, info: 'Reducing power for biosynthesis (fatty acids, cholesterol, steroids) and antioxidant defense (glutathione regeneration). Major source: PPP oxidative branch.' },
+  'NADP+':           { x: 185, y: 385, pathway: 'glycogen-ppp', cofactor: true, info: 'Oxidized form. Used by G6PD and 6PGD.' },
+
+  // ==== GLYCOLYSIS ====
+  'Glucose':         { x: 320, y: 80, pathway: 'glycolysis', info: 'Primary carbohydrate fuel; enters cell via GLUT transporters.' },
+  'Glucose-6-P':     { x: 320, y: 160, pathway: 'glycolysis', info: 'Central branch point: glycolysis, PPP, glycogen, gluconeogenesis exit (liver G6Pase).' },
+  'Fructose-6-P':    { x: 320, y: 240, pathway: 'glycolysis', info: 'Isomer of G6P; substrate of PFK-1 — the committed step. Also product of FBPase-1 in gluconeogenesis.' },
+  'Fructose-1,6-BP': { x: 320, y: 320, pathway: 'glycolysis', info: 'Product of PFK-1; allosteric activator of pyruvate kinase. Cleaved by FBPase-1 in gluconeogenesis.' },
+  'DHAP':            { x: 235, y: 400, pathway: 'glycolysis', info: 'Dihydroxyacetone phosphate; equilibrates with GAP via TPI. Also feeds glycerol-3-P for triglyceride synthesis.' },
+  'GAP':             { x: 400, y: 400, pathway: 'glycolysis', info: 'Glyceraldehyde-3-phosphate; substrate of GAPDH.' },
+  '1,3-BPG':         { x: 400, y: 480, pathway: 'glycolysis', info: '1,3-Bisphosphoglycerate; high-energy intermediate powering ATP synthesis at PGK.' },
+  '3-PG':            { x: 400, y: 560, pathway: 'glycolysis', info: '3-Phosphoglycerate.' },
+  '2-PG':            { x: 400, y: 640, pathway: 'glycolysis', info: '2-Phosphoglycerate.' },
+  'PEP':             { x: 400, y: 720, pathway: 'glycolysis', info: 'Phosphoenolpyruvate; highest-energy phosphate carrier. Made from OAA in gluconeogenesis via PEPCK.' },
+  'Pyruvate':        { x: 400, y: 800, pathway: 'glycolysis', info: 'End of glycolysis. Branches: → lactate (LDH), → acetyl-CoA (PDH), → OAA (PC, anaplerotic + gluconeogenesis), → alanine (transamination).' },
+  'Lactate':         { x: 235, y: 800, pathway: 'glycolysis', info: 'Anaerobic product. LDH regenerates NAD+ so glycolysis can continue. Also fuel for heart, brain via Cori cycle.' },
+
+  // ==== ACETYL-COA HUB + BRIDGE METABOLITES ====
+  'Acetyl-CoA':      { x: 600, y: 800, pathway: 'tca', info: '2-C activated unit. Central hub: from PDH, β-oxidation, ketones, AAs. Used by: TCA, FA synthesis, ketogenesis, cholesterol synthesis, acetylation.' },
+
+  // ==== LIPID STORAGE / LIPOLYSIS / β-OXIDATION ====
+  'Triglyceride':    { x: 555, y: 480, pathway: 'fa-ketones', info: 'Storage form of fat (glycerol + 3 fatty acids). Hydrolyzed by hormone-sensitive lipase (activated by glucagon, epinephrine) → FFA + glycerol.' },
+  'Fatty acid':      { x: 720, y: 580, pathway: 'fa-ketones', info: 'Long-chain FA (palmitate, oleate, etc.). Activated in cytosol to acyl-CoA; transported into mito via carnitine shuttle (CPT1 — blocked by malonyl-CoA).' },
+  'Acyl-CoA':        { x: 720, y: 680, pathway: 'fa-ketones', info: 'Activated fatty acid (CoA thioester). Each β-oxidation cycle shortens by 2 C, producing 1 NADH, 1 FADH2, 1 acetyl-CoA.' },
+  'Malonyl-CoA':     { x: 855, y: 720, pathway: 'fa-ketones', info: 'Committed step of fatty acid synthesis (ACC). Allosterically inhibits CPT1 — prevents β-ox while building fat. Activated by citrate, insulin; inhibited by glucagon (phosphorylation).' },
+
+  // ==== TCA CYCLE ====
+  'Citrate':         { x: 880, y: 855, pathway: 'tca', info: '6C. Product of citrate synthase. Allosteric inhibitor of PFK-1. Can exit mito (citrate shuttle) → cytosolic acetyl-CoA for FA/cholesterol synthesis.' },
+  'Isocitrate':      { x: 968, y: 892, pathway: 'tca', info: '6C. IDH (rate-limiting TCA step) → α-KG + CO₂ + NADH.' },
+  'α-KG':            { x: 1005, y: 980, pathway: 'tca', info: 'α-Ketoglutarate (5C). α-KGDH → succinyl-CoA + CO₂ + NADH. Anaplerotic via glutamate ↔ amino acids.' },
+  'Succinyl-CoA':    { x: 968, y: 1068, pathway: 'tca', info: '4C high-energy thioester. SCS → GTP (substrate-level phosphorylation). Entry point for odd-chain FAs and some AAs.' },
+  'Succinate':       { x: 880, y: 1105, pathway: 'tca', info: '4C. Oxidized by Complex II (SDH) — the only TCA enzyme in the inner mitochondrial membrane.' },
+  'Fumarate':        { x: 792, y: 1068, pathway: 'tca', info: '4C. Hydrated by fumarase. Also produced by urea cycle (ASL) and purine nucleotide cycle.' },
+  'Malate':          { x: 755, y: 980, pathway: 'tca', info: '4C. MDH → OAA + NADH. Carries reducing equivalents into mito (malate–aspartate shuttle).' },
+  'OAA':             { x: 792, y: 892, pathway: 'tca', info: 'Oxaloacetate (4C). Condenses with acetyl-CoA. Exits to gluconeogenesis (PEPCK), aspartate (AST transamination).' },
+
+  // ==== ETC + COFACTORS ====
+  'NADH':            { x: 1550, y: 180, pathway: 'etc', cofactor: true, info: 'Reduced; delivers e⁻ to Complex I. ~2.5 ATP per NADH oxidized.' },
+  'NAD+':            { x: 1760, y: 180, pathway: 'etc', cofactor: true, info: 'Oxidized; required by GAPDH, PDH, IDH, α-KGDH, MDH, β-ox. Limiting in hypoxia / ethanol.' },
+  'FADH2':           { x: 1550, y: 280, pathway: 'etc', cofactor: true, info: 'Reduced cofactor from SDH and β-oxidation. ~1.5 ATP per FADH2.' },
+  'FAD':             { x: 1760, y: 280, pathway: 'etc', cofactor: true, info: 'Oxidized; covalently bound to SDH.' },
+  'CoQH2':           { x: 1550, y: 400, pathway: 'etc', info: 'Ubiquinol (reduced). Mobile lipid carrier; accepts e⁻ from Complex I & II.' },
+  'CoQ':             { x: 1760, y: 400, pathway: 'etc', info: 'Ubiquinone (oxidized).' },
+  'Cyt c (red)':     { x: 1550, y: 500, pathway: 'etc', info: 'Reduced cytochrome c. Substrate of Complex IV. Cytosolic release triggers apoptosis.' },
+  'O2':              { x: 1550, y: 600, pathway: 'etc', info: 'Final e⁻ acceptor at Complex IV. ETC stops without it.' },
+  'H2O':             { x: 1760, y: 600, pathway: 'etc', info: 'Product of Complex IV.' },
+  'H⁺ gradient':     { x: 1860, y: 700, pathway: 'etc', info: 'Proton motive force. Built by Complexes I, III, IV; consumed by ATP synthase.' },
+  'ADP':             { x: 1550, y: 780, pathway: 'etc', cofactor: true, info: 'Substrate of ATP synthase. Activator of PFK-1, PK, IDH.' },
+  'ATP':             { x: 1760, y: 780, pathway: 'etc', cofactor: true, info: 'Primary energy currency. ~30-32 ATP per glucose fully aerobic.' },
+  'CO2':             { x: 590, y: 880, pathway: 'tca', cofactor: true, info: 'Released by PDH (1×) + TCA (2×) per pyruvate. Also from PPP (6PGD). 6 CO₂ per glucose oxidized.' },
+  'GTP':             { x: 1090, y: 1140, pathway: 'tca', cofactor: true, info: 'Substrate-level phosphorylation by SCS. Freely interconvertible with ATP via nucleoside diphosphate kinase.' },
+
+  // ==== KETOGENESIS ====
+  'Acetoacetyl-CoA': { x: 460, y: 920, pathway: 'fa-ketones', info: '2 acetyl-CoA condensed by thiolase. Shared first step with cholesterol synthesis.' },
+  'HMG-CoA':         { x: 460, y: 1000, pathway: 'fa-ketones', info: 'β-Hydroxy-β-methylglutaryl-CoA. Mitochondrial = ketogenesis (lyase). Cytosolic = cholesterol (reductase, statin target).' },
+  'Acetoacetate':    { x: 380, y: 1080, pathway: 'fa-ketones', info: 'Ketone body. Released by liver; used by brain, heart, muscle in fasting. Can spontaneously decarboxylate → acetone (breath smell in DKA).' },
+  'β-OH-butyrate':   { x: 540, y: 1080, pathway: 'fa-ketones', info: 'β-Hydroxybutyrate — main circulating ketone in prolonged fasting. Reduced form: AcAc + NADH ⇌ βOHB + NAD+.' },
+
+  // ==== UREA CYCLE ====
+  'NH4+':            { x: 1100, y: 700, pathway: 'urea', info: 'Ammonium. Toxic; from AA catabolism (mostly glutaminase, GDH). Must become urea (in liver).' },
+  'Carbamoyl-P':     { x: 1210, y: 700, pathway: 'urea', info: 'Carbamoyl phosphate. CPS1 (mitochondrial, rate-limiting): NH3 + CO2 + 2 ATP → carbamoyl-P + 2 ADP + Pi.' },
+  'Citrulline':      { x: 1310, y: 760, pathway: 'urea', info: '6C non-protein amino acid. Made in mito by OTC; exported to cytosol.' },
+  'Argininosuccinate': { x: 1310, y: 850, pathway: 'urea', info: 'Cytosolic. ASS: citrulline + aspartate + ATP → argininosuccinate + AMP + PPi.' },
+  'Arginine':        { x: 1210, y: 920, pathway: 'urea', info: 'Hydrolyzed by arginase → ornithine + urea. Also substrate for NO synthase, polyamines, creatine.' },
+  'Ornithine':       { x: 1100, y: 850, pathway: 'urea', info: '5C non-protein amino acid. Nitrogen carrier — re-enters mito to restart cycle.' },
+  'Urea':            { x: 1100, y: 970, pathway: 'urea', info: 'CO(NH₂)₂. Excreted in urine (~30 g/day). 2 N atoms per molecule: one from NH4+, one from aspartate.' },
+  'Aspartate':       { x: 1420, y: 850, pathway: 'protein', info: 'Donates 2nd N to urea cycle (via ASS). Made from OAA via AST transamination — direct link between TCA, urea, and amino acid metabolism.' },
+
+  // ==== PROTEIN / AMINO ACIDS ====
+  'Alanine':         { x: 525, y: 720, pathway: 'protein', info: 'Glucogenic AA. Cahill cycle: muscle → liver alanine carries N as Pyruvate. ALT: Alanine + α-KG ⇌ Pyruvate + Glutamate.' },
+  'AA pool':         { x: 1060, y: 1170, pathway: 'protein', info: 'Generic amino acid pool. AAs are catabolized via transamination → Glutamate, then GDH releases NH₄⁺. Carbon skeletons enter TCA at 7 entry points (pyruvate, acetyl-CoA, α-KG, succinyl-CoA, fumarate, OAA, acetoacetate).' },
+  'Glutamate':       { x: 1200, y: 1170, pathway: 'protein', info: 'Central N carrier. GDH: Glutamate + NAD⁺ ⇌ α-KG + NH₄⁺. Also forms glutamine, GABA, glutathione, proline.' },
+  'Glutamine':       { x: 1340, y: 1170, pathway: 'protein', info: 'Non-toxic N-transport molecule (blood). Glutaminase (kidney, gut) → Glutamate + NH₄⁺. Glutamine synthetase (astrocytes, muscle) protects against ammonia.' },
+
+  // ==== CHOLESTEROL / STEROIDS ====
+  'Mevalonate':      { x: 1110, y: 210, pathway: 'sterol', info: 'Product of HMG-CoA reductase — the committed, rate-limiting step of cholesterol synthesis (statin target). Converted to 5-C isoprene units.' },
+  'Squalene':        { x: 1110, y: 290, pathway: 'sterol', info: '30-C linear isoprenoid. Cyclized (squalene epoxidase + oxidosqualene cyclase) → lanosterol → cholesterol.' },
+  'Cholesterol':     { x: 1110, y: 370, pathway: 'sterol', info: '27-C sterol. Membrane fluidity; precursor of bile acids, steroid hormones, vitamin D. Mostly endogenous, not dietary.' },
+  'Bile acids':      { x: 1265, y: 370, pathway: 'sterol', info: 'Cholic / chenodeoxycholic acid. Made in liver (CYP7A1 rate-limiting), recycled via enterohepatic circulation. Bile-acid sequestrants ↑ synthesis → ↓LDL.' },
+  'Steroid hormones':{ x: 1270, y: 450, pathway: 'sterol', info: 'All from pregnenolone (CYP11A1, rate-limiting): cortisol, aldosterone, androgens, estrogens. Ketoconazole inhibits synthesis.' },
+  'Vitamin D':       { x: 1420, y: 370, pathway: 'sterol', info: '7-dehydrocholesterol → cholecalciferol (skin/UV) → 25-OH (liver) → 1,25-(OH)₂ (kidney, active form).' },
+
+  // ==== HEME SYNTHESIS ====
+  'Glycine':         { x: 1010, y: 1270, pathway: 'heme', info: 'Simplest amino acid. Condenses with succinyl-CoA (ALA synthase, B6-dependent) to begin heme synthesis.' },
+  'δ-ALA':           { x: 1130, y: 1270, pathway: 'heme', info: 'δ-Aminolevulinate. Product of ALA synthase (rate-limiting, mitochondrial). Accumulates in lead poisoning and acute intermittent porphyria.' },
+  'PBG':             { x: 1250, y: 1270, pathway: 'heme', info: 'Porphobilinogen. 2 ALA → PBG via ALA dehydratase (zinc enzyme — strongly inhibited by lead).' },
+  'Uropor III':      { x: 1375, y: 1330, pathway: 'heme', info: 'Uroporphyrinogen III. Built from 4 PBG (PBG deaminase, deficient in AIP). UROD deficiency → porphyria cutanea tarda.' },
+  'Protopor IX':     { x: 1505, y: 1330, pathway: 'heme', info: 'Protoporphyrin IX. Final intermediate; ferrochelatase inserts Fe²⁺. Accumulates in lead poisoning + erythropoietic protoporphyria.' },
+  'Heme':            { x: 1630, y: 1270, pathway: 'heme', info: 'Fe²⁺-protoporphyrin IX. Cofactor of hemoglobin, myoglobin, cytochromes, catalase, NOS. Heme feedback-inhibits ALA synthase.' },
+
+  // ==== PURINES ====
+  'PRPP':            { x: 2010, y: 130, pathway: 'nucleotide', info: '5-Phosphoribosyl-1-PP. Activated ribose from R5P (PPP) + ATP. Shared substrate of de novo purine + pyrimidine synthesis and salvage.' },
+  'IMP':             { x: 2130, y: 200, pathway: 'nucleotide', info: 'Inosine monophosphate. First complete purine (~10 ATP-costly steps from PRPP). Branches to AMP and GMP.' },
+  'AMP':             { x: 2055, y: 290, pathway: 'nucleotide', info: 'Adenosine monophosphate. Made from IMP + aspartate. AMP:ATP ratio activates AMPK and PFK-1.' },
+  'GMP':             { x: 2200, y: 290, pathway: 'nucleotide', info: 'Guanosine monophosphate. Made from IMP + glutamine (rate-limited by GTP/energy availability).' },
+  'Hypoxanthine':    { x: 2130, y: 380, pathway: 'nucleotide', info: 'Purine degradation intermediate. Salvaged to IMP by HGPRT (absent in Lesch-Nyhan).' },
+  'Uric acid':       { x: 2130, y: 470, pathway: 'nucleotide', info: 'End-product of purine catabolism in humans (we lack uricase). Deposits → gout, uric-acid stones, tumor lysis syndrome.' },
+
+  // ==== PYRIMIDINES ====
+  'Orotate':         { x: 2055, y: 670, pathway: 'nucleotide', info: 'From cytosolic carbamoyl-P (CPS-II) + aspartate. Builds the ring BEFORE attaching ribose (opposite order to purines). Orotic aciduria if UMP synthase or OTC defective.' },
+  'UMP':             { x: 2055, y: 770, pathway: 'nucleotide', info: 'Uridine monophosphate. First complete pyrimidine. Parent of UTP, CTP, dTMP.' },
+  'CTP':             { x: 2205, y: 770, pathway: 'nucleotide', info: 'Cytidine triphosphate. RNA, and phospholipid synthesis (CDP-choline / CDP-DAG).' },
+  'dTMP':            { x: 2055, y: 870, pathway: 'nucleotide', info: 'Deoxythymidine-MP. Made by thymidylate synthase (dUMP→dTMP), which needs folate. Blocked by 5-FU (TS) and methotrexate (DHFR → no folate regeneration).' },
+};
+
+// ============================================
+// EDGES — enzyme reactions
+// ============================================
+
+const E = [
+  // ==== GLYCOGEN ====
+  { e: 'Glycogen phos.', from: 'Glycogen', to: 'G1P' },
+  { e: 'PGM', from: 'G1P', to: 'Glucose-6-P' },
+  { e: 'UDP-Glc PPase', from: 'G1P', to: 'UDP-Glucose', curved: true },
+  { e: 'Glycogen synthase', from: 'UDP-Glucose', to: 'Glycogen', curved: true },
+
+  // ==== PPP (oxidative) ====
+  { e: 'G6PD', from: 'Glucose-6-P', to: '6-PG' },
+  { e: '6PGD', from: '6-PG', to: 'Ribulose-5-P' },
+  { e: 'Isomerase', from: 'Ribulose-5-P', to: 'Ribose-5-P' },
+  { e: '+NADPH', from: '6-PG', to: 'NADPH', noLabel: true, cofactor: true, curved: true },
+
+  // ==== GLYCOLYSIS ====
+  { e: 'Hexokinase', from: 'Glucose', to: 'Glucose-6-P' },
+  { e: 'PGI', from: 'Glucose-6-P', to: 'Fructose-6-P' },
+  { e: 'PFK-1', from: 'Fructose-6-P', to: 'Fructose-1,6-BP' },
+  { e: 'Aldolase', from: 'Fructose-1,6-BP', to: 'DHAP' },
+  { e: 'Aldolase', from: 'Fructose-1,6-BP', to: 'GAP', noLabel: true },
+  { e: 'TPI', from: 'DHAP', to: 'GAP' },
+  { e: 'GAPDH', from: 'GAP', to: '1,3-BPG' },
+  { e: 'PGK', from: '1,3-BPG', to: '3-PG' },
+  { e: 'PGAM', from: '3-PG', to: '2-PG' },
+  { e: 'Enolase', from: '2-PG', to: 'PEP' },
+  { e: 'PK', from: 'PEP', to: 'Pyruvate' },
+  { e: 'LDH', from: 'Pyruvate', to: 'Lactate' },
+  { e: 'PDH', from: 'Pyruvate', to: 'Acetyl-CoA' },
+
+  // ==== GLUCONEOGENESIS BYPASS ====
+  { e: 'G6Pase', from: 'Glucose-6-P', to: 'Glucose', gluconeogenesis: true, curved: true },
+  { e: 'FBPase-1', from: 'Fructose-1,6-BP', to: 'Fructose-6-P', gluconeogenesis: true, curved: true },
+  { e: 'PC', from: 'Pyruvate', to: 'OAA', gluconeogenesis: true, curved: true },
+  { e: 'PEPCK', from: 'OAA', to: 'PEP', gluconeogenesis: true, curved: true },
+
+  // ==== LIPOLYSIS · β-OXIDATION · LIPOGENESIS ====
+  { e: 'Lipase', from: 'Triglyceride', to: 'Fatty acid' },
+  { e: 'Acyl-CoA syn.', from: 'Fatty acid', to: 'Acyl-CoA' },
+  { e: 'β-ox spiral', from: 'Acyl-CoA', to: 'Acetyl-CoA' },
+  { e: 'ACC', from: 'Acetyl-CoA', to: 'Malonyl-CoA', curved: true },
+  { e: 'FAS', from: 'Malonyl-CoA', to: 'Fatty acid', curved: true },
+  { e: 'Esterification', from: 'Fatty acid', to: 'Triglyceride', curved: true, cofactor: true, noLabel: true },
+
+  // ==== KETOGENESIS ====
+  { e: 'Thiolase', from: 'Acetyl-CoA', to: 'Acetoacetyl-CoA', curved: true },
+  { e: 'HMG-CoA syn.', from: 'Acetoacetyl-CoA', to: 'HMG-CoA' },
+  { e: 'HMG-CoA lyase', from: 'HMG-CoA', to: 'Acetoacetate' },
+  { e: 'BDH', from: 'Acetoacetate', to: 'β-OH-butyrate' },
+
+  // ==== TCA CYCLE ====
+  { e: 'Citrate synthase', from: 'Acetyl-CoA', to: 'Citrate' },
+  { e: 'Citrate synthase', from: 'OAA', to: 'Citrate', noLabel: true },
+  { e: 'Aconitase', from: 'Citrate', to: 'Isocitrate' },
+  { e: 'IDH', from: 'Isocitrate', to: 'α-KG' },
+  { e: 'α-KGDH', from: 'α-KG', to: 'Succinyl-CoA' },
+  { e: 'SCS', from: 'Succinyl-CoA', to: 'Succinate' },
+  { e: 'SDH (CII)', from: 'Succinate', to: 'Fumarate' },
+  { e: 'Fumarase', from: 'Fumarate', to: 'Malate' },
+  { e: 'MDH', from: 'Malate', to: 'OAA' },
+
+  // ==== UREA CYCLE ====
+  { e: 'CPS1', from: 'NH4+', to: 'Carbamoyl-P' },
+  { e: 'OTC', from: 'Carbamoyl-P', to: 'Citrulline' },
+  { e: 'OTC', from: 'Ornithine', to: 'Citrulline', noLabel: true },
+  { e: 'ASS', from: 'Citrulline', to: 'Argininosuccinate' },
+  { e: 'ASS', from: 'Aspartate', to: 'Argininosuccinate', noLabel: true },
+  { e: 'ASL', from: 'Argininosuccinate', to: 'Arginine' },
+  { e: 'ASL → Fumarate', from: 'Argininosuccinate', to: 'Fumarate', noLabel: true, cofactor: true, curved: true },
+  { e: 'Arginase', from: 'Arginine', to: 'Urea' },
+  { e: 'Arginase', from: 'Arginine', to: 'Ornithine', noLabel: true },
+  { e: 'AST', from: 'OAA', to: 'Aspartate', cofactor: true, curved: true },
+
+  // ==== PROTEIN / AMINO ACID METABOLISM ====
+  { e: 'ALT', from: 'Alanine', to: 'Pyruvate', curved: true },
+  { e: 'Glutaminase', from: 'Glutamine', to: 'Glutamate' },
+  { e: 'GDH', from: 'Glutamate', to: 'α-KG', curved: true },
+  { e: 'GDH', from: 'Glutamate', to: 'NH4+', noLabel: true, cofactor: true, curved: true },
+  { e: 'AA catabolism', from: 'AA pool', to: 'Glutamate' },
+  { e: 'transam.', from: 'AA pool', to: 'Pyruvate', noLabel: true, cofactor: true, curved: true },
+  { e: 'transam.', from: 'AA pool', to: 'Acetyl-CoA', noLabel: true, cofactor: true, curved: true },
+  { e: 'transam.', from: 'AA pool', to: 'Succinyl-CoA', noLabel: true, cofactor: true, curved: true },
+  { e: 'transam.', from: 'AA pool', to: 'Fumarate', noLabel: true, cofactor: true, curved: true },
+
+  // ==== ETC ====
+  { e: 'Complex I', from: 'NADH', to: 'NAD+' },
+  { e: 'Complex II', from: 'FADH2', to: 'FAD' },
+  { e: 'e⁻', from: 'NADH', to: 'CoQH2', noLabel: true, curved: true, cofactor: true },
+  { e: 'e⁻', from: 'FADH2', to: 'CoQH2', noLabel: true, curved: true, cofactor: true },
+  { e: 'Complex III', from: 'CoQH2', to: 'CoQ' },
+  { e: 'e⁻', from: 'CoQH2', to: 'Cyt c (red)', noLabel: true, cofactor: true },
+  { e: 'Complex IV', from: 'Cyt c (red)', to: 'H2O' },
+  { e: 'O₂', from: 'O2', to: 'H2O', noLabel: true, cofactor: true },
+  { e: 'ATP Synthase', from: 'ADP', to: 'ATP' },
+  { e: 'PMF', from: 'H⁺ gradient', to: 'ATP', noLabel: true, curved: true, cofactor: true },
+
+  // ==== SIDE PRODUCTS ====
+  { e: '+GTP', from: 'Succinyl-CoA', to: 'GTP', noLabel: true, cofactor: true, curved: true },
+  { e: 'CO₂', from: 'Isocitrate', to: 'CO2', noLabel: true, cofactor: true, curved: true },
+
+  // ==== CHOLESTEROL / STEROIDS ====
+  { e: 'HMG-CoA reductase', from: 'Acetyl-CoA', to: 'Mevalonate', curved: true },
+  { e: '→ isoprenoids', from: 'Mevalonate', to: 'Squalene' },
+  { e: 'cyclization', from: 'Squalene', to: 'Cholesterol' },
+  { e: 'CYP7A1', from: 'Cholesterol', to: 'Bile acids' },
+  { e: 'steroidogenesis', from: 'Cholesterol', to: 'Steroid hormones', curved: true },
+  { e: 'UV / hydroxylases', from: 'Cholesterol', to: 'Vitamin D' },
+
+  // ==== HEME SYNTHESIS ====
+  { e: 'ALA synthase', from: 'Succinyl-CoA', to: 'δ-ALA', curved: true },
+  { e: '+Glycine', from: 'Glycine', to: 'δ-ALA', noLabel: true, cofactor: true },
+  { e: 'ALA dehydratase', from: 'δ-ALA', to: 'PBG' },
+  { e: 'PBG deaminase', from: 'PBG', to: 'Uropor III' },
+  { e: 'multi-step', from: 'Uropor III', to: 'Protopor IX' },
+  { e: 'Ferrochelatase', from: 'Protopor IX', to: 'Heme' },
+  { e: 'AA→Gly', from: 'AA pool', to: 'Glycine', noLabel: true, cofactor: true, curved: true },
+
+  // ==== PURINES ====
+  { e: 'de novo (~10 steps)', from: 'PRPP', to: 'IMP' },
+  { e: '+Asp', from: 'IMP', to: 'AMP' },
+  { e: '+Gln', from: 'IMP', to: 'GMP' },
+  { e: 'catabolism', from: 'AMP', to: 'Hypoxanthine', curved: true },
+  { e: 'catabolism', from: 'GMP', to: 'Hypoxanthine', noLabel: true, curved: true },
+  { e: 'Xanthine oxidase', from: 'Hypoxanthine', to: 'Uric acid' },
+  { e: 'HGPRT salvage', from: 'Hypoxanthine', to: 'IMP', cofactor: true, curved: true, noLabel: true },
+  { e: 'PRPP synthetase', from: 'Ribose-5-P', to: 'PRPP', cofactor: true, curved: true, noLabel: true },
+
+  // ==== PYRIMIDINES ====
+  { e: 'CPS-II → orotate', from: 'Aspartate', to: 'Orotate', curved: true },
+  { e: 'UMP synthase', from: 'Orotate', to: 'UMP' },
+  { e: 'CTP synthase', from: 'UMP', to: 'CTP' },
+  { e: 'Thymidylate synthase', from: 'UMP', to: 'dTMP' },
+];
+
+// ============================================
+// PERTURBATIONS
+// ============================================
+
+const P = [
+  // ---- SUBSTRATES / NUTRITIONAL ----
+  { id: 'glucose-fed', name: 'Glucose / fed state', cat: 'Substrate',
+    desc: 'Plentiful glucose; full glycolytic + storage flux.',
+    activates: ['Hexokinase', 'PFK-1', 'PDH'],
+    effects: { 'Glucose': 3, 'Glucose-6-P': 2, 'Fructose-6-P': 1, 'Fructose-1,6-BP': 2, 'GAP': 1, '1,3-BPG': 1, 'Pyruvate': 2, 'Acetyl-CoA': 2, 'Citrate': 1, 'NADH': 1, 'ATP': 1, 'CO2': 1, 'H2O': 1, 'Glycogen': 2, 'G1P': 1, 'UDP-Glucose': 2, '6-PG': 1, 'NADPH': 1, 'Malonyl-CoA': 2, 'Triglyceride': 2 } },
+
+  { id: 'starvation', name: 'Starvation / low glucose', cat: 'Substrate',
+    desc: 'Low glucose; switch to fat fuel — β-ox up, ketogenesis up, gluconeogenesis up.',
+    inhibits: ['Hexokinase', 'PFK-1'],
+    activates: ['Glycogen phos.', 'PC', 'PEPCK', 'FBPase-1', 'G6Pase', 'β-ox spiral', 'Thiolase', 'HMG-CoA syn.', 'HMG-CoA lyase'],
+    effects: { 'Glucose': -2, 'Glycogen': -3, 'G1P': 1, 'UDP-Glucose': -2, 'Glucose-6-P': -1, 'Fructose-1,6-BP': -2, 'Pyruvate': -2, 'Lactate': -2,
+      'Triglyceride': -2, 'Fatty acid': -1, 'Acyl-CoA': 2, 'Malonyl-CoA': -2, 'Acetyl-CoA': 2, 'Acetoacetyl-CoA': 2, 'HMG-CoA': 2, 'Acetoacetate': 3, 'β-OH-butyrate': 3,
+      'AA pool': 1, 'Alanine': 1, 'Glutamate': 1, 'NH4+': 1, 'Urea': 1,
+      'OAA': -1, 'Citrate': -1, 'NADH': 1, 'ATP': 0, 'CO2': 1 } },
+
+  // ---- GLYCOLYSIS INHIBITORS ----
+  { id: '2dg', name: '2-Deoxyglucose', cat: 'Glycolysis inhibitor',
+    desc: 'Phosphorylated to 2-DG-6-P which cannot proceed; competitively traps hexokinase. Used in PET imaging (¹⁸F-FDG).',
+    inhibits: ['Hexokinase'],
+    effects: { 'Glucose': 1, 'Glucose-6-P': -2, 'Fructose-6-P': -2, 'Fructose-1,6-BP': -2, 'GAP': -1, 'Pyruvate': -2, 'Lactate': -1, 'Acetyl-CoA': -1, 'Citrate': -1, 'ATP': -1, 'NADH': -1, '6-PG': -1, 'NADPH': -1 } },
+
+  { id: 'arsenate', name: 'Arsenate', cat: 'Glycolysis inhibitor',
+    desc: 'Replaces Pi at GAPDH; the resulting 1-arseno-3-PG hydrolyses spontaneously, bypassing ATP synthesis at PGK.',
+    inhibits: ['PGK'],
+    effects: { 'GAP': 0, '1,3-BPG': -2, '3-PG': 0, 'Pyruvate': 0, 'ATP': -2 } },
+
+  { id: 'fluoride', name: 'Fluoride (enolase)', cat: 'Glycolysis inhibitor',
+    desc: 'Chelates Mg²⁺ at enolase; 2-PG accumulates, PEP cannot form.',
+    inhibits: ['Enolase'],
+    effects: { '3-PG': 1, '2-PG': 3, 'PEP': -3, 'Pyruvate': -2, 'Lactate': -2, 'Acetyl-CoA': -1, 'Citrate': -1, 'ATP': -1, 'NADH': -1 } },
+
+  // ---- TCA INHIBITORS ----
+  { id: 'arsenite', name: 'Arsenite', cat: 'TCA inhibitor',
+    desc: 'Inhibits lipoic-acid-dependent enzymes — PDH AND α-KGDH both block.',
+    inhibits: ['PDH', 'α-KGDH'],
+    effects: { 'Pyruvate': 2, 'Lactate': 2, 'Acetyl-CoA': -2, 'Citrate': -1, 'Isocitrate': -1, 'α-KG': 3, 'Succinyl-CoA': -2, 'Succinate': -2, 'Fumarate': -2, 'Malate': -1, 'OAA': -1, 'NADH': -1, 'ATP': -2, 'CO2': -2 } },
+
+  { id: 'fluoroacetate', name: 'Fluoroacetate', cat: 'TCA inhibitor',
+    desc: 'Forms fluorocitrate, which inhibits aconitase ("lethal synthesis").',
+    inhibits: ['Aconitase'],
+    effects: { 'Acetyl-CoA': 1, 'Citrate': 3, 'Isocitrate': -3, 'α-KG': -2, 'Succinyl-CoA': -2, 'Succinate': -2, 'Fumarate': -1, 'Malate': -1, 'OAA': -1, 'NADH': -1, 'ATP': -1, 'CO2': -2 } },
+
+  { id: 'malonate', name: 'Malonate', cat: 'TCA inhibitor',
+    desc: 'Competitive inhibitor of succinate dehydrogenase (Complex II).',
+    inhibits: ['SDH (CII)', 'Complex II'],
+    effects: { 'Succinate': 3, 'Fumarate': -2, 'Malate': -2, 'OAA': -2, 'Citrate': -1, 'FADH2': -1, 'FAD': 1 } },
+
+  // ---- ETC / OXPHOS ----
+  { id: 'rotenone', name: 'Rotenone (Complex I)', cat: 'ETC inhibitor',
+    desc: 'Blocks NADH → CoQ at Complex I.',
+    inhibits: ['Complex I'],
+    effects: { 'NADH': 3, 'NAD+': -2, 'CoQH2': -1, 'CoQ': 1, 'Cyt c (red)': -1, 'H2O': -1, 'H⁺ gradient': -2, 'ATP': -2,
+      'Pyruvate': 1, 'Lactate': 2, 'Acetyl-CoA': 1, 'Citrate': 1, 'Isocitrate': 1, 'α-KG': 1, 'Malate': 1, 'OAA': -1 } },
+
+  { id: 'antimycin', name: 'Antimycin A (Complex III)', cat: 'ETC inhibitor',
+    desc: 'Blocks CoQH₂ → Cyt c at Complex III.',
+    inhibits: ['Complex III'],
+    effects: { 'CoQH2': 3, 'CoQ': -2, 'Cyt c (red)': -2, 'H2O': -2, 'NADH': 2, 'NAD+': -2, 'FADH2': 2, 'FAD': -2, 'H⁺ gradient': -2, 'ATP': -3,
+      'Citrate': 1, 'Isocitrate': 1, 'α-KG': 1, 'Succinate': 1, 'Lactate': 2 } },
+
+  { id: 'cyanide', name: 'Cyanide / CO / Azide (Complex IV)', cat: 'ETC inhibitor',
+    desc: 'Binds Fe in cytochrome a₃; O₂ cannot accept electrons. Rapidly lethal.',
+    inhibits: ['Complex IV'],
+    effects: { 'Cyt c (red)': 3, 'O2': 2, 'H2O': -3, 'CoQH2': 2, 'CoQ': -1, 'NADH': 3, 'NAD+': -3, 'FADH2': 2, 'FAD': -2, 'H⁺ gradient': -3, 'ATP': -3,
+      'Pyruvate': 1, 'Lactate': 3, 'Acetyl-CoA': 1, 'Citrate': 1, 'Isocitrate': 1, 'α-KG': 1, 'Succinate': 1 } },
+
+  { id: 'oligomycin', name: 'Oligomycin (ATP synthase)', cat: 'OxPhos inhibitor',
+    desc: 'Blocks F₀ proton channel. Gradient builds → ETC stalls (respiratory control).',
+    inhibits: ['ATP Synthase'],
+    effects: { 'ATP': -3, 'ADP': 2, 'H⁺ gradient': 3, 'H2O': -1, 'O2': 1, 'NADH': 2, 'NAD+': -2, 'FADH2': 2, 'FAD': -2, 'CoQH2': 1, 'Cyt c (red)': 1,
+      'Pyruvate': 1, 'Lactate': 2, 'Acetyl-CoA': 1, 'Citrate': 1 } },
+
+  { id: 'dnp', name: 'DNP / FCCP (uncoupler)', cat: 'OxPhos inhibitor',
+    desc: 'Lipid-soluble proton carrier — collapses gradient. ETC accelerates; no ATP; heat released.',
+    effects: { 'H⁺ gradient': -3, 'ATP': -3, 'ADP': 2, 'O2': -3, 'H2O': 3, 'NADH': -2, 'NAD+': 2, 'FADH2': -1, 'FAD': 1, 'CoQH2': -1, 'CoQ': 1,
+      'Acetyl-CoA': -1, 'Citrate': -1, 'CO2': 2, 'Acyl-CoA': -1 } },
+
+  // ---- CONDITIONS ----
+  { id: 'hypoxia', name: 'Hypoxia / no O₂', cat: 'Condition',
+    desc: 'No final acceptor; ETC backs up; Pasteur effect → lactate fermentation rescues NAD+.',
+    inhibits: ['Complex IV'],
+    activates: ['LDH'],
+    effects: { 'O2': -3, 'H2O': -3, 'Cyt c (red)': 3, 'CoQH2': 2, 'CoQ': -2, 'NADH': 3, 'NAD+': -3, 'FADH2': 2, 'FAD': -2, 'H⁺ gradient': -3, 'ATP': -3,
+      'Lactate': 3, 'Pyruvate': 1, 'Citrate': 1, 'Isocitrate': 1, 'α-KG': 1, 'Malate': 1, 'OAA': -1, 'CO2': -2 } },
+
+  { id: 'exercise', name: 'Vigorous exercise (muscle)', cat: 'Condition',
+    desc: 'High ATP demand → ↑AMP/ADP → activates PFK-1, PDH, glycogen phos. Lactate rises if O₂ insufficient.',
+    activates: ['PFK-1', 'PDH', 'IDH', 'α-KGDH', 'Glycogen phos.'],
+    effects: { 'ADP': 2, 'ATP': -1, 'Glycogen': -2, 'G1P': 1, 'Glucose-6-P': 1, 'Fructose-1,6-BP': 2, 'Pyruvate': 2, 'Lactate': 2, 'Acetyl-CoA': 1, 'Citrate': 1, 'NADH': 1, 'CO2': 1, 'O2': -1, 'H2O': 1 } },
+
+  { id: 'fasting-ketosis', name: 'Prolonged fasting / ketosis', cat: 'Condition',
+    desc: 'Liver glycogen depleted; gluconeogenesis & ketogenesis dominate. Brain shifts to ketones as fuel after ~3 days.',
+    activates: ['Glycogen phos.', 'PC', 'PEPCK', 'FBPase-1', 'G6Pase', 'β-ox spiral', 'Thiolase', 'HMG-CoA syn.', 'HMG-CoA lyase'],
+    inhibits: ['PFK-1', 'PK', 'PDH'],
+    effects: {
+      'Glycogen': -3, 'G1P': 1, 'UDP-Glucose': -3, 'Glucose-6-P': 1, 'Fructose-6-P': 1,
+      'Fructose-1,6-BP': -2, 'PEP': 1, 'Pyruvate': -2, 'Lactate': -2,
+      'Triglyceride': -3, 'Fatty acid': 1, 'Acyl-CoA': 2, 'Malonyl-CoA': -3, 'Acetyl-CoA': 3,
+      'Acetoacetyl-CoA': 3, 'HMG-CoA': 3, 'Acetoacetate': 3, 'β-OH-butyrate': 3,
+      'AA pool': 2, 'Alanine': -1, 'Glutamate': 1, 'Glutamine': 1, 'Aspartate': 1,
+      'OAA': -2, 'Citrate': -1, 'Isocitrate': -1, 'α-KG': -1,
+      'NADH': 2, 'FADH2': 1, 'ATP': 0, 'CO2': 1, 'NH4+': 1, 'Urea': 2
+    } },
+
+  { id: 'dka', name: 'Diabetic ketoacidosis (DKA)', cat: 'Condition',
+    desc: 'Insulin deficiency → uncontrolled lipolysis → massive FA → acetyl-CoA. OAA drained for gluconeogenesis → acetyl-CoA can\'t enter TCA → ketone overproduction.',
+    activates: ['β-ox spiral', 'Thiolase', 'HMG-CoA syn.', 'PC', 'PEPCK', 'G6Pase', 'Glycogen phos.'],
+    inhibits: ['PDH', 'Hexokinase', 'PFK-1'],
+    effects: {
+      'Glucose': 3, 'Glucose-6-P': 1, 'Glycogen': -1, 'UDP-Glucose': -2,
+      'Triglyceride': -3, 'Fatty acid': 2, 'Acyl-CoA': 3, 'Malonyl-CoA': -3, 'Acetyl-CoA': 3,
+      'Acetoacetyl-CoA': 3, 'HMG-CoA': 3, 'Acetoacetate': 3, 'β-OH-butyrate': 3,
+      'AA pool': 1, 'Alanine': 1, 'Glutamine': 1, 'NH4+': 1, 'Urea': 2,
+      'OAA': -3, 'Citrate': -2, 'Malate': -1, 'α-KG': -1,
+      'Pyruvate': -1, 'NADH': 2, 'CO2': 1
+    } },
+
+  { id: 'alcohol', name: 'Ethanol intoxication', cat: 'Condition',
+    desc: 'EtOH → acetaldehyde → acetate; both via NAD+. High NADH:NAD+ inhibits TCA + gluconeogenesis → lactate ↑↑, hypoglycemia, fatty liver (acetyl-CoA → FA synthesis).',
+    inhibits: ['IDH', 'α-KGDH', 'MDH', 'PDH', 'PC'],
+    effects: { 'NADH': 3, 'NAD+': -3, 'Lactate': 3, 'Pyruvate': -1, 'Glucose': -1,
+      'Acetyl-CoA': 2, 'Acetoacetyl-CoA': 2, 'HMG-CoA': 1, 'Acetoacetate': 2, 'β-OH-butyrate': 3,
+      'Malate': 2, 'OAA': -2, 'Citrate': 1, 'Isocitrate': 1, 'α-KG': 1, 'Fatty acid': 1, 'Acyl-CoA': 1 } },
+
+  // ---- HORMONAL ----
+  { id: 'insulin', name: 'Insulin (fed signal)', cat: 'Hormonal',
+    desc: '↑PFK-2 → ↑F2,6-BP → activates PFK-1 & inhibits FBPase-1; also activates PDH, glycogen synthase, ACC (FA synthesis), and dephosphorylates many key enzymes.',
+    activates: ['PFK-1', 'PDH', 'Hexokinase', 'PK', 'Glycogen synthase', 'UDP-Glc PPase', 'ACC', 'FAS'],
+    inhibits: ['Glycogen phos.', 'PC', 'PEPCK', 'FBPase-1', 'G6Pase', 'HMG-CoA syn.', 'Lipase', 'β-ox spiral'],
+    effects: { 'Glycogen': 3, 'G1P': -1, 'UDP-Glucose': 2, 'Glucose-6-P': 1, 'Fructose-1,6-BP': 2, 'Pyruvate': 1, 'Acetyl-CoA': 2, 'Citrate': 2, 'ATP': 1, 'NADH': 1, 'CO2': 1, '6-PG': 1, 'NADPH': 2,
+      'Malonyl-CoA': 3, 'Fatty acid': 1, 'Triglyceride': 3, 'Acyl-CoA': -1, 'Acetoacetate': -2, 'β-OH-butyrate': -2 } },
+
+  { id: 'glucagon', name: 'Glucagon (fasting signal)', cat: 'Hormonal',
+    desc: 'PKA → ↓PFK-2 → ↓F2,6-BP → ↓PFK-1, ↑FBPase-1. Activates glycogen phos., PC, PEPCK; promotes β-oxidation + ketogenesis.',
+    inhibits: ['PFK-1', 'PK'],
+    activates: ['Glycogen phos.', 'PC', 'PEPCK', 'FBPase-1', 'G6Pase', 'β-ox spiral', 'HMG-CoA syn.', 'Lipase'],
+    inhibits: ['PFK-1', 'PK', 'Glycogen synthase', 'ACC', 'FAS'],
+    effects: { 'Glycogen': -2, 'G1P': 1, 'UDP-Glucose': -2, 'Glucose-6-P': 1, 'Glucose': 1, 'Fructose-6-P': 1, 'Fructose-1,6-BP': -2, 'PEP': 1, 'Pyruvate': -2, 'Lactate': -1,
+      'Triglyceride': -2, 'Fatty acid': 1, 'Acyl-CoA': 1, 'Malonyl-CoA': -3, 'Acetyl-CoA': 1, 'HMG-CoA': 1, 'Acetoacetate': 2, 'β-OH-butyrate': 2, 'NADH': -1 } },
+
+  // ---- ALLOSTERIC ----
+  { id: 'high-citrate', name: 'High citrate', cat: 'Allosteric',
+    desc: 'Citrate signals abundant TCA → feedback inhibits PFK-1, activates ACC (→ FA synthesis).',
+    inhibits: ['PFK-1'],
+    effects: { 'Citrate': 2, 'Fructose-6-P': 1, 'Fructose-1,6-BP': -2, 'GAP': -1, 'Pyruvate': -1, 'Acetyl-CoA': -1, 'NADH': -1 } },
+
+  { id: 'high-nadh', name: 'High NADH:NAD⁺', cat: 'Allosteric',
+    desc: 'NADH inhibits PDH, IDH, α-KGDH, MDH allosterically. TCA grinds; pyruvate → lactate.',
+    inhibits: ['PDH', 'IDH', 'α-KGDH', 'MDH'],
+    effects: { 'NADH': 2, 'NAD+': -2, 'Pyruvate': 2, 'Lactate': 2, 'Acetyl-CoA': -1, 'Citrate': 1, 'Isocitrate': 2, 'α-KG': 2, 'Succinyl-CoA': -1, 'Malate': 2, 'OAA': -2, 'ATP': -1 } },
+
+  { id: 'high-atp', name: 'High ATP / energy charge', cat: 'Allosteric',
+    desc: 'Plentiful ATP → inhibits PFK-1, PK, IDH; product inhibition of citrate synthase.',
+    inhibits: ['PFK-1', 'PK', 'IDH', 'Citrate synthase'],
+    effects: { 'ATP': 2, 'ADP': -1, 'Fructose-6-P': 1, 'Fructose-1,6-BP': -2, 'PEP': 1, 'Pyruvate': -1, 'Acetyl-CoA': 1, 'Citrate': 1, 'Isocitrate': 2, 'α-KG': -1 } },
+
+  // ---- GENETIC / DISEASE ----
+  { id: 'g6pd-deficiency', name: 'G6PD deficiency', cat: 'Genetic / disease',
+    desc: 'Most common enzyme deficiency. ↓NADPH → glutathione cannot be regenerated → RBC hemolysis under oxidative stress (fava beans, primaquine, sulfa drugs, infection).',
+    inhibits: ['G6PD'],
+    effects: { 'Glucose-6-P': 1, '6-PG': -3, 'Ribulose-5-P': -3, 'Ribose-5-P': -2, 'NADPH': -3, 'NADP+': 2 } },
+
+  { id: 'carnitine-def', name: 'Carnitine deficiency', cat: 'Genetic / disease',
+    desc: 'Long-chain acyl-CoA cannot enter mito (CPT1/CPT2 require carnitine). Hypoketotic hypoglycemia, muscle weakness, cardiomyopathy.',
+    inhibits: ['β-ox spiral'],
+    effects: { 'Fatty acid': 1, 'Acyl-CoA': 3, 'Acetyl-CoA': -1, 'Acetoacetyl-CoA': -2, 'HMG-CoA': -2, 'Acetoacetate': -3, 'β-OH-butyrate': -3, 'NADH': -1, 'FADH2': -1, 'ATP': -1, 'Glucose': -1 } },
+
+  { id: 'otc-deficiency', name: 'Urea cycle defect (OTC)', cat: 'Genetic / disease',
+    desc: 'OTC deficiency = X-linked, most common urea cycle disorder. NH4+ accumulates → hyperammonemia → CNS toxicity. Tx: low-protein diet, benzoate, lactulose.',
+    inhibits: ['OTC'],
+    effects: { 'NH4+': 3, 'Carbamoyl-P': 3, 'Citrulline': -3, 'Argininosuccinate': -3, 'Arginine': -3, 'Ornithine': 2, 'Urea': -3 } },
+
+  { id: 'pdh-deficiency', name: 'PDH deficiency', cat: 'Genetic / disease',
+    desc: 'Congenital pyruvate dehydrogenase deficiency. Pyruvate cannot enter TCA → lactic acidosis, neurological symptoms. Tx: ketogenic diet (bypasses PDH).',
+    inhibits: ['PDH'],
+    effects: { 'Pyruvate': 3, 'Lactate': 3, 'Alanine': 2, 'Acetyl-CoA': -2, 'Citrate': -1, 'NADH': -1, 'ATP': -1, 'CO2': -1 } },
+
+  { id: 'hyperammonemia', name: 'Hyperammonemia', cat: 'Genetic / disease',
+    desc: 'Liver failure or any UCD. NH₄⁺ pulls α-KG → Glutamate → Glutamine (GS in astrocytes); TCA depletes, cerebral edema. Tx: lactulose, rifaximin, benzoate.',
+    effects: { 'NH4+': 3, 'Glutamate': 3, 'Glutamine': 3, 'α-KG': -3, 'Succinyl-CoA': -2, 'Succinate': -1,
+      'Fumarate': -1, 'Malate': -1, 'OAA': -2, 'Citrate': -1, 'Acetyl-CoA': 1, 'Urea': -2, 'ATP': -1, 'AA pool': 1 } },
+
+  { id: 'msud', name: 'Maple Syrup Urine Disease', cat: 'Genetic / disease',
+    desc: 'Branched-chain α-keto acid dehydrogenase deficient. Val/Leu/Ile accumulate → maple-syrup–smelling urine, neuro toxicity in neonates.',
+    effects: { 'AA pool': 3, 'Acetyl-CoA': -1, 'Succinyl-CoA': -2, 'NH4+': 1, 'ATP': -1 } },
+
+  { id: 'thiamine-def', name: 'Thiamine deficiency (B1)', cat: 'Genetic / disease',
+    desc: 'Wernicke–Korsakoff (alcoholism, malnutrition). Thiamine is a cofactor for PDH, α-KGDH, transketolase (PPP), and BCKDH.',
+    inhibits: ['PDH', 'α-KGDH'],
+    effects: { 'Pyruvate': 2, 'Lactate': 2, 'Alanine': 1, 'Acetyl-CoA': -2, 'α-KG': 2, 'Succinyl-CoA': -2,
+      'Citrate': -1, 'NADH': -1, 'ATP': -2, 'AA pool': 1, '6-PG': 1, 'NADPH': -1 } },
+
+  // ---- PROTEIN / DIET ----
+  { id: 'high-protein', name: 'High-protein meal', cat: 'Substrate',
+    desc: 'Excess AAs → transaminated → carbon skeletons feed TCA, N → urea cycle. Urea output ↑↑; mild gluconeogenic push.',
+    activates: ['ALT', 'GDH', 'CPS1', 'OTC', 'ASS', 'ASL', 'Arginase'],
+    effects: { 'AA pool': 3, 'Alanine': 2, 'Glutamate': 2, 'Glutamine': 2, 'Aspartate': 2,
+      'NH4+': 2, 'Carbamoyl-P': 2, 'Citrulline': 2, 'Argininosuccinate': 1, 'Arginine': 1, 'Ornithine': 1, 'Urea': 3,
+      'Pyruvate': 1, 'OAA': 1, 'α-KG': 1, 'Acetyl-CoA': 1, 'Succinyl-CoA': 1, 'Fumarate': 1, 'CO2': 1 } },
+
+  // ---- LIPOGENESIS ----
+  { id: 'lipogenesis', name: 'Active lipogenesis (fed + high citrate)', cat: 'Allosteric',
+    desc: 'High insulin + ↑citrate → cytosolic acetyl-CoA → ACC → malonyl-CoA → FAS → palmitate → triglyceride. Malonyl-CoA blocks CPT1 (no β-ox while building fat).',
+    activates: ['ACC', 'FAS'],
+    inhibits: ['β-ox spiral'],
+    effects: { 'Citrate': 1, 'Acetyl-CoA': 1, 'Malonyl-CoA': 3, 'Fatty acid': 2, 'Triglyceride': 3,
+      'Acyl-CoA': -1, 'Acetoacetate': -2, 'β-OH-butyrate': -2, 'NADPH': -2 } },
+
+  // ---- DRUGS ----
+  { id: 'metformin', name: 'Metformin', cat: 'Drug',
+    desc: 'First-line T2DM drug. Mild Complex I inhibitor → AMP↑ → activates AMPK → ↓gluconeogenesis, ↑glucose uptake. Risk: lactic acidosis.',
+    inhibits: ['Complex I', 'PC', 'G6Pase'],
+    activates: ['PFK-1'],
+    effects: { 'NADH': 1, 'NAD+': -1, 'ATP': -1, 'ADP': 1, 'Lactate': 2, 'Pyruvate': 1, 'Glucose': -1, 'Glucose-6-P': -1, 'OAA': -1 } },
+
+  { id: 'aspirin-od', name: 'Aspirin (salicylate) overdose', cat: 'Drug',
+    desc: 'High-dose salicylate uncouples OxPhos (mild) + stimulates respiratory center → mixed respiratory alkalosis + metabolic acidosis.',
+    effects: { 'H⁺ gradient': -2, 'ATP': -2, 'O2': -1, 'NADH': -1, 'Lactate': 2, 'CO2': 1 } },
+
+  { id: 'statin', name: 'Statin (HMG-CoA reductase)', cat: 'Drug',
+    desc: 'Inhibits cytosolic HMG-CoA reductase — committed step of cholesterol synthesis. Lowers LDL; modest HDL ↑. Ketogenesis (mito HMG-CoA lyase) unaffected.',
+    inhibits: ['HMG-CoA reductase'],
+    effects: { 'Mevalonate': -3, 'Squalene': -2, 'Cholesterol': -3, 'Bile acids': -1, 'Steroid hormones': -1, 'Vitamin D': -1 } },
+
+  // ---- CHOLESTEROL / STEROID ----
+  { id: 'lipogenesis-chol', name: 'Insulin / fed → cholesterol synthesis', cat: 'Allosteric',
+    desc: 'Insulin dephosphorylates (activates) HMG-CoA reductase; citrate supplies cytosolic acetyl-CoA. Cholesterol + bile acid + steroid output rise.',
+    activates: ['HMG-CoA reductase'],
+    effects: { 'Acetyl-CoA': 1, 'Mevalonate': 3, 'Squalene': 2, 'Cholesterol': 2, 'Bile acids': 1, 'Steroid hormones': 1, 'Vitamin D': 1, 'NADPH': -1 } },
+
+  // ---- HEME / PORPHYRIA ----
+  { id: 'lead', name: 'Lead poisoning', cat: 'Toxin / disease',
+    desc: 'Inhibits ALA dehydratase AND ferrochelatase. Microcytic anemia, basophilic stippling, abdominal colic, peripheral neuropathy, ↑ALA + protoporphyrin.',
+    inhibits: ['ALA dehydratase', 'Ferrochelatase'],
+    effects: { 'δ-ALA': 3, 'PBG': -2, 'Uropor III': -2, 'Protopor IX': 3, 'Heme': -3 } },
+
+  { id: 'aip', name: 'Acute Intermittent Porphyria', cat: 'Genetic / disease',
+    desc: 'PBG deaminase deficiency. ↓Heme de-represses ALA synthase → ALA + PBG flood. Painful abdomen, neuro/psych, port-wine urine. Tx: hemin, glucose.',
+    inhibits: ['PBG deaminase'],
+    effects: { 'δ-ALA': 3, 'PBG': 3, 'Uropor III': -3, 'Protopor IX': -2, 'Heme': -2 } },
+
+  { id: 'pct', name: 'Porphyria Cutanea Tarda', cat: 'Genetic / disease',
+    desc: 'Uroporphyrinogen decarboxylase deficiency — most common porphyria. Blistering photosensitivity, tea-colored urine. Triggers: alcohol, HCV, iron, estrogen.',
+    effects: { 'PBG': 1, 'Uropor III': 3, 'Protopor IX': -1, 'Heme': -1 } },
+
+  // ---- NUCLEOTIDE DRUGS / DISEASE ----
+  { id: 'methotrexate', name: 'Methotrexate (DHFR)', cat: 'Drug',
+    desc: 'Inhibits dihydrofolate reductase → no THF regeneration → blocks dTMP (and de novo purine) synthesis. Chemo, RA, psoriasis, ectopic pregnancy. Rescue: leucovorin.',
+    inhibits: ['Thymidylate synthase'],
+    effects: { 'dTMP': -3, 'IMP': -2, 'AMP': -1, 'GMP': -1, 'UMP': 1 } },
+
+  { id: '5fu', name: '5-Fluorouracil (TS)', cat: 'Drug',
+    desc: 'Forms F-dUMP → covalently blocks thymidylate synthase → "thymineless death". Colorectal/breast/GI chemo. Toxicity worsened by DPD deficiency.',
+    inhibits: ['Thymidylate synthase'],
+    effects: { 'UMP': 1, 'dTMP': -3 } },
+
+  { id: '6mp', name: '6-Mercaptopurine / Azathioprine', cat: 'Drug',
+    desc: 'Active form inhibits PRPP amidotransferase (committed step of de novo purines). ALL, IBD, transplant. Allopurinol blocks its breakdown → toxicity (lower the dose).',
+    effects: { 'PRPP': 1, 'IMP': -3, 'AMP': -2, 'GMP': -2, 'Uric acid': -1 } },
+
+  { id: 'hydroxyurea', name: 'Hydroxyurea (RNR)', cat: 'Drug',
+    desc: 'Inhibits ribonucleotide reductase → ↓dNTPs → S-phase arrest. Also ↑HbF in sickle cell. CML, polycythemia vera.',
+    effects: { 'dTMP': -2, 'AMP': -1, 'GMP': -1, 'UMP': 1 } },
+
+  { id: 'allopurinol', name: 'Allopurinol / Febuxostat (XO)', cat: 'Drug',
+    desc: 'Inhibits xanthine oxidase → ↓uric acid. Chronic gout, tumor lysis prophylaxis. Builds up xanthine/hypoxanthine (more soluble).',
+    inhibits: ['Xanthine oxidase'],
+    effects: { 'Hypoxanthine': 2, 'Uric acid': -3 } },
+
+  { id: 'lesch-nyhan', name: 'Lesch-Nyhan (HGPRT)', cat: 'Genetic / disease',
+    desc: 'X-linked HGPRT deficiency — no purine salvage. PRPP accumulates → de novo overdrive → hyperuricemia, gout, self-mutilation, dystonia, intellectual disability.',
+    effects: { 'PRPP': 2, 'IMP': 1, 'AMP': 1, 'GMP': 1, 'Hypoxanthine': 3, 'Uric acid': 3 } },
+
+  { id: 'tumor-lysis', name: 'Tumor lysis syndrome', cat: 'Toxin / disease',
+    desc: 'Massive cell death after chemo dumps nucleic acids → ↑↑uric acid (+ K⁺, phosphate). Acute urate nephropathy. Prevent with hydration, allopurinol, rasburicase.',
+    effects: { 'AMP': 2, 'GMP': 2, 'Hypoxanthine': 3, 'Uric acid': 3, 'PRPP': -1 } },
+
+  // ---- ONCOMETABOLITE ----
+  { id: 'idh-mutation', name: 'IDH1/2 mutation (2-HG)', cat: 'Genetic / disease',
+    desc: 'Mutant IDH gains neomorphic activity: α-KG → D-2-hydroxyglutarate. 2-HG inhibits α-KG-dependent dioxygenases → DNA/histone hypermethylation. Gliomas, AML, chondrosarcoma.',
+    inhibits: ['IDH'],
+    effects: { 'Isocitrate': 2, 'α-KG': -2, 'Succinyl-CoA': -1, 'Succinate': -1, 'NADPH': -2, 'NADP+': 1 } },
+
+  { id: 'b6-deficiency', name: 'Vitamin B6 deficiency', cat: 'Toxin / disease',
+    desc: 'B6 (PLP) is the cofactor for transaminases (ALT, AST), GDH, glycogen phos., and ALA synthase. Causes: isoniazid, alcoholism. → sideroblastic anemia, neuropathy.',
+    inhibits: ['ALT', 'AST', 'GDH', 'ALA synthase'],
+    effects: { 'Alanine': 1, 'Glutamate': -1, 'Aspartate': -1, 'α-KG': -1, 'δ-ALA': -2, 'PBG': -1, 'Heme': -2, 'Urea': -1 } },
+];
+
+// ============================================
+// STATE
+// ============================================
+
+const activePerturbations = new Set();
+let selectedMetabolite = null;
+let selectedPerturbation = null;
+
+function computeState() {
+  const state = {};
+  for (const m in M) state[m] = 0;
+  for (const pid of activePerturbations) {
+    const p = P.find(x => x.id === pid);
+    if (!p) continue;
+    for (const [m, d] of Object.entries(p.effects || {})) {
+      if (state[m] === undefined) continue; // skip unknown metabolites
+      state[m] = state[m] + d;
+    }
+  }
+  for (const m in state) state[m] = Math.max(-3, Math.min(3, state[m]));
+  return state;
+}
+
+function deltaClass(d) {
+  if (d >= 2) return 'up2';
+  if (d === 1) return 'up';
+  if (d === 0) return 'unchanged';
+  if (d === -1) return 'down';
+  return 'down2';
+}
+function deltaArrow(d) {
+  if (d >= 2) return '↑↑';
+  if (d === 1) return '↑';
+  if (d === 0) return '=';
+  if (d === -1) return '↓';
+  return '↓↓';
+}
+function deltaLabel(d) {
+  if (d >= 2) return 'Strongly increased';
+  if (d === 1) return 'Increased';
+  if (d === 0) return 'Unchanged';
+  if (d === -1) return 'Decreased';
+  return 'Strongly decreased';
+}
+
+// ============================================
+// RENDERING
+// ============================================
+
+function nodeWidth(name) {
+  return Math.max(80, name.length * 7.2 + 34);
+}
+const NODE_H = 32;
+
+function renderNodes(state) {
+  const g = document.getElementById('nodes');
+  const items = [];
+  for (const [name, m] of Object.entries(M)) {
+    const w = nodeWidth(name);
+    const d = state[name] || 0;
+    const cls = `node ${deltaClass(d)}${m.cofactor ? ' cofactor' : ''}${selectedMetabolite === name ? ' selected' : ''}`;
+    items.push(
+      `<g class="${cls}" transform="translate(${m.x},${m.y})" data-name="${escapeAttr(name)}">` +
+        `<rect x="${-w/2}" y="${-NODE_H/2}" width="${w}" height="${NODE_H}" rx="6"/>` +
+        `<text class="label" x="${-w/2 + 8}" y="0" text-anchor="start">${escapeText(name)}</text>` +
+        `<text class="delta" x="${w/2 - 12}" y="0" text-anchor="middle">${deltaArrow(d)}</text>` +
+      `</g>`
+    );
+  }
+  g.innerHTML = items.join('');
+}
+
+function getEdgeEnzymeStatus(enzymeName) {
+  let inhibited = false, activated = false;
+  for (const pid of activePerturbations) {
+    const p = P.find(x => x.id === pid);
+    if (!p) continue;
+    if (p.inhibits && p.inhibits.includes(enzymeName)) inhibited = true;
+    if (p.activates && p.activates.includes(enzymeName)) activated = true;
+  }
+  if (inhibited) return 'inhibited';
+  if (activated) return 'activated';
+  return '';
+}
+
+function intersectRect(cx, cy, w, h, tx, ty) {
+  const dx = tx - cx, dy = ty - cy;
+  if (dx === 0 && dy === 0) return { x: cx, y: cy };
+  const hw = w / 2, hh = h / 2;
+  const sx = dx === 0 ? Infinity : hw / Math.abs(dx);
+  const sy = dy === 0 ? Infinity : hh / Math.abs(dy);
+  const s = Math.min(sx, sy);
+  return { x: cx + dx * s, y: cy + dy * s };
+}
+
+function renderEdges() {
+  const g = document.getElementById('edges');
+  const labelDrawn = new Set();
+  const items = [];
+
+  for (const edge of E) {
+    const src = M[edge.from], tgt = M[edge.to];
+    if (!src || !tgt) continue;
+
+    const srcW = nodeWidth(edge.from), tgtW = nodeWidth(edge.to);
+    const start = intersectRect(src.x, src.y, srcW + 2, NODE_H + 2, tgt.x, tgt.y);
+    const end = intersectRect(tgt.x, tgt.y, tgtW + 12, NODE_H + 12, src.x, src.y);
+
+    const status = getEdgeEnzymeStatus(edge.e);
+    let classes = ['edge'];
+    if (edge.cofactor) classes.push('cofactor-edge');
+    if (edge.gluconeogenesis) classes.push('gluconeogenesis');
+    if (status) classes.push(status);
+    const cls = classes.join(' ');
+
+    let marker;
+    if (status === 'inhibited') marker = 'arrow-down';
+    else if (status === 'activated') marker = 'arrow-up';
+    else if (edge.gluconeogenesis) marker = 'arrow-gluco';
+    else marker = 'arrow';
+
+    if (edge.curved) {
+      const mx = (start.x + end.x) / 2;
+      const my = (start.y + end.y) / 2;
+      const dx = end.x - start.x, dy = end.y - start.y;
+      const len = Math.sqrt(dx*dx + dy*dy) || 1;
+      const curveAmt = Math.min(50, len * 0.18);
+      const ox = -dy / len * curveAmt, oy = dx / len * curveAmt;
+      items.push(`<path class="${cls}" d="M ${start.x} ${start.y} Q ${mx + ox} ${my + oy} ${end.x} ${end.y}" marker-end="url(#${marker})" stroke-opacity="${edge.cofactor ? 0.45 : 1}"/>`);
+    } else {
+      items.push(`<line class="${cls}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" marker-end="url(#${marker})" stroke-opacity="${edge.cofactor ? 0.45 : 1}"/>`);
+    }
+
+    if (!edge.noLabel && !labelDrawn.has(edge.e)) {
+      const lx = (start.x + end.x) / 2;
+      const ly = (start.y + end.y) / 2;
+      const dx = end.x - start.x, dy = end.y - start.y;
+      const len = Math.sqrt(dx*dx + dy*dy) || 1;
+      let offsetMag = 11;
+      if (edge.curved) {
+        const curveAmt = Math.min(50, len * 0.18);
+        offsetMag = curveAmt * 0.55 + 6;
+      }
+      const ox = -dy / len * offsetMag;
+      const oy = dx / len * offsetMag;
+      const labelText = edge.e;
+      const textW = labelText.length * 5.8 + 8;
+      let labelCls = `edge-label ${status}`;
+      if (edge.gluconeogenesis && !status) labelCls = 'edge-label gluconeogenesis';
+      items.push(`<rect x="${lx + ox - textW/2}" y="${ly + oy - 7}" width="${textW}" height="13" rx="3" fill="#0d1117" opacity="0.92"/>`);
+      items.push(`<text class="${labelCls}" x="${lx + ox}" y="${ly + oy + 0.5}" text-anchor="middle" dominant-baseline="middle">${escapeText(labelText)}</text>`);
+      labelDrawn.add(edge.e);
+    }
+  }
+  g.innerHTML = items.join('');
+}
+
+function renderPerturbationList() {
+  const list = document.getElementById('perturbations-list');
+  const grouped = {};
+  for (const p of P) {
+    (grouped[p.cat] = grouped[p.cat] || []).push(p);
+  }
+  const html = [];
+  for (const cat of Object.keys(grouped)) {
+    html.push(`<div class="category-header"><div class="category-dot"></div>${escapeText(cat)}</div>`);
+    for (const p of grouped[cat]) {
+      const isActive = activePerturbations.has(p.id);
+      html.push(
+        `<div class="perturbation ${isActive ? 'active' : ''}" data-id="${escapeAttr(p.id)}">` +
+          `<div class="checkbox"></div>` +
+          `<div class="info">` +
+            `<div class="name">${escapeText(p.name)}</div>` +
+            `<div class="desc">${escapeText(p.desc)}</div>` +
+          `</div>` +
+        `</div>`
+      );
+    }
+  }
+  list.innerHTML = html.join('');
+}
+
+function renderMetaboliteLists(state) {
+  const groups = { glycolysis: [], 'glycogen-ppp': [], tca: [], 'fa-ketones': [], protein: [], urea: [], sterol: [], heme: [], nucleotide: [], etc: [] };
+  for (const [name, m] of Object.entries(M)) {
+    if (groups[m.pathway]) groups[m.pathway].push(name);
+  }
+  const ids = {
+    glycolysis: 'list-glycolysis',
+    'glycogen-ppp': 'list-glycogen-ppp',
+    tca: 'list-tca',
+    'fa-ketones': 'list-fa-ketones',
+    protein: 'list-protein',
+    urea: 'list-urea',
+    sterol: 'list-sterol',
+    heme: 'list-heme',
+    nucleotide: 'list-nucleotide',
+    etc: 'list-etc'
+  };
+  for (const pathway of Object.keys(groups)) {
+    const ul = document.getElementById(ids[pathway]);
+    if (!ul) continue;
+    ul.innerHTML = groups[pathway].map(n => {
+      const d = state[n] || 0;
+      const cls = deltaClass(d);
+      const selectedCls = selectedMetabolite === n ? ' selected' : '';
+      return `<div class="metabolite-row${selectedCls}" data-name="${escapeAttr(n)}">
+        <span class="name">${escapeText(n)}</span>
+        <span class="change ${cls}">${deltaArrow(d)}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+function renderDetail(state) {
+  const d = document.getElementById('detail');
+  if (selectedPerturbation) {
+    const p = P.find(x => x.id === selectedPerturbation);
+    if (p) {
+      const effectsList = Object.entries(p.effects || {})
+        .filter(([k, v]) => v !== 0 && M[k])
+        .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+      d.innerHTML = `
+        <h4>${escapeText(p.name)}</h4>
+        <div class="label-pair"><span class="k">Category</span><span>${escapeText(p.cat)}</span></div>
+        ${p.inhibits ? `<div class="label-pair"><span class="k">Inhibits</span><span class="change down" style="text-align:right">${p.inhibits.map(escapeText).join(', ')}</span></div>` : ''}
+        ${p.activates ? `<div class="label-pair"><span class="k">Activates</span><span class="change up" style="text-align:right">${p.activates.map(escapeText).join(', ')}</span></div>` : ''}
+        <p style="margin-top:10px;font-size:11.5px;color:var(--text-2);line-height:1.5">${escapeText(p.desc)}</p>
+        ${effectsList.length ? `
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
+            <div style="font-size:10.5px;color:var(--text-2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Direct effects</div>
+            ${effectsList.map(([k, v]) =>
+              `<div class="driver-row"><span>${escapeText(k)}</span><span class="change ${deltaClass(v)}">${v > 0 ? '+' : ''}${v}</span></div>`
+            ).join('')}
+          </div>` : ''}
+      `;
+      return;
+    }
+  }
+  if (selectedMetabolite) {
+    const m = M[selectedMetabolite];
+    if (m) {
+      const val = state[selectedMetabolite] || 0;
+      const drivers = [];
+      for (const pid of activePerturbations) {
+        const p = P.find(x => x.id === pid);
+        if (!p || !p.effects) continue;
+        if (p.effects[selectedMetabolite] !== undefined && p.effects[selectedMetabolite] !== 0) {
+          drivers.push({ name: p.name, delta: p.effects[selectedMetabolite] });
+        }
+      }
+      const pathwayLabels = {
+        glycolysis: 'Glycolysis',
+        'glycogen-ppp': 'Glycogen / PPP',
+        tca: 'TCA Cycle',
+        'fa-ketones': 'Lipids · β-Ox · Ketones',
+        protein: 'Amino Acids / Protein',
+        urea: 'Urea Cycle',
+        sterol: 'Cholesterol / Steroids',
+        heme: 'Heme Synthesis',
+        nucleotide: 'Purines / Pyrimidines',
+        etc: 'ETC / OxPhos'
+      };
+      d.innerHTML = `
+        <h4>${escapeText(selectedMetabolite)}</h4>
+        <div class="label-pair"><span class="k">State</span><span class="change ${deltaClass(val)}">${deltaArrow(val)} &nbsp; ${deltaLabel(val)}</span></div>
+        <div class="label-pair"><span class="k">Pathway</span><span>${pathwayLabels[m.pathway] || m.pathway}</span></div>
+        <p style="margin-top:8px;font-size:11.5px;color:var(--text-2);line-height:1.5">${escapeText(m.info || '')}</p>
+        ${drivers.length ? `
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
+            <div style="font-size:10.5px;color:var(--text-2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Affected by</div>
+            ${drivers.map(dr => `<div class="driver-row">
+              <span>${escapeText(dr.name)}</span><span class="change ${deltaClass(dr.delta)}">${dr.delta > 0 ? '+' : ''}${dr.delta}</span>
+            </div>`).join('')}
+          </div>` : ''}
+      `;
+      return;
+    }
+  }
+  d.innerHTML = `<p class="muted">Click a metabolite in the pathway or list, or any perturbation, for details.</p>`;
+}
+
+function renderAll() {
+  const state = computeState();
+  renderNodes(state);
+  renderEdges();
+  renderMetaboliteLists(state);
+  renderDetail(state);
+  const count = activePerturbations.size;
+  const badge = document.getElementById('active-count');
+  badge.textContent = count;
+  badge.classList.toggle('zero', count === 0);
+}
+
+function escapeText(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escapeAttr(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ============================================
+// EVENTS
+// ============================================
+
+renderPerturbationList();
+renderAll();
+
+document.getElementById('perturbations-list').addEventListener('click', (e) => {
+  const el = e.target.closest('.perturbation');
+  if (!el) return;
+  const id = el.dataset.id;
+  if (activePerturbations.has(id)) activePerturbations.delete(id);
+  else activePerturbations.add(id);
+  selectedPerturbation = id;
+  selectedMetabolite = null;
+  renderPerturbationList();
+  renderAll();
+});
+
+document.getElementById('pathway-svg').addEventListener('click', (e) => {
+  const node = e.target.closest('.node');
+  if (node) {
+    selectedMetabolite = node.dataset.name;
+    selectedPerturbation = null;
+    renderAll();
+  }
+});
+
+document.querySelector('aside.right').addEventListener('click', (e) => {
+  const row = e.target.closest('.metabolite-row');
+  if (row) {
+    selectedMetabolite = row.dataset.name;
+    selectedPerturbation = null;
+    renderAll();
+  }
+});
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  activePerturbations.clear();
+  selectedMetabolite = null;
+  selectedPerturbation = null;
+  renderPerturbationList();
+  renderAll();
+});
+</script>
+</body>
+</html>
