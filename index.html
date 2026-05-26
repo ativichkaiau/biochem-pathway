@@ -30,6 +30,15 @@
   --glow1: rgba(88, 166, 255, 0.04);
   --glow2: rgba(86, 211, 100, 0.04);
   --glow3: rgba(210, 153, 34, 0.04);
+  --glass: rgba(18, 23, 31, 0.55);
+  --glass-2: rgba(28, 34, 44, 0.72);
+  --glass-brd: rgba(255, 255, 255, 0.08);
+  --glass-hi: rgba(255, 255, 255, 0.10);
+  --shadow: rgba(0, 0, 0, 0.45);
+  --blob1: rgba(56, 130, 246, 0.42);
+  --blob2: rgba(167, 85, 247, 0.36);
+  --blob3: rgba(20, 200, 170, 0.32);
+  --base-grad: radial-gradient(120% 120% at 50% 0%, #11161f 0%, #0a0d13 60%, #070a0f 100%);
 }
 body.light {
   --bg: #f6f8fa;
@@ -55,41 +64,84 @@ body.light {
   --glow1: rgba(9, 105, 218, 0.05);
   --glow2: rgba(26, 127, 55, 0.05);
   --glow3: rgba(154, 103, 0, 0.05);
+  --glass: rgba(255, 255, 255, 0.6);
+  --glass-2: rgba(255, 255, 255, 0.8);
+  --glass-brd: rgba(15, 23, 42, 0.08);
+  --glass-hi: rgba(255, 255, 255, 0.9);
+  --shadow: rgba(80, 100, 140, 0.18);
+  --blob1: rgba(56, 130, 246, 0.22);
+  --blob2: rgba(167, 85, 247, 0.18);
+  --blob3: rgba(20, 184, 166, 0.18);
+  --base-grad: radial-gradient(120% 120% at 50% 0%, #f3f6fb 0%, #eef2f8 55%, #e7edf5 100%);
 }
 html, body { height: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
   background: var(--bg);
+  background-image: var(--base-grad);
+  background-attachment: fixed;
   color: var(--text);
   overflow: hidden;
   font-size: 13px;
 }
+/* ===== Atmosphere: 3 living blobs ===== */
+#atmos { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+#atmos .blob { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; }
+#atmos .b1 { width: 52vw; height: 52vw; left: -8vw; top: -12vw;
+  background: radial-gradient(circle at 50% 50%, var(--blob1), transparent 70%); animation: drift1 28s ease-in-out infinite; }
+#atmos .b2 { width: 46vw; height: 46vw; right: -10vw; bottom: -14vw;
+  background: radial-gradient(circle at 50% 50%, var(--blob2), transparent 70%); animation: drift2 34s ease-in-out infinite; }
+#atmos .b3 { width: 40vw; height: 40vw; left: 42vw; top: 34vh;
+  background: radial-gradient(circle at 50% 50%, var(--blob3), transparent 70%); animation: drift3 31s ease-in-out infinite; }
+@keyframes drift1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(7vw,6vh) scale(1.14)} }
+@keyframes drift2 { 0%,100%{transform:translate(0,0) scale(1.05)} 50%{transform:translate(-6vw,-5vh) scale(0.92)} }
+@keyframes drift3 { 0%,100%{transform:translate(0,0) scale(0.95)} 50%{transform:translate(-8vw,4vh) scale(1.18)} }
+@media (prefers-reduced-motion: reduce) { #atmos .blob { animation: none; } }
+header, .layout { position: relative; z-index: 1; }
 header {
-  height: 60px;
-  padding: 0 20px;
-  background: linear-gradient(180deg, var(--panel-2) 0%, var(--panel) 100%);
-  border-bottom: 1px solid var(--border);
+  height: 64px;
+  padding: 0 22px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+  border-bottom: 1px solid var(--glass-brd);
+  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 8px 30px -12px var(--shadow);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-header h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
-header h1 .accent { color: var(--accent); margin-left: 4px; font-weight: 400; }
-.subtitle { color: var(--text-2); font-size: 11px; margin-top: 2px; }
+.brand { display: flex; align-items: center; gap: 11px; }
+.brand-mark {
+  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+  display: grid; place-items: center; font-size: 17px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  box-shadow: 0 4px 14px -3px var(--accent), 0 0 0 1px var(--glass-hi) inset;
+}
+header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.1; }
+header h1 .accent {
+  background: linear-gradient(120deg, var(--accent), var(--purple) 90%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  margin-left: 5px; font-weight: 700;
+}
+.subtitle { color: var(--text-2); font-size: 11px; margin-top: 1px; }
 .btn {
-  background: var(--panel-2);
+  background: var(--glass-2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-brd);
   padding: 7px 14px;
-  border-radius: 6px;
+  border-radius: 9px;
   cursor: pointer;
   font-size: 12px;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
 }
-.btn:hover { background: var(--border); }
+.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
 .count-badge {
   display: inline-block;
   padding: 1px 7px;
@@ -110,21 +162,23 @@ header h1 .accent { color: var(--accent); margin-left: 4px; font-weight: 400; }
 .layout {
   display: grid;
   grid-template-columns: 310px 1fr 310px;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 64px);
 }
 .layout.hide-left { grid-template-columns: 0 1fr 310px; }
 .layout.hide-right { grid-template-columns: 310px 1fr 0; }
 .layout.hide-left.hide-right { grid-template-columns: 0 1fr 0; }
 
 aside {
-  background: var(--panel);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 0;
   padding: 16px;
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--glass-brd);
 }
-aside.right { border-right: none; border-left: 1px solid var(--border); }
+aside.right { border-right: none; border-left: 1px solid var(--glass-brd); }
 .layout.hide-left #perturbations-aside,
 .layout.hide-right aside.right { padding: 0; border: none; }
 aside h2 {
@@ -199,11 +253,7 @@ aside h2 {
 
 main {
   overflow: auto;
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(circle at 15% 15%, var(--glow1), transparent 40%),
-    radial-gradient(circle at 75% 70%, var(--glow2), transparent 40%),
-    radial-gradient(circle at 50% 95%, var(--glow3), transparent 40%);
+  background: transparent;
 }
 
 svg { display: block; min-width: 2560px; }
@@ -323,10 +373,10 @@ svg { display: block; min-width: 2560px; }
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  padding: 8px;
-  background: var(--panel-2);
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  padding: 9px;
+  background: var(--glass-2);
+  border-radius: 10px;
+  border: 1px solid var(--glass-brd);
 }
 .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10.5px; }
 .legend-box {
@@ -337,10 +387,10 @@ svg { display: block; min-width: 2560px; }
 }
 
 .detail-box {
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 12px;
+  background: var(--glass-2);
+  border: 1px solid var(--glass-brd);
+  border-radius: 10px;
+  padding: 13px;
   font-size: 12px;
   line-height: 1.5;
 }
@@ -374,13 +424,86 @@ svg { display: block; min-width: 2560px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--neutral); }
+
+/* ===== Intro splash ===== */
+#intro {
+  position: fixed; inset: 0; z-index: 50;
+  display: grid; place-items: center; padding: 24px;
+  background: radial-gradient(130% 130% at 50% 0%, rgba(10,13,19,0.35), rgba(7,10,15,0.78));
+  -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+  opacity: 1; transition: opacity 0.55s ease, visibility 0.55s;
+}
+body.light #intro { background: radial-gradient(130% 130% at 50% 0%, rgba(243,246,251,0.45), rgba(225,232,242,0.8)); }
+#intro.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.intro-card {
+  max-width: 640px; width: 100%; padding: 44px 48px 36px; border-radius: 26px;
+  text-align: center; position: relative;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(34px) saturate(160%); backdrop-filter: blur(34px) saturate(160%);
+  border: 1px solid var(--glass-brd);
+  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 40px 110px -34px var(--shadow);
+  animation: cardIn 0.7s cubic-bezier(.2,.85,.25,1) both;
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(26px) scale(0.96); } to { opacity: 1; transform: none; } }
+.intro-badge {
+  display: inline-flex; align-items: center; gap: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: 1.6px;
+  padding: 6px 13px; border-radius: 999px; color: var(--accent); margin-bottom: 22px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+}
+.intro-mark {
+  width: 66px; height: 66px; border-radius: 19px; margin: 0 auto 18px; display: grid; place-items: center; font-size: 33px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  box-shadow: 0 14px 36px -8px var(--accent), 0 0 0 1px var(--glass-hi) inset;
+}
+.intro-title { font-size: 46px; font-weight: 800; letter-spacing: -1.4px; line-height: 1.04; margin-bottom: 14px; }
+.intro-title span { background: linear-gradient(120deg, var(--accent), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.intro-sub { color: var(--text-2); font-size: 14.5px; line-height: 1.62; max-width: 490px; margin: 0 auto 26px; }
+.intro-stats { display: flex; margin-bottom: 30px; border: 1px solid var(--glass-brd); border-radius: 14px; overflow: hidden; background: var(--glass-2); }
+.intro-stat { flex: 1; padding: 14px 6px; }
+.intro-stat + .intro-stat { border-left: 1px solid var(--glass-brd); }
+.intro-stat b { display: block; font-size: 23px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(120deg, var(--accent), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.intro-stat span { font-size: 10px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.7px; }
+.intro-enter {
+  font-family: inherit; cursor: pointer; font-size: 15px; font-weight: 700; color: #fff;
+  padding: 13px 34px; border-radius: 13px; border: none;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  box-shadow: 0 14px 32px -8px var(--accent), 0 0 0 1px var(--glass-hi) inset;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.intro-enter:hover { transform: translateY(-2px); box-shadow: 0 20px 44px -10px var(--accent); }
+.intro-enter:active { transform: translateY(0); }
+.intro-hint { margin-top: 18px; font-size: 11.5px; color: var(--text-2); }
+.intro-hint kbd { font-family: inherit; font-size: 10.5px; padding: 2px 7px; border-radius: 6px; background: var(--glass-2); border: 1px solid var(--glass-brd); color: var(--text); }
+@media (prefers-reduced-motion: reduce) { .intro-card { animation: none; } }
 </style>
 </head>
 <body>
+<div id="atmos" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+
+<div id="intro">
+  <div class="intro-card">
+    <div class="intro-badge">🧬 INTERACTIVE METABOLISM</div>
+    <div class="intro-mark">⚗️</div>
+    <h1 class="intro-title">Biochem <span>Met</span></h1>
+    <p class="intro-sub">A living map of human metabolism. Toggle drugs, hormones, conditions, and inborn errors — and watch every metabolite rise, fall, or hold across the network in real time.</p>
+    <div class="intro-stats">
+      <div class="intro-stat"><b>109</b><span>Metabolites</span></div>
+      <div class="intro-stat"><b>20</b><span>Pathways</span></div>
+      <div class="intro-stat"><b>62</b><span>Perturbations</span></div>
+    </div>
+    <button class="intro-enter" id="enter-btn">Enter the map →</button>
+    <div class="intro-hint">Tip: <kbd>t</kbd> day / night · <kbd>f</kbd> focus · <kbd>[</kbd> <kbd>]</kbd> panels</div>
+  </div>
+</div>
+
 <header>
-  <div>
-    <h1>Metabolism Pathway<span class="accent">// Interactive</span></h1>
-    <div class="subtitle">Glycolysis · TCA · ETC · PPP · Glycogen · β-Oxidation · Ketones · Urea cycle · Gluconeogenesis</div>
+  <div class="brand">
+    <div class="brand-mark">⚗️</div>
+    <div>
+      <h1>Biochem<span class="accent">Met</span></h1>
+      <div class="subtitle">Interactive metabolism · glycolysis → ETC · lipids · protein · urea · heme · nucleotides · more</div>
+    </div>
   </div>
   <div class="header-actions">
     <button class="btn" id="theme-btn" title="Toggle day / night mode  ( t )"><span class="ico">☀</span><span class="lbl">Day</span></button>
@@ -1558,6 +1681,16 @@ function applyTheme(light) {
 themeBtn.addEventListener('click', () => applyTheme(!document.body.classList.contains('light')));
 (function initTheme(){ let saved=null; try { saved = localStorage.getItem('biochem-theme'); } catch(e){} applyTheme(saved === 'light'); })();
 
+// ---- Intro splash (reappears on every reload — not persisted) ----
+const intro = document.getElementById('intro');
+function dismissIntro() { intro.classList.add('hidden'); }
+function introOpen() { return !intro.classList.contains('hidden'); }
+document.getElementById('enter-btn').addEventListener('click', dismissIntro);
+intro.addEventListener('click', (e) => { if (e.target === intro) dismissIntro(); });
+document.addEventListener('keydown', (e) => {
+  if (introOpen() && (e.key === 'Enter' || e.key === 'Escape' || e.key === ' ')) { e.preventDefault(); dismissIntro(); }
+}, true);
+
 // ---- Panel toggles (make the pathway the main focus) ----
 const layoutEl = document.querySelector('.layout');
 const tlBtn = document.getElementById('toggle-left');
@@ -1582,6 +1715,7 @@ focusBtn.addEventListener('click', () => {
 document.addEventListener('keydown', (e) => {
   const tag = (e.target.tagName || '').toLowerCase();
   if (tag === 'input' || tag === 'textarea' || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (introOpen()) return;
   if (e.key === '[') { layoutEl.classList.toggle('hide-left'); syncToggleButtons(); }
   else if (e.key === ']') { layoutEl.classList.toggle('hide-right'); syncToggleButtons(); }
   else if (e.key === 'f' || e.key === 'F') { focusBtn.click(); }
