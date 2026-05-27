@@ -511,8 +511,8 @@ body.light #intro {
   position: relative; margin: 0 auto 24px;
   width: 100%; max-width: 760px;
   background:
-    radial-gradient(circle at 24% 28%, color-mix(in srgb, var(--gluco) 12%, transparent), transparent 28%),
-    radial-gradient(circle at 75% 22%, color-mix(in srgb, var(--lbl-nucleo) 12%, transparent), transparent 32%),
+    radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--gluco) 9%, transparent), transparent 30%),
+    radial-gradient(circle at 78% 20%, color-mix(in srgb, var(--lbl-nucleo) 8%, transparent), transparent 34%),
     color-mix(in srgb, var(--bg) 55%, transparent);
   border: 1px solid var(--glass-brd);
   border-radius: 20px;
@@ -523,25 +523,41 @@ body.light #intro {
 }
 .intro-demo svg { display: block; width: 100%; height: auto; }
 .intro-demo .d-flow {
-  fill: none; stroke: var(--gluco); stroke-width: 2.6; stroke-linecap: round;
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gluco) 65%, transparent));
+  fill: none; stroke: var(--gluco); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
 }
-.intro-demo .d-flow-secondary { stroke: var(--lbl-nucleo); opacity: 0.78; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--lbl-nucleo) 45%, transparent)); }
-.intro-demo .d-break { fill: none; stroke: var(--down); stroke-width: 2.5; stroke-linecap: round; }
-.intro-demo .d-node circle:first-child { fill: color-mix(in srgb, var(--bg) 75%, transparent); stroke: var(--gluco); stroke-width: 2.4; }
-.intro-demo .d-node.aa circle:first-child { stroke: var(--purple); }
-.intro-demo .d-node.lipid circle:first-child { stroke: var(--lbl-lipid); }
-.intro-demo .d-node.etc circle:first-child { stroke: var(--lbl-nucleo); }
-.intro-demo .d-dot { fill: var(--gluco); stroke: none; }
-.intro-demo .d-node.aa .d-dot { fill: var(--purple); }
-.intro-demo .d-node.lipid .d-dot { fill: var(--lbl-lipid); }
-.intro-demo .d-node.etc .d-dot { fill: var(--lbl-nucleo); }
-.intro-demo .d-lbl { fill: var(--text-2); font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-anchor: middle; font-family: inherit; }
-.intro-demo .d-region { fill: color-mix(in srgb, var(--panel) 45%, transparent); stroke: var(--glass-brd); stroke-width: 1.1; }
-.intro-demo .d-region-label { fill: var(--text-2); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-anchor: middle; font-family: inherit; opacity: 0.62; }
-.intro-demo .d-cycle { fill: none; stroke: var(--purple); stroke-width: 2.3; stroke-dasharray: 7 5; opacity: 0.9; }
-.intro-demo .d-cycle-dot { fill: var(--purple); opacity: 0.95; }
-.intro-demo .d-lesion-core { fill: var(--down); filter: drop-shadow(0 0 8px var(--down)); }
+.intro-demo .d-flow-secondary {
+  fill: none; stroke: var(--lbl-nucleo); stroke-width: 2.1;
+  stroke-linecap: round; stroke-linejoin: round; opacity: 0.82;
+}
+.intro-demo .d-break { fill: none; stroke: var(--down); stroke-width: 2.4; stroke-linecap: round; }
+.intro-demo .d-lbl { fill: var(--text-2); font-size: 10.5px; font-weight: 760; letter-spacing: 1.2px; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-region { fill: color-mix(in srgb, var(--panel) 42%, transparent); stroke: var(--glass-brd); stroke-width: 1.1; }
+.intro-demo .d-region-label { fill: var(--text-2); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-anchor: middle; font-family: inherit; opacity: 0.66; }
+.intro-demo .d-mol-title { fill: var(--text); font-size: 15px; font-weight: 850; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-formula { fill: var(--text-2); font-size: 11px; font-weight: 680; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-ring, .intro-demo .d-bond {
+  fill: none; stroke: var(--gluco); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+}
+.intro-demo .d-carbonyl { stroke: var(--lbl-heme); }
+.intro-demo .d-oxygen { fill: var(--lbl-heme); font-size: 10px; font-weight: 850; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-atom { fill: var(--text); font-size: 10px; font-weight: 850; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-plus { fill: var(--text-2); font-size: 22px; font-weight: 400; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-enzyme rect {
+  fill: color-mix(in srgb, var(--gluco) 13%, transparent);
+  stroke: color-mix(in srgb, var(--gluco) 48%, transparent);
+}
+.intro-demo .d-enzyme text { fill: var(--gluco); font-size: 10px; font-weight: 820; letter-spacing: 1px; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-cofactor rect {
+  fill: color-mix(in srgb, var(--lbl-nucleo) 13%, transparent);
+  stroke: color-mix(in srgb, var(--lbl-nucleo) 45%, transparent);
+}
+.intro-demo .d-cofactor text { fill: var(--lbl-nucleo); font-size: 10.5px; font-weight: 780; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-lesion-core { fill: var(--down); }
+.intro-demo .d-inhibitor rect {
+  fill: color-mix(in srgb, var(--down) 15%, transparent);
+  stroke: color-mix(in srgb, var(--down) 55%, transparent);
+}
+.intro-demo .d-inhibitor text { fill: var(--down); font-size: 10px; font-weight: 850; letter-spacing: 0.9px; text-anchor: middle; font-family: inherit; }
 .intro-demo .d-chip rect { fill: color-mix(in srgb, var(--gluco) 18%, transparent); stroke: color-mix(in srgb, var(--gluco) 45%, transparent); }
 .intro-demo .d-chip text { fill: var(--gluco); font-size: 11px; font-weight: 700; text-anchor: middle; font-family: inherit; }
 .intro-demo .d-chip-down rect { fill: color-mix(in srgb, var(--down) 16%, transparent); stroke: color-mix(in srgb, var(--down) 45%, transparent); }
@@ -550,10 +566,10 @@ body.light #intro {
 .intro-demo .d-chip-nadh text { fill: var(--lbl-nucleo); }
 .intro-demo .d-pill rect { fill: color-mix(in srgb, var(--lbl-nucleo) 18%, transparent); stroke: color-mix(in srgb, var(--lbl-nucleo) 50%, transparent); }
 .intro-demo .d-pill text { fill: var(--lbl-nucleo); font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-equation { fill: var(--text); font-size: 13px; font-weight: 760; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-smallnote { fill: var(--text-2); font-size: 10px; font-weight: 680; text-anchor: middle; font-family: inherit; opacity: 0.82; }
 .intro-demo .d-energy text { fill: var(--text); font-size: 12px; font-weight: 800; font-family: inherit; text-anchor: middle; }
 .intro-demo .d-energy rect { fill: color-mix(in srgb, var(--up) 16%, transparent); stroke: color-mix(in srgb, var(--up) 46%, transparent); }
-.intro-demo .d-pulse { transform-origin: center; animation: pulseGlow 2.8s ease-in-out infinite; }
-@keyframes pulseGlow { 0%,100%{opacity:0.75; transform:scale(1)} 50%{opacity:1; transform:scale(1.08)} }
 .intro-demo[data-step="1"] .d-perturb,
 .intro-demo[data-step="1"] .d-readout { display: none; }
 .intro-demo[data-step="2"] .d-readout { display: none; }
@@ -614,11 +630,11 @@ body.light .intro-next { color: #fff; }
 <div id="intro">
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
   <div class="intro-card">
-    <div class="intro-eyebrow">METABOLIC CARTOGRAPHY</div>
+    <div class="intro-eyebrow">BIOCHEMICAL FLUX LAB</div>
     <h1 class="intro-title">Biochem <span>Met</span></h1>
-    <p class="intro-sub"><strong>Follow carbon, electrons, nitrogen, and energy</strong> as one map. Toggle a condition and watch the biochemical consequences move through the network.</p>
+    <p class="intro-sub"><strong>Balance substrates, enzymes, cofactors, and ATP yield</strong> across one metabolism map. Toggle a condition and watch the biochemical consequences move through the network.</p>
     <div class="intro-chipline" aria-hidden="true">
-      <span>Glycolysis</span><span>TCA / Lipids</span><span>ETC / Cofactors</span><span>Heme / Nucleotides</span>
+      <span>Carbon skeletons</span><span>Enzyme control</span><span>NAD⁺ / NADH</span><span>ATP yield</span>
     </div>
 
     <div class="intro-demo" data-step="1">
@@ -640,83 +656,102 @@ body.light .intro-next { color: #fff; }
           </marker>
         </defs>
         <rect width="100%" height="100%" fill="url(#demo-grid)"/>
-        <rect class="d-region" x="18" y="26" width="310" height="190" rx="18"/>
-        <rect class="d-region" x="356" y="26" width="346" height="190" rx="18"/>
-        <text x="173" y="46" class="d-region-label">CYTOSOL</text>
-        <text x="529" y="46" class="d-region-label">MITOCHONDRION</text>
+        <rect class="d-region" x="18" y="24" width="684" height="214" rx="18"/>
+        <text x="360" y="39" class="d-region-label">SUBSTRATES · ENZYMES · COFACTORS</text>
 
-        <path class="d-flow" d="M 78 116 L 168 116 L 260 116 L 360 116" marker-end="url(#demo-arrow)"/>
-        <path class="d-flow" d="M 478 116 C 528 62, 610 66, 652 116" marker-end="url(#demo-arrow)"/>
-        <path class="d-flow d-flow-secondary" d="M 536 150 C 574 176, 612 178, 652 150" marker-end="url(#demo-arrow)"/>
-        <path class="d-cycle" d="M 410 116 C 410 70, 500 70, 500 116 C 500 162, 410 162, 410 116"/>
+        <g transform="translate(74 100)">
+          <polygon class="d-ring" points="-28,-13 -7,-31 22,-23 32,6 10,29 -20,22"/>
+          <path class="d-bond" d="M -7 -31 L -7 -48 M 22 -23 L 40 -38 M 32 6 L 50 6 M 10 29 L 18 48 M -20 22 L -38 34"/>
+          <text class="d-oxygen" x="-7" y="-54">CH₂OH</text>
+          <text class="d-oxygen" x="45" y="-41">OH</text>
+          <text class="d-oxygen" x="58" y="9">OH</text>
+          <text class="d-oxygen" x="24" y="61">OH</text>
+          <text class="d-oxygen" x="-56" y="34">OH</text>
+          <text class="d-atom" x="-4" y="2">O</text>
+        </g>
+        <text x="74" y="176" class="d-mol-title">Glucose</text>
+        <text x="74" y="192" class="d-formula">C₆H₁₂O₆</text>
 
-        <path class="d-flow d-perturb" d="M 260 126 C 238 174, 176 190, 120 176" marker-end="url(#demo-arrow-red)"/>
-        <path class="d-break d-perturb" stroke-dasharray="7 6" d="M 592 112 C 610 98, 632 98, 652 116" marker-end="url(#demo-arrow-red)"/>
-
-        <g class="d-node">
-          <circle cx="78" cy="116" r="22"/>
-          <circle cx="78" cy="116" r="8" class="d-dot"/>
+        <path class="d-flow" d="M 124 104 L 238 104" marker-end="url(#demo-arrow)"/>
+        <g class="d-enzyme">
+          <rect x="145" y="72" width="68" height="21" rx="10.5"/>
+          <text x="179" y="86">HK / PFK-1</text>
         </g>
-        <g class="d-node">
-          <circle cx="168" cy="116" r="22"/>
-          <circle cx="168" cy="116" r="8" class="d-dot"/>
+        <g class="d-cofactor">
+          <rect x="142" y="128" width="76" height="22" rx="11"/>
+          <text x="180" y="143">ADP + Pi</text>
         </g>
-        <g class="d-node">
-          <circle cx="260" cy="116" r="22"/>
-          <circle cx="260" cy="116" r="8" class="d-dot"/>
-        </g>
-        <g class="d-node lipid">
-          <circle cx="360" cy="116" r="22"/>
-          <circle cx="360" cy="116" r="8" class="d-dot"/>
-        </g>
-        <g class="d-node aa">
-          <circle cx="455" cy="116" r="28"/>
-          <circle cx="455" cy="116" r="9" class="d-dot"/>
-        </g>
-        <g class="d-node etc">
-          <circle cx="652" cy="116" r="24"/>
-          <circle cx="652" cy="116" r="8" class="d-dot"/>
-        </g>
-        <circle cx="455" cy="68" r="5" class="d-cycle-dot d-pulse"/>
-        <circle cx="498" cy="140" r="5" class="d-cycle-dot"/>
-
-        <g class="d-node d-perturb">
-          <circle cx="120" cy="176" r="20"/>
-          <circle cx="120" cy="176" r="7" class="d-lesion-core"/>
-        </g>
-        <g class="d-lesion d-perturb">
-          <circle cx="592" cy="112" r="30" fill="url(#demo-lesion-grad)"/>
-          <circle cx="592" cy="112" r="9" class="d-lesion-core"/>
+        <g class="d-inhibitor d-perturb">
+          <rect x="136" y="44" width="88" height="22" rx="11"/>
+          <text x="180" y="59">PFK-1 block</text>
+          <path class="d-break" d="M 165 95 L 198 113"/>
+          <path class="d-break" d="M 198 95 L 165 113"/>
         </g>
 
-        <text x="78" y="156" class="d-lbl">GLUCOSE</text>
-        <text x="168" y="156" class="d-lbl">G6P</text>
-        <text x="260" y="156" class="d-lbl">PYRUVATE</text>
-        <text x="360" y="156" class="d-lbl">ACETYL-CoA</text>
-        <text x="455" y="190" class="d-lbl">TCA</text>
-        <text x="652" y="156" class="d-lbl">ETC</text>
-        <text x="120" y="212" class="d-lbl d-perturb">LACTATE</text>
+        <g transform="translate(286 100)">
+          <path class="d-bond" d="M -26 0 L 0 0 L 28 0"/>
+          <path class="d-bond d-carbonyl" d="M 0 0 L 0 -32"/>
+          <path class="d-bond" d="M 28 0 L 42 -18 M 28 0 L 44 17"/>
+          <text class="d-atom" x="-39" y="4">CH₃</text>
+          <text class="d-oxygen" x="0" y="-42">O</text>
+          <text class="d-oxygen" x="56" y="-20">O⁻</text>
+          <text class="d-oxygen" x="58" y="21">O</text>
+        </g>
+        <text x="286" y="162" class="d-mol-title">2 Pyruvate</text>
+        <text x="286" y="178" class="d-formula">CH₃–CO–COO⁻</text>
+
+        <path class="d-flow" d="M 340 104 L 418 104" marker-end="url(#demo-arrow)"/>
+        <g class="d-enzyme">
+          <rect x="354" y="68" width="48" height="21" rx="10.5"/>
+          <text x="378" y="82">PDH</text>
+        </g>
+        <g class="d-cofactor d-readout">
+          <rect x="344" y="128" width="75" height="22" rx="11"/>
+          <text x="381" y="143">NADH ↑</text>
+        </g>
+
+        <g transform="translate(462 100)">
+          <path class="d-bond" d="M -30 0 L -4 0 L 20 0"/>
+          <path class="d-bond d-carbonyl" d="M -4 0 L -4 -30"/>
+          <text class="d-oxygen" x="-4" y="-40">O</text>
+          <text class="d-atom" x="-45" y="4">CH₃</text>
+          <text class="d-atom" x="42" y="4">S–CoA</text>
+        </g>
+        <text x="462" y="162" class="d-mol-title">Acetyl-CoA</text>
+        <text x="462" y="178" class="d-formula">thioester entry</text>
+
+        <g transform="translate(565 102)">
+          <path class="d-flow-secondary" d="M 0 -43 C 54 -43, 54 43, 0 43 C -54 43, -54 -43, 0 -43" marker-end="url(#demo-arrow)"/>
+          <text x="0" y="-58" class="d-lbl">CITRATE</text>
+          <text x="58" y="5" class="d-lbl">α-KG</text>
+          <text x="0" y="64" class="d-lbl">SUCCINATE</text>
+          <text x="-72" y="-13" class="d-lbl">OAA</text>
+          <text x="0" y="5" class="d-mol-title">TCA</text>
+          <text x="78" y="35" class="d-formula d-readout">CO₂</text>
+        </g>
+        <path class="d-flow-secondary d-readout" d="M 628 102 L 674 102" marker-end="url(#demo-arrow)"/>
+        <g class="d-energy d-readout">
+          <rect x="644" y="128" width="44" height="28" rx="14"/>
+          <text x="666" y="146">ATP</text>
+        </g>
 
         <g class="d-chip d-chip-up d-readout">
-          <rect x="48" y="70" width="60" height="22" rx="11"/>
-          <text x="78" y="85">G6P ↑</text>
+          <rect x="50" y="198" width="86" height="24" rx="12"/>
+          <text x="93" y="214">G6P ↑</text>
         </g>
         <g class="d-chip d-chip-down d-readout">
-          <rect x="228" y="70" width="64" height="22" rx="11"/>
-          <text x="260" y="85">ATP ↓</text>
+          <rect x="146" y="198" width="92" height="24" rx="12"/>
+          <text x="192" y="214">F1,6BP ↓</text>
         </g>
         <g class="d-chip d-chip-nadh d-readout">
-          <rect x="512" y="62" width="74" height="22" rx="11"/>
-          <text x="549" y="77">NADH ↑↑</text>
-        </g>
-        <g class="d-energy d-readout">
-          <rect x="604" y="190" width="96" height="30" rx="15"/>
-          <text x="652" y="209">ATP flux</text>
+          <rect x="248" y="198" width="96" height="24" rx="12"/>
+          <text x="296" y="214">NADH/NAD⁺</text>
         </g>
         <g class="d-pill d-readout">
-          <rect x="248" y="236" width="224" height="24" rx="12"/>
-          <text x="360" y="252">carbon flow + redox state + energy charge</text>
+          <rect x="356" y="198" width="220" height="24" rx="12"/>
+          <text x="466" y="214">flux = mass balance + enzyme control</text>
         </g>
+        <text x="628" y="214" class="d-equation d-readout">O₂ → H₂O</text>
       </svg>
     </div>
 
