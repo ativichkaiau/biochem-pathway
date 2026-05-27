@@ -256,7 +256,7 @@ main {
   background: transparent;
 }
 
-svg { display: block; min-width: 2560px; }
+#pathway-svg { display: block; min-width: 2560px; }
 
 .node { cursor: pointer; }
 .node rect {
@@ -425,56 +425,136 @@ svg { display: block; min-width: 2560px; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--neutral); }
 
-/* ===== Intro splash ===== */
+/* ===== Intro: 3-step lab walkthrough ===== */
 #intro {
   position: fixed; inset: 0; z-index: 50;
-  display: grid; place-items: center; padding: 24px;
-  background: radial-gradient(130% 130% at 50% 0%, rgba(10,13,19,0.35), rgba(7,10,15,0.78));
-  -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
-  opacity: 1; transition: opacity 0.55s ease, visibility 0.55s;
+  display: grid; place-items: center; padding: 40px 24px;
+  background: radial-gradient(120% 120% at 8% 8%, rgba(210,153,34,0.16), transparent 55%),
+              radial-gradient(120% 120% at 100% 100%, rgba(167,85,247,0.16), transparent 55%),
+              linear-gradient(180deg, rgba(8,10,15,0.78), rgba(5,7,11,0.92));
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  opacity: 1; transition: opacity 0.5s ease, visibility 0.5s;
 }
-body.light #intro { background: radial-gradient(130% 130% at 50% 0%, rgba(243,246,251,0.45), rgba(225,232,242,0.8)); }
+body.light #intro {
+  background: radial-gradient(120% 120% at 8% 8%, rgba(210,153,34,0.18), transparent 55%),
+              radial-gradient(120% 120% at 100% 100%, rgba(130,80,223,0.14), transparent 55%),
+              linear-gradient(180deg, rgba(245,247,251,0.85), rgba(228,234,243,0.95));
+}
 #intro.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.intro-skip {
+  position: fixed; top: 22px; right: 26px; z-index: 51;
+  font-family: inherit; font-size: 10.5px; font-weight: 700; letter-spacing: 1.8px;
+  padding: 8px 18px; border-radius: 999px;
+  background: transparent; color: var(--text-2);
+  border: 1px solid var(--glass-brd); cursor: pointer;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.intro-skip:hover { color: var(--text); border-color: var(--text-2); background: var(--glass-2); }
+
 .intro-card {
-  max-width: 640px; width: 100%; padding: 44px 48px 36px; border-radius: 26px;
-  text-align: center; position: relative;
+  width: min(820px, 100%); min-width: 0; padding: 36px 42px 22px; border-radius: 26px;
   background: var(--glass);
   -webkit-backdrop-filter: blur(34px) saturate(160%); backdrop-filter: blur(34px) saturate(160%);
   border: 1px solid var(--glass-brd);
-  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 40px 110px -34px var(--shadow);
-  animation: cardIn 0.7s cubic-bezier(.2,.85,.25,1) both;
+  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 50px 130px -40px var(--shadow);
+  animation: cardIn 0.6s cubic-bezier(.2,.85,.25,1) both;
+  text-align: center;
 }
-@keyframes cardIn { from { opacity: 0; transform: translateY(26px) scale(0.96); } to { opacity: 1; transform: none; } }
-.intro-badge {
-  display: inline-flex; align-items: center; gap: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: 1.6px;
-  padding: 6px 13px; border-radius: 999px; color: var(--accent); margin-bottom: 22px;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+@keyframes cardIn { from { opacity: 0; transform: translateY(22px) scale(0.97); } to { opacity: 1; transform: none; } }
+
+.intro-eyebrow {
+  display: inline-block; margin-bottom: 12px;
+  font-size: 11px; font-weight: 700; letter-spacing: 2.4px;
+  color: var(--gluco);
 }
-.intro-mark {
-  width: 66px; height: 66px; border-radius: 19px; margin: 0 auto 18px; display: grid; place-items: center; font-size: 33px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  box-shadow: 0 14px 36px -8px var(--accent), 0 0 0 1px var(--glass-hi) inset;
+.intro-title { font-size: 44px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.05; margin-bottom: 10px; }
+.intro-title span {
+  background: linear-gradient(120deg, var(--gluco), color-mix(in srgb, var(--gluco) 60%, var(--accent)));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.intro-title { font-size: 46px; font-weight: 800; letter-spacing: -1.4px; line-height: 1.04; margin-bottom: 14px; }
-.intro-title span { background: linear-gradient(120deg, var(--accent), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.intro-sub { color: var(--text-2); font-size: 14.5px; line-height: 1.62; max-width: 490px; margin: 0 auto 26px; }
-.intro-stats { display: flex; margin-bottom: 30px; border: 1px solid var(--glass-brd); border-radius: 14px; overflow: hidden; background: var(--glass-2); }
-.intro-stat { flex: 1; padding: 14px 6px; }
-.intro-stat + .intro-stat { border-left: 1px solid var(--glass-brd); }
-.intro-stat b { display: block; font-size: 23px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(120deg, var(--accent), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.intro-stat span { font-size: 10px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.7px; }
-.intro-enter {
-  font-family: inherit; cursor: pointer; font-size: 15px; font-weight: 700; color: #fff;
-  padding: 13px 34px; border-radius: 13px; border: none;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  box-shadow: 0 14px 32px -8px var(--accent), 0 0 0 1px var(--glass-hi) inset;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+.intro-sub { color: var(--text-2); font-size: 14px; line-height: 1.5; max-width: 520px; margin: 0 auto 24px; }
+
+.intro-demo {
+  position: relative; margin: 0 auto 24px;
+  width: 100%; max-width: 660px;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  border: 1px solid var(--glass-brd);
+  border-radius: 16px;
+  padding: 16px 18px 14px;
+  box-shadow: inset 0 1px 0 var(--glass-hi);
+  color: var(--text-2);
 }
-.intro-enter:hover { transform: translateY(-2px); box-shadow: 0 20px 44px -10px var(--accent); }
-.intro-enter:active { transform: translateY(0); }
-.intro-hint { margin-top: 18px; font-size: 11.5px; color: var(--text-2); }
-.intro-hint kbd { font-family: inherit; font-size: 10.5px; padding: 2px 7px; border-radius: 6px; background: var(--glass-2); border: 1px solid var(--glass-brd); color: var(--text); }
+.intro-demo svg { display: block; width: 100%; height: auto; }
+.intro-demo .d-flow {
+  fill: none; stroke: var(--gluco); stroke-width: 2.6; stroke-linecap: round;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gluco) 65%, transparent));
+}
+.intro-demo .d-break { fill: none; stroke: var(--down); stroke-width: 2.4; stroke-linecap: round; }
+.intro-demo .d-node circle:first-child { fill: color-mix(in srgb, var(--bg) 75%, transparent); stroke: var(--gluco); stroke-width: 2.4; }
+.intro-demo .d-dot { fill: var(--gluco); stroke: none; }
+.intro-demo .d-lbl { fill: var(--text-2); font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-lesion-core { fill: var(--down); filter: drop-shadow(0 0 8px var(--down)); }
+.intro-demo .d-chip rect { fill: color-mix(in srgb, var(--gluco) 18%, transparent); stroke: color-mix(in srgb, var(--gluco) 45%, transparent); }
+.intro-demo .d-chip text { fill: var(--gluco); font-size: 11px; font-weight: 700; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-chip-down rect { fill: color-mix(in srgb, var(--down) 16%, transparent); stroke: color-mix(in srgb, var(--down) 45%, transparent); }
+.intro-demo .d-chip-down text { fill: var(--down); }
+.intro-demo .d-pill rect { fill: color-mix(in srgb, var(--lbl-nucleo) 18%, transparent); stroke: color-mix(in srgb, var(--lbl-nucleo) 50%, transparent); }
+.intro-demo .d-pill text { fill: var(--lbl-nucleo); font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-anchor: middle; font-family: inherit; }
+.intro-demo[data-step="1"] .d-break,
+.intro-demo[data-step="1"] .d-lesion,
+.intro-demo[data-step="1"] .d-chip,
+.intro-demo[data-step="1"] .d-pill { display: none; }
+.intro-demo[data-step="2"] .d-pill { display: none; }
+
+.intro-step { text-align: left; max-width: 660px; margin: 0 auto; padding: 0 4px; }
+.step-eyebrow { display: flex; align-items: center; gap: 12px; margin-bottom: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 2.2px; color: var(--gluco); }
+.step-dash { width: 22px; height: 1.5px; background: var(--gluco); opacity: 0.55; display: inline-block; border-radius: 1px; }
+.step-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin: 0 0 6px; color: var(--text); }
+.step-desc { color: var(--text-2); font-size: 13.5px; line-height: 1.55; margin: 0; }
+
+.intro-footer {
+  margin-top: 22px; padding-top: 18px;
+  border-top: 1px solid var(--glass-brd);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.intro-dots { display: flex; gap: 7px; align-items: center; }
+.intro-dot {
+  width: 22px; height: 4px; border-radius: 3px;
+  background: var(--text-2); opacity: 0.25; cursor: pointer;
+  transition: background 0.2s, opacity 0.2s, width 0.25s ease;
+}
+.intro-dot.done { background: var(--gluco); opacity: 0.55; }
+.intro-dot.active { background: var(--gluco); opacity: 1; width: 32px; }
+.intro-nav { display: flex; gap: 10px; }
+.intro-back, .intro-next {
+  font-family: inherit; font-weight: 700; font-size: 13px;
+  padding: 10px 24px; border-radius: 11px; cursor: pointer;
+}
+.intro-back {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--glass-brd);
+  transition: border-color 0.15s, color 0.15s;
+}
+.intro-back:hover:not(:disabled) { border-color: var(--text-2); }
+.intro-back:disabled { color: var(--text-2); opacity: 0.4; cursor: not-allowed; }
+.intro-next {
+  background: var(--gluco); color: #1a1408; border: none;
+  box-shadow: 0 10px 26px -10px var(--gluco);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+body.light .intro-next { color: #fff; }
+.intro-next:hover { transform: translateY(-1px); box-shadow: 0 14px 32px -10px var(--gluco); }
+.intro-next:active { transform: translateY(0); }
+
+@media (max-width: 620px) {
+  .intro-card { padding: 28px 22px 16px; }
+  .intro-title { font-size: 32px; }
+  .step-title { font-size: 19px; }
+  .intro-skip { top: 14px; right: 14px; padding: 6px 14px; font-size: 10px; }
+}
 @media (prefers-reduced-motion: reduce) { .intro-card { animation: none; } }
 </style>
 </head>
@@ -482,18 +562,79 @@ body.light #intro { background: radial-gradient(130% 130% at 50% 0%, rgba(243,24
 <div id="atmos" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
 
 <div id="intro">
+  <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
   <div class="intro-card">
-    <div class="intro-badge">🧬 INTERACTIVE METABOLISM</div>
-    <div class="intro-mark">⚗️</div>
+    <div class="intro-eyebrow">BIOCHEM METABOLISM LAB</div>
     <h1 class="intro-title">Biochem <span>Met</span></h1>
-    <p class="intro-sub">A living map of human metabolism. Toggle drugs, hormones, conditions, and inborn errors — and watch every metabolite rise, fall, or hold across the network in real time.</p>
-    <div class="intro-stats">
-      <div class="intro-stat"><b>109</b><span>Metabolites</span></div>
-      <div class="intro-stat"><b>20</b><span>Pathways</span></div>
-      <div class="intro-stat"><b>62</b><span>Perturbations</span></div>
+    <p class="intro-sub">Map the network. Apply a block. Read the cascade.</p>
+
+    <div class="intro-demo" data-step="1">
+      <svg viewBox="0 0 620 200" width="620" height="200" preserveAspectRatio="xMidYMid meet" style="max-width:100%;height:auto">
+        <defs>
+          <pattern id="demo-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+          </pattern>
+          <radialGradient id="demo-lesion-grad">
+            <stop offset="0%" stop-color="var(--down)" stop-opacity="0.85"/>
+            <stop offset="55%" stop-color="var(--down)" stop-opacity="0.28"/>
+            <stop offset="100%" stop-color="var(--down)" stop-opacity="0"/>
+          </radialGradient>
+          <marker id="demo-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+            <polygon points="0 0, 9 4.5, 0 9" fill="var(--gluco)"/>
+          </marker>
+          <marker id="demo-arrow-red" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+            <polygon points="0 0, 9 4.5, 0 9" fill="var(--down)"/>
+          </marker>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#demo-grid)"/>
+        <path class="d-flow" d="M 110 100 C 220 30, 400 170, 510 100" marker-end="url(#demo-arrow)"/>
+        <path class="d-break" stroke-dasharray="6 5" d="M 310 100 C 380 130, 450 130, 510 100" marker-end="url(#demo-arrow-red)"/>
+        <g class="d-node">
+          <circle cx="110" cy="100" r="22"/>
+          <circle cx="110" cy="100" r="8" class="d-dot"/>
+        </g>
+        <g class="d-node">
+          <circle cx="510" cy="100" r="22"/>
+          <circle cx="510" cy="100" r="8" class="d-dot"/>
+        </g>
+        <g class="d-lesion">
+          <circle cx="310" cy="100" r="28" fill="url(#demo-lesion-grad)"/>
+          <circle cx="310" cy="100" r="9" class="d-lesion-core"/>
+        </g>
+        <text x="110" y="158" class="d-lbl">SUBSTRATE</text>
+        <text x="510" y="158" class="d-lbl">PRODUCT</text>
+        <g class="d-chip d-chip-up">
+          <rect x="84" y="50" width="52" height="20" rx="10"/>
+          <text x="110" y="64">↑↑</text>
+        </g>
+        <g class="d-chip d-chip-down">
+          <rect x="484" y="50" width="52" height="20" rx="10"/>
+          <text x="510" y="64">↓↓</text>
+        </g>
+        <g class="d-pill">
+          <rect x="225" y="170" width="170" height="22" rx="11"/>
+          <text x="310" y="185">NADH ↑↑ · ATP ↓↓</text>
+        </g>
+      </svg>
     </div>
-    <button class="intro-enter" id="enter-btn">Enter the map →</button>
-    <div class="intro-hint">Tip: <kbd>t</kbd> day / night · <kbd>f</kbd> focus · <kbd>[</kbd> <kbd>]</kbd> panels</div>
+
+    <div class="intro-step">
+      <div class="step-eyebrow"><span class="step-num">01</span><span class="step-dash"></span><span class="step-kind">MAP</span></div>
+      <h2 class="step-title">Trace the pathway</h2>
+      <p class="step-desc">Each reaction links a substrate to a product. Click any node for its role, regulation, and which conditions touch it.</p>
+    </div>
+
+    <div class="intro-footer">
+      <div class="intro-dots">
+        <span class="intro-dot active" data-i="0"></span>
+        <span class="intro-dot" data-i="1"></span>
+        <span class="intro-dot" data-i="2"></span>
+      </div>
+      <div class="intro-nav">
+        <button class="intro-back" id="intro-back" disabled>Back</button>
+        <button class="intro-next" id="intro-next">Next</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1681,15 +1822,62 @@ function applyTheme(light) {
 themeBtn.addEventListener('click', () => applyTheme(!document.body.classList.contains('light')));
 (function initTheme(){ let saved=null; try { saved = localStorage.getItem('biochem-theme'); } catch(e){} applyTheme(saved === 'light'); })();
 
-// ---- Intro splash (reappears on every reload — not persisted) ----
+// ---- Intro: 3-step lab walkthrough (reappears every reload) ----
 const intro = document.getElementById('intro');
+const introSteps = [
+  { kind: 'MAP',       title: 'Trace the pathway',
+    desc: 'Every reaction links a substrate to a product across 20 pathways and 109 metabolites. Click any node to see its role, regulation, and which conditions touch it.' },
+  { kind: 'PERTURB',   title: 'Apply a block',
+    desc: 'Toggle a drug, hormone, diet state, or genetic defect (62 to choose from, left panel). The enzyme stops — substrate piles up, product runs short, and the break colors red.' },
+  { kind: 'INTEGRATE', title: 'Read the cascade',
+    desc: 'Every metabolite reports ↑, ↓, or unchanged in the right panel. Stack multiple perturbations to model full physiological states like DKA, fasting, or cyanide poisoning.' }
+];
+let introStep = 0;
+
+const _demoEl = document.querySelector('.intro-demo');
+const _numEl  = document.querySelector('.step-num');
+const _kindEl = document.querySelector('.step-kind');
+const _titleEl= document.querySelector('.step-title');
+const _descEl = document.querySelector('.step-desc');
+const _dots   = document.querySelectorAll('.intro-dot');
+const _backBtn= document.getElementById('intro-back');
+const _nextBtn= document.getElementById('intro-next');
+
+function setIntroStep(i) {
+  introStep = Math.max(0, Math.min(introSteps.length - 1, i));
+  const s = introSteps[introStep];
+  _demoEl.dataset.step = String(introStep + 1);
+  _numEl.textContent   = String(introStep + 1).padStart(2, '0');
+  _kindEl.textContent  = s.kind;
+  _titleEl.textContent = s.title;
+  _descEl.textContent  = s.desc;
+  _dots.forEach((d, idx) => {
+    d.classList.toggle('active', idx === introStep);
+    d.classList.toggle('done',   idx <  introStep);
+  });
+  _backBtn.disabled    = introStep === 0;
+  _nextBtn.textContent = introStep === introSteps.length - 1 ? 'Begin →' : 'Next';
+}
+function introAdvance() {
+  if (introStep === introSteps.length - 1) dismissIntro();
+  else setIntroStep(introStep + 1);
+}
+function introRetreat() { if (introStep > 0) setIntroStep(introStep - 1); }
 function dismissIntro() { intro.classList.add('hidden'); }
-function introOpen() { return !intro.classList.contains('hidden'); }
-document.getElementById('enter-btn').addEventListener('click', dismissIntro);
-intro.addEventListener('click', (e) => { if (e.target === intro) dismissIntro(); });
+function introOpen()    { return !intro.classList.contains('hidden'); }
+
+document.getElementById('skip-intro').addEventListener('click', dismissIntro);
+_nextBtn.addEventListener('click', introAdvance);
+_backBtn.addEventListener('click', introRetreat);
+_dots.forEach(d => d.addEventListener('click', () => setIntroStep(parseInt(d.dataset.i, 10))));
 document.addEventListener('keydown', (e) => {
-  if (introOpen() && (e.key === 'Enter' || e.key === 'Escape' || e.key === ' ')) { e.preventDefault(); dismissIntro(); }
+  if (!introOpen()) return;
+  if (e.key === 'Escape') { e.preventDefault(); dismissIntro(); }
+  else if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); introAdvance(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); introRetreat(); }
 }, true);
+
+setIntroStep(0);
 
 // ---- Panel toggles (make the pathway the main focus) ----
 const layoutEl = document.querySelector('.layout');
