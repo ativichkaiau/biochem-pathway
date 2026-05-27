@@ -429,16 +429,20 @@ main {
 #intro {
   position: fixed; inset: 0; z-index: 50;
   display: grid; place-items: center; padding: 40px 24px;
-  background: radial-gradient(120% 120% at 8% 8%, rgba(210,153,34,0.16), transparent 55%),
-              radial-gradient(120% 120% at 100% 100%, rgba(167,85,247,0.16), transparent 55%),
-              linear-gradient(180deg, rgba(8,10,15,0.78), rgba(5,7,11,0.92));
+  background:
+    radial-gradient(85% 85% at 18% 16%, rgba(210,153,34,0.20), transparent 58%),
+    radial-gradient(70% 80% at 84% 20%, rgba(95,208,197,0.18), transparent 62%),
+    radial-gradient(80% 90% at 74% 92%, rgba(188,140,255,0.18), transparent 60%),
+    linear-gradient(180deg, rgba(8,10,15,0.78), rgba(5,7,11,0.93));
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   opacity: 1; transition: opacity 0.5s ease, visibility 0.5s;
 }
 body.light #intro {
-  background: radial-gradient(120% 120% at 8% 8%, rgba(210,153,34,0.18), transparent 55%),
-              radial-gradient(120% 120% at 100% 100%, rgba(130,80,223,0.14), transparent 55%),
-              linear-gradient(180deg, rgba(245,247,251,0.85), rgba(228,234,243,0.95));
+  background:
+    radial-gradient(85% 85% at 18% 16%, rgba(210,153,34,0.18), transparent 58%),
+    radial-gradient(70% 80% at 84% 20%, rgba(19,114,104,0.12), transparent 62%),
+    radial-gradient(80% 90% at 74% 92%, rgba(130,80,223,0.14), transparent 60%),
+    linear-gradient(180deg, rgba(245,247,251,0.84), rgba(228,234,243,0.96));
 }
 #intro.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
@@ -454,7 +458,8 @@ body.light #intro {
 .intro-skip:hover { color: var(--text); border-color: var(--text-2); background: var(--glass-2); }
 
 .intro-card {
-  width: min(820px, 100%); min-width: 0; padding: 36px 42px 22px; border-radius: 26px;
+  position: relative; overflow: hidden;
+  width: min(920px, 100%); min-width: 0; padding: 34px 42px 22px; border-radius: 28px;
   background: var(--glass);
   -webkit-backdrop-filter: blur(34px) saturate(160%); backdrop-filter: blur(34px) saturate(160%);
   border: 1px solid var(--glass-brd);
@@ -462,51 +467,96 @@ body.light #intro {
   animation: cardIn 0.6s cubic-bezier(.2,.85,.25,1) both;
   text-align: center;
 }
+.intro-card::before {
+  content: ""; position: absolute; inset: -1px; pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 0 18%, color-mix(in srgb, var(--gluco) 18%, transparent) 28%, transparent 40%),
+    radial-gradient(circle at 22% 18%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 34%);
+  opacity: 0.75;
+}
+.intro-card > * { position: relative; z-index: 1; }
 @keyframes cardIn { from { opacity: 0; transform: translateY(22px) scale(0.97); } to { opacity: 1; transform: none; } }
 
 .intro-eyebrow {
-  display: inline-block; margin-bottom: 12px;
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;
   font-size: 11px; font-weight: 700; letter-spacing: 2.4px;
   color: var(--gluco);
 }
-.intro-title { font-size: 44px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.05; margin-bottom: 10px; }
+.intro-eyebrow::before, .intro-eyebrow::after {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gluco); box-shadow: 0 0 18px var(--gluco);
+}
+.intro-title { font-size: 50px; font-weight: 850; letter-spacing: -1.6px; line-height: 1.02; margin-bottom: 10px; }
 .intro-title span {
-  background: linear-gradient(120deg, var(--gluco), color-mix(in srgb, var(--gluco) 60%, var(--accent)));
+  background: linear-gradient(120deg, var(--gluco), var(--lbl-nucleo), var(--purple));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.intro-sub { color: var(--text-2); font-size: 14px; line-height: 1.5; max-width: 520px; margin: 0 auto 24px; }
+.intro-sub { color: var(--text-2); font-size: 14px; line-height: 1.5; max-width: 650px; margin: 0 auto 18px; }
+.intro-sub strong { color: var(--text); font-weight: 700; }
+
+.intro-chipline {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 auto 18px;
+}
+.intro-chipline span {
+  font-size: 10.5px; font-weight: 750; letter-spacing: 1.1px; text-transform: uppercase;
+  color: var(--text-2); padding: 6px 10px; border: 1px solid var(--glass-brd);
+  border-radius: 999px; background: color-mix(in srgb, var(--bg) 36%, transparent);
+}
+.intro-chipline span:nth-child(1) { color: var(--gluco); }
+.intro-chipline span:nth-child(2) { color: var(--lbl-lipid); }
+.intro-chipline span:nth-child(3) { color: var(--lbl-nucleo); }
+.intro-chipline span:nth-child(4) { color: var(--lbl-heme); }
 
 .intro-demo {
   position: relative; margin: 0 auto 24px;
-  width: 100%; max-width: 660px;
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  width: 100%; max-width: 760px;
+  background:
+    radial-gradient(circle at 24% 28%, color-mix(in srgb, var(--gluco) 12%, transparent), transparent 28%),
+    radial-gradient(circle at 75% 22%, color-mix(in srgb, var(--lbl-nucleo) 12%, transparent), transparent 32%),
+    color-mix(in srgb, var(--bg) 55%, transparent);
   border: 1px solid var(--glass-brd);
-  border-radius: 16px;
-  padding: 16px 18px 14px;
+  border-radius: 20px;
+  padding: 16px 18px 12px;
   box-shadow: inset 0 1px 0 var(--glass-hi);
   color: var(--text-2);
+  overflow: hidden;
 }
 .intro-demo svg { display: block; width: 100%; height: auto; }
 .intro-demo .d-flow {
   fill: none; stroke: var(--gluco); stroke-width: 2.6; stroke-linecap: round;
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gluco) 65%, transparent));
 }
-.intro-demo .d-break { fill: none; stroke: var(--down); stroke-width: 2.4; stroke-linecap: round; }
+.intro-demo .d-flow-secondary { stroke: var(--lbl-nucleo); opacity: 0.78; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--lbl-nucleo) 45%, transparent)); }
+.intro-demo .d-break { fill: none; stroke: var(--down); stroke-width: 2.5; stroke-linecap: round; }
 .intro-demo .d-node circle:first-child { fill: color-mix(in srgb, var(--bg) 75%, transparent); stroke: var(--gluco); stroke-width: 2.4; }
+.intro-demo .d-node.aa circle:first-child { stroke: var(--purple); }
+.intro-demo .d-node.lipid circle:first-child { stroke: var(--lbl-lipid); }
+.intro-demo .d-node.etc circle:first-child { stroke: var(--lbl-nucleo); }
 .intro-demo .d-dot { fill: var(--gluco); stroke: none; }
+.intro-demo .d-node.aa .d-dot { fill: var(--purple); }
+.intro-demo .d-node.lipid .d-dot { fill: var(--lbl-lipid); }
+.intro-demo .d-node.etc .d-dot { fill: var(--lbl-nucleo); }
 .intro-demo .d-lbl { fill: var(--text-2); font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-anchor: middle; font-family: inherit; }
+.intro-demo .d-region { fill: color-mix(in srgb, var(--panel) 45%, transparent); stroke: var(--glass-brd); stroke-width: 1.1; }
+.intro-demo .d-region-label { fill: var(--text-2); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-anchor: middle; font-family: inherit; opacity: 0.62; }
+.intro-demo .d-cycle { fill: none; stroke: var(--purple); stroke-width: 2.3; stroke-dasharray: 7 5; opacity: 0.9; }
+.intro-demo .d-cycle-dot { fill: var(--purple); opacity: 0.95; }
 .intro-demo .d-lesion-core { fill: var(--down); filter: drop-shadow(0 0 8px var(--down)); }
 .intro-demo .d-chip rect { fill: color-mix(in srgb, var(--gluco) 18%, transparent); stroke: color-mix(in srgb, var(--gluco) 45%, transparent); }
 .intro-demo .d-chip text { fill: var(--gluco); font-size: 11px; font-weight: 700; text-anchor: middle; font-family: inherit; }
 .intro-demo .d-chip-down rect { fill: color-mix(in srgb, var(--down) 16%, transparent); stroke: color-mix(in srgb, var(--down) 45%, transparent); }
 .intro-demo .d-chip-down text { fill: var(--down); }
+.intro-demo .d-chip-nadh rect { fill: color-mix(in srgb, var(--lbl-nucleo) 15%, transparent); stroke: color-mix(in srgb, var(--lbl-nucleo) 45%, transparent); }
+.intro-demo .d-chip-nadh text { fill: var(--lbl-nucleo); }
 .intro-demo .d-pill rect { fill: color-mix(in srgb, var(--lbl-nucleo) 18%, transparent); stroke: color-mix(in srgb, var(--lbl-nucleo) 50%, transparent); }
 .intro-demo .d-pill text { fill: var(--lbl-nucleo); font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-anchor: middle; font-family: inherit; }
-.intro-demo[data-step="1"] .d-break,
-.intro-demo[data-step="1"] .d-lesion,
-.intro-demo[data-step="1"] .d-chip,
-.intro-demo[data-step="1"] .d-pill { display: none; }
-.intro-demo[data-step="2"] .d-pill { display: none; }
+.intro-demo .d-energy text { fill: var(--text); font-size: 12px; font-weight: 800; font-family: inherit; text-anchor: middle; }
+.intro-demo .d-energy rect { fill: color-mix(in srgb, var(--up) 16%, transparent); stroke: color-mix(in srgb, var(--up) 46%, transparent); }
+.intro-demo .d-pulse { transform-origin: center; animation: pulseGlow 2.8s ease-in-out infinite; }
+@keyframes pulseGlow { 0%,100%{opacity:0.75; transform:scale(1)} 50%{opacity:1; transform:scale(1.08)} }
+.intro-demo[data-step="1"] .d-perturb,
+.intro-demo[data-step="1"] .d-readout { display: none; }
+.intro-demo[data-step="2"] .d-readout { display: none; }
 
 .intro-step { text-align: left; max-width: 660px; margin: 0 auto; padding: 0 4px; }
 .step-eyebrow { display: flex; align-items: center; gap: 12px; margin-bottom: 6px;
@@ -564,12 +614,15 @@ body.light .intro-next { color: #fff; }
 <div id="intro">
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
   <div class="intro-card">
-    <div class="intro-eyebrow">BIOCHEM METABOLISM LAB</div>
+    <div class="intro-eyebrow">METABOLIC CARTOGRAPHY</div>
     <h1 class="intro-title">Biochem <span>Met</span></h1>
-    <p class="intro-sub">Map the network. Apply a block. Read the cascade.</p>
+    <p class="intro-sub"><strong>Follow carbon, electrons, nitrogen, and energy</strong> as one map. Toggle a condition and watch the biochemical consequences move through the network.</p>
+    <div class="intro-chipline" aria-hidden="true">
+      <span>Glycolysis</span><span>TCA / Lipids</span><span>ETC / Cofactors</span><span>Heme / Nucleotides</span>
+    </div>
 
     <div class="intro-demo" data-step="1">
-      <svg viewBox="0 0 620 200" width="620" height="200" preserveAspectRatio="xMidYMid meet" style="max-width:100%;height:auto">
+      <svg viewBox="0 0 720 280" width="720" height="280" preserveAspectRatio="xMidYMid meet" style="max-width:100%;height:auto">
         <defs>
           <pattern id="demo-grid" width="40" height="40" patternUnits="userSpaceOnUse">
             <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
@@ -587,33 +640,82 @@ body.light .intro-next { color: #fff; }
           </marker>
         </defs>
         <rect width="100%" height="100%" fill="url(#demo-grid)"/>
-        <path class="d-flow" d="M 110 100 C 220 30, 400 170, 510 100" marker-end="url(#demo-arrow)"/>
-        <path class="d-break" stroke-dasharray="6 5" d="M 310 100 C 380 130, 450 130, 510 100" marker-end="url(#demo-arrow-red)"/>
+        <rect class="d-region" x="18" y="26" width="310" height="190" rx="18"/>
+        <rect class="d-region" x="356" y="26" width="346" height="190" rx="18"/>
+        <text x="173" y="46" class="d-region-label">CYTOSOL</text>
+        <text x="529" y="46" class="d-region-label">MITOCHONDRION</text>
+
+        <path class="d-flow" d="M 78 116 L 168 116 L 260 116 L 360 116" marker-end="url(#demo-arrow)"/>
+        <path class="d-flow" d="M 478 116 C 528 62, 610 66, 652 116" marker-end="url(#demo-arrow)"/>
+        <path class="d-flow d-flow-secondary" d="M 536 150 C 574 176, 612 178, 652 150" marker-end="url(#demo-arrow)"/>
+        <path class="d-cycle" d="M 410 116 C 410 70, 500 70, 500 116 C 500 162, 410 162, 410 116"/>
+
+        <path class="d-flow d-perturb" d="M 260 126 C 238 174, 176 190, 120 176" marker-end="url(#demo-arrow-red)"/>
+        <path class="d-break d-perturb" stroke-dasharray="7 6" d="M 592 112 C 610 98, 632 98, 652 116" marker-end="url(#demo-arrow-red)"/>
+
         <g class="d-node">
-          <circle cx="110" cy="100" r="22"/>
-          <circle cx="110" cy="100" r="8" class="d-dot"/>
+          <circle cx="78" cy="116" r="22"/>
+          <circle cx="78" cy="116" r="8" class="d-dot"/>
         </g>
         <g class="d-node">
-          <circle cx="510" cy="100" r="22"/>
-          <circle cx="510" cy="100" r="8" class="d-dot"/>
+          <circle cx="168" cy="116" r="22"/>
+          <circle cx="168" cy="116" r="8" class="d-dot"/>
         </g>
-        <g class="d-lesion">
-          <circle cx="310" cy="100" r="28" fill="url(#demo-lesion-grad)"/>
-          <circle cx="310" cy="100" r="9" class="d-lesion-core"/>
+        <g class="d-node">
+          <circle cx="260" cy="116" r="22"/>
+          <circle cx="260" cy="116" r="8" class="d-dot"/>
         </g>
-        <text x="110" y="158" class="d-lbl">SUBSTRATE</text>
-        <text x="510" y="158" class="d-lbl">PRODUCT</text>
-        <g class="d-chip d-chip-up">
-          <rect x="84" y="50" width="52" height="20" rx="10"/>
-          <text x="110" y="64">↑↑</text>
+        <g class="d-node lipid">
+          <circle cx="360" cy="116" r="22"/>
+          <circle cx="360" cy="116" r="8" class="d-dot"/>
         </g>
-        <g class="d-chip d-chip-down">
-          <rect x="484" y="50" width="52" height="20" rx="10"/>
-          <text x="510" y="64">↓↓</text>
+        <g class="d-node aa">
+          <circle cx="455" cy="116" r="28"/>
+          <circle cx="455" cy="116" r="9" class="d-dot"/>
         </g>
-        <g class="d-pill">
-          <rect x="225" y="170" width="170" height="22" rx="11"/>
-          <text x="310" y="185">NADH ↑↑ · ATP ↓↓</text>
+        <g class="d-node etc">
+          <circle cx="652" cy="116" r="24"/>
+          <circle cx="652" cy="116" r="8" class="d-dot"/>
+        </g>
+        <circle cx="455" cy="68" r="5" class="d-cycle-dot d-pulse"/>
+        <circle cx="498" cy="140" r="5" class="d-cycle-dot"/>
+
+        <g class="d-node d-perturb">
+          <circle cx="120" cy="176" r="20"/>
+          <circle cx="120" cy="176" r="7" class="d-lesion-core"/>
+        </g>
+        <g class="d-lesion d-perturb">
+          <circle cx="592" cy="112" r="30" fill="url(#demo-lesion-grad)"/>
+          <circle cx="592" cy="112" r="9" class="d-lesion-core"/>
+        </g>
+
+        <text x="78" y="156" class="d-lbl">GLUCOSE</text>
+        <text x="168" y="156" class="d-lbl">G6P</text>
+        <text x="260" y="156" class="d-lbl">PYRUVATE</text>
+        <text x="360" y="156" class="d-lbl">ACETYL-CoA</text>
+        <text x="455" y="190" class="d-lbl">TCA</text>
+        <text x="652" y="156" class="d-lbl">ETC</text>
+        <text x="120" y="212" class="d-lbl d-perturb">LACTATE</text>
+
+        <g class="d-chip d-chip-up d-readout">
+          <rect x="48" y="70" width="60" height="22" rx="11"/>
+          <text x="78" y="85">G6P ↑</text>
+        </g>
+        <g class="d-chip d-chip-down d-readout">
+          <rect x="228" y="70" width="64" height="22" rx="11"/>
+          <text x="260" y="85">ATP ↓</text>
+        </g>
+        <g class="d-chip d-chip-nadh d-readout">
+          <rect x="512" y="62" width="74" height="22" rx="11"/>
+          <text x="549" y="77">NADH ↑↑</text>
+        </g>
+        <g class="d-energy d-readout">
+          <rect x="604" y="190" width="96" height="30" rx="15"/>
+          <text x="652" y="209">ATP flux</text>
+        </g>
+        <g class="d-pill d-readout">
+          <rect x="248" y="236" width="224" height="24" rx="12"/>
+          <text x="360" y="252">carbon flow + redox state + energy charge</text>
         </g>
       </svg>
     </div>
@@ -1825,12 +1927,12 @@ themeBtn.addEventListener('click', () => applyTheme(!document.body.classList.con
 // ---- Intro: 3-step lab walkthrough (reappears every reload) ----
 const intro = document.getElementById('intro');
 const introSteps = [
-  { kind: 'MAP',       title: 'Trace the pathway',
-    desc: 'Every reaction links a substrate to a product across 20 pathways and 109 metabolites. Click any node to see its role, regulation, and which conditions touch it.' },
-  { kind: 'PERTURB',   title: 'Apply a block',
-    desc: 'Toggle a drug, hormone, diet state, or genetic defect (62 to choose from, left panel). The enzyme stops — substrate piles up, product runs short, and the break colors red.' },
-  { kind: 'INTEGRATE', title: 'Read the cascade',
-    desc: 'Every metabolite reports ↑, ↓, or unchanged in the right panel. Stack multiple perturbations to model full physiological states like DKA, fasting, or cyanide poisoning.' }
+  { kind: 'CARBON', title: 'Trace carbon from glucose to ATP',
+    desc: 'Start with glucose, then follow the carbon skeleton through glycolysis, acetyl-CoA, TCA, ETC, glycogen, lipids, amino acids, heme, and nucleotides.' },
+  { kind: 'BLOCK', title: 'Perturb a real biochemical handle',
+    desc: 'Toggle a drug, hormone, diet state, toxin, or inherited defect. Enzyme blocks turn red; alternate routes like lactate, ketones, or glycogen begin to matter.' },
+  { kind: 'READOUT', title: 'Read the physiology, not just the arrow',
+    desc: 'Biochem Met translates the network into ↑, ↓, or unchanged for metabolites and cofactors, so redox pressure, ATP state, nitrogen flow, and carbon traffic stay visible.' }
 ];
 let introStep = 0;
 
