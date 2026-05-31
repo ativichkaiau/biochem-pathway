@@ -1,0 +1,80 @@
+{
+  "id": "glycolysis-vongierke",
+  "pathway": "glycolysis",
+  "title": "The 5-month-old with hepatomegaly and morning seizures",
+  "blurb": "Inborn error of carbohydrate metabolism with a deceptive triad: hypoglycemia, lactic acidosis, and hepatomegaly.",
+  "patient": {
+    "age": "5 months",
+    "sex": "M",
+    "complaint": "Sweaty, listless, and breathing fast every morning before the first feed."
+  },
+  "opening": "5-month-old boy. Doll-like face, massive hepatomegaly to the iliac crest, tachypnea. Mom says he gets shaky and pale if she stretches feeds past 3 hours. Glucose at the bedside reads 38 mg/dL. What do you want to ask, examine, or order next?",
+  "history": "Born at term, uneventful pregnancy. Feeding well early on, but mom noticed his belly growing fast and he wakes up sweaty every morning. No vomiting, no diarrhea. Older sister died at 9 months of unclear metabolic disease.",
+  "exam": "Vitals: HR 168, RR 60, T 36.9, SpO2 96%. Weight 50th, height 25th, head 75th. Doll facies, protuberant abdomen with liver edge at the iliac crest, no splenomegaly. No jaundice. Neuro: lethargic but rousable, normal tone, no focal signs.",
+  "labs": [
+    { "name": "Glucose",      "value": 38,   "unit": "mg/dL",   "ref": "70-110",   "flag": "low"  },
+    { "name": "Lactate",      "value": 9.2,  "unit": "mmol/L",  "ref": "0.5-2.2",  "flag": "high" },
+    { "name": "pH",           "value": 7.21, "unit": "",        "ref": "7.35-7.45","flag": "low"  },
+    { "name": "HCO3",         "value": 12,   "unit": "mmol/L",  "ref": "22-28",    "flag": "low"  },
+    { "name": "Anion gap",    "value": 22,   "unit": "mmol/L",  "ref": "8-12",     "flag": "high" },
+    { "name": "Triglycerides","value": 520,  "unit": "mg/dL",   "ref": "<150",     "flag": "high" },
+    { "name": "Uric acid",    "value": 11.4, "unit": "mg/dL",   "ref": "2.4-6.0",  "flag": "high" },
+    { "name": "AST",          "value": 180,  "unit": "U/L",     "ref": "<40",      "flag": "high" },
+    { "name": "ALT",          "value": 132,  "unit": "U/L",     "ref": "<35",      "flag": "high" },
+    { "name": "Ammonia",      "value": 38,   "unit": "umol/L",  "ref": "<50",      "flag": "normal" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the most likely diagnosis?",
+      "cause":     "What is the deficient enzyme or biochemical step?",
+      "mechanism": "Briefly: why does this child have both hypoglycemia AND lactic acidosis?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["von gierke", "gsd 1", "gsd i", "gsd-i", "glycogen storage disease 1", "glycogen storage disease i", "glycogen storage disease type 1", "glycogen storage disease type i"] },
+      "cause":     { "weight": 1.0, "accepts": ["g6pase", "glucose-6-phosphatase", "glucose 6 phosphatase", "g6p phosphatase", "glucose-6-p phosphatase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["g6p", "lactate", "glucose"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the exact enzyme step that fails in this disorder.",
+    "target": { "type": "edge", "edgeId": "G6Pase:Glucose-6-P->Glucose" },
+    "correctMsg": "Yes — Glucose-6-phosphatase. The only enzyme in the body that releases free glucose from G6P. Its absence locks G6P inside the hepatocyte.",
+    "wrongMsg":   "Not quite. Think about which enzyme is uniquely needed to release FREE glucose into the bloodstream.",
+    "revealMsg":  "The target was G6Pase (Glucose-6-P → Glucose). It is the final hepatic step in both gluconeogenesis and glycogenolysis."
+  },
+  "mcqs": [
+    {
+      "stem": "Which lab finding most directly results from accumulation of glucose-6-phosphate upstream of the block?",
+      "choices": ["Hypoglycemia", "Hyperlactatemia", "Hypertriglyceridemia", "Hyperuricemia"],
+      "correct": 1,
+      "explanation": "Trapped G6P pushes through glycolysis to pyruvate → lactate (the kidney can’t excrete fast enough, hence the acidosis). Hypoglycemia is the consequence of the deficiency itself, not the upstream pile-up."
+    },
+    {
+      "stem": "Why does fasting overnight precipitate this child’s symptoms?",
+      "choices": [
+        "Glycogen breaks down, but the glucose can’t leave the hepatocyte",
+        "Insulin remains elevated overnight",
+        "Cortisol rises and inhibits glycolysis",
+        "Mitochondrial β-oxidation fails"
+      ],
+      "correct": 0,
+      "explanation": "Glycogenolysis still runs and produces G6P, but without G6Pase the glucose can’t exit the cell into the blood. Fasting just makes the deficit visible."
+    },
+    {
+      "stem": "Hyperuricemia in this disorder is mechanistically linked to which of the following?",
+      "choices": [
+        "Increased renal urate excretion",
+        "Lactate competing with urate at the renal tubule + ATP depletion driving purine breakdown",
+        "Excess dietary purine intake",
+        "HGPRT salvage pathway upregulation"
+      ],
+      "correct": 1,
+      "explanation": "Two mechanisms: (1) lactate is a competitive substrate at the urate transporter, blocking excretion; (2) trapped G6P diverts ATP, raising AMP → purine catabolism → uric acid."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

@@ -680,6 +680,198 @@ body.light .intro-next { color: #fff; }
   .intro-skip { top: 14px; right: 14px; padding: 6px 14px; font-size: 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .intro-card { animation: none; } }
+
+/* ===== Case mode: 5-phase interactive loop ===== */
+#case-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  display: none; padding: 28px 24px; overflow: auto;
+  background: radial-gradient(120% 120% at 6% 6%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 55%),
+              radial-gradient(120% 120% at 96% 96%, color-mix(in srgb, var(--purple) 12%, transparent), transparent 55%),
+              linear-gradient(180deg, rgba(8,10,15,0.86), rgba(5,7,11,0.96));
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+body.light #case-overlay {
+  background: radial-gradient(120% 120% at 6% 6%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
+              radial-gradient(120% 120% at 96% 96%, color-mix(in srgb, var(--purple) 12%, transparent), transparent 55%),
+              linear-gradient(180deg, rgba(243,246,251,0.86), rgba(228,234,243,0.96));
+}
+#case-overlay.open { display: grid; place-items: start center; }
+
+.case-shell {
+  width: min(960px, 100%); margin: 0 auto;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(34px) saturate(160%); backdrop-filter: blur(34px) saturate(160%);
+  border: 1px solid var(--glass-brd); border-radius: 22px;
+  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 50px 130px -40px var(--shadow);
+  display: flex; flex-direction: column;
+  animation: caseIn 0.4s cubic-bezier(.2,.85,.25,1) both;
+}
+@keyframes caseIn { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+
+.case-header { display: flex; gap: 18px; padding: 20px 26px 14px; border-bottom: 1px solid var(--glass-brd); align-items: flex-start; justify-content: space-between; }
+.case-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: 1.8px; color: var(--text-2); margin-bottom: 6px; }
+.case-eyebrow-pw { color: var(--pw, var(--accent)); }
+.case-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin: 0 0 4px; line-height: 1.25; }
+.case-blurb { color: var(--text-2); font-size: 12.5px; line-height: 1.5; max-width: 640px; }
+.case-close { padding: 6px 14px; flex-shrink: 0; }
+
+.case-strip { display: flex; gap: 6px; padding: 14px 26px; border-bottom: 1px solid var(--glass-brd); overflow-x: auto; }
+.case-phase-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--glass-2); border: 1px solid var(--glass-brd);
+  color: var(--text-2); font-size: 10.5px; font-weight: 700; letter-spacing: 1.4px;
+  cursor: default; user-select: none; white-space: nowrap;
+  transition: all 0.18s;
+}
+.case-phase-chip .chip-num { font-variant-numeric: tabular-nums; opacity: 0.7; }
+.case-phase-chip.done { background: color-mix(in srgb, var(--accent) 14%, transparent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); color: var(--accent); }
+.case-phase-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 8px 20px -8px var(--accent); }
+.case-phase-chip.active .chip-num { opacity: 1; }
+
+.case-body { padding: 22px 26px 26px; min-height: 380px; }
+.case-pane { display: none; }
+.case-pane.active { display: block; }
+.pane-title { font-size: 17px; font-weight: 700; letter-spacing: -0.25px; margin: 0 0 6px; }
+.pane-sub { color: var(--text-2); font-size: 12.5px; margin: 0 0 16px; line-height: 1.5; }
+
+/* Chat */
+.chat-log { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; padding: 4px 4px 12px; }
+.chat-msg { padding: 10px 14px; border-radius: 14px; max-width: 82%; line-height: 1.5; font-size: 13px; white-space: pre-wrap; }
+.chat-msg.assistant { background: var(--glass-2); border: 1px solid var(--glass-brd); align-self: flex-start; color: var(--text); }
+.chat-msg.user { background: var(--accent); color: #fff; align-self: flex-end; }
+.chat-msg.streaming::after { content: "▍"; opacity: 0.6; animation: caret 0.85s steps(2,end) infinite; margin-left: 2px; }
+@keyframes caret { 0%,50%{opacity:0.6} 51%,100%{opacity:0} }
+.chat-turn-counter { font-size: 10.5px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; margin: 4px 0 8px; font-weight: 700; }
+.chat-input { display: flex; gap: 8px; }
+.chat-text {
+  flex: 1; padding: 11px 14px; border-radius: 11px;
+  background: var(--glass-2); border: 1px solid var(--glass-brd);
+  color: var(--text); font-size: 13.5px; font-family: inherit;
+  transition: border-color 0.15s;
+}
+.chat-text:focus { outline: none; border-color: var(--accent); }
+.chat-text:disabled { opacity: 0.5; cursor: not-allowed; }
+.chat-hint { font-size: 11px; color: var(--text-2); margin-top: 10px; font-style: italic; }
+
+/* Labs */
+.labs-wrap { border: 1px solid var(--glass-brd); border-radius: 12px; overflow: hidden; background: var(--glass-2); }
+.labs-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.labs-table th, .labs-table td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--glass-brd); }
+.labs-table tr:last-child td { border-bottom: none; }
+.labs-table th { font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-2); font-weight: 700; }
+.labs-table td.lab-val { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.labs-table td.lab-ref { color: var(--text-2); font-size: 11.5px; }
+.labs-table tr.flag-high .lab-val, .labs-table tr.flag-low .lab-val { color: var(--down); }
+.lab-pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; border: 1px solid; }
+.flag-high .lab-pill, .flag-low .lab-pill { background: color-mix(in srgb, var(--down) 15%, transparent); color: var(--down); border-color: color-mix(in srgb, var(--down) 40%, transparent); }
+.flag-normal .lab-pill { background: color-mix(in srgb, var(--up) 15%, transparent); color: var(--up); border-color: color-mix(in srgb, var(--up) 40%, transparent); }
+
+/* Explain */
+.explain-grid { display: grid; gap: 12px; }
+.explain-field { display: flex; flex-direction: column; gap: 5px; }
+.explain-field label { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; color: var(--text-2); text-transform: uppercase; }
+.explain-field input {
+  padding: 10px 13px; border-radius: 10px;
+  background: var(--glass-2); border: 1px solid var(--glass-brd);
+  color: var(--text); font-size: 13px; font-family: inherit;
+  transition: border-color 0.15s;
+}
+.explain-field input:focus { outline: none; border-color: var(--accent); }
+.feedback-card { margin-top: 16px; padding: 14px 16px; border-radius: 14px; background: var(--glass-2); border: 1px solid var(--glass-brd); }
+.feedback-row { display: flex; gap: 12px; padding: 7px 0; border-top: 1px solid var(--glass-brd); font-size: 12.5px; align-items: flex-start; }
+.feedback-row:first-of-type { border-top: none; padding-top: 0; }
+.feedback-row .fb-key { color: var(--text-2); width: 92px; flex-shrink: 0; font-weight: 700; font-size: 10.5px; letter-spacing: 0.5px; text-transform: uppercase; padding-top: 1px; }
+.feedback-row .fb-val { flex: 1; line-height: 1.45; color: var(--text); }
+.feedback-row .fb-mark { font-weight: 700; font-size: 14px; flex-shrink: 0; }
+.feedback-row.correct .fb-mark { color: var(--up); }
+.feedback-row.incorrect .fb-mark { color: var(--down); }
+.feedback-row .fb-note { display: block; color: var(--text-2); font-size: 11.5px; margin-top: 3px; font-style: italic; }
+
+/* MCQ */
+.mcq-prog { font-size: 10.5px; font-weight: 700; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 8px; }
+.mcq-choices { display: grid; gap: 8px; margin-top: 12px; }
+.mcq-choice {
+  padding: 12px 16px; border-radius: 12px; cursor: pointer;
+  background: var(--glass-2); border: 1.5px solid var(--glass-brd);
+  font-size: 13px; line-height: 1.45; font-family: inherit; color: var(--text);
+  text-align: left; transition: all 0.15s; width: 100%;
+}
+.mcq-choice:hover:not(:disabled) { border-color: var(--accent); }
+.mcq-choice.picked { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.mcq-choice.correct { border-color: var(--up); background: color-mix(in srgb, var(--up) 14%, transparent); }
+.mcq-choice.incorrect { border-color: var(--down); background: color-mix(in srgb, var(--down) 14%, transparent); }
+.mcq-choice:disabled { cursor: default; }
+.mcq-explain {
+  margin-top: 14px; padding: 12px 14px; border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--glass-2));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  font-size: 12.5px; line-height: 1.55; color: var(--text);
+}
+
+/* Summary */
+.score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+.score-cell { padding: 14px 12px; border-radius: 12px; background: var(--glass-2); border: 1px solid var(--glass-brd); text-align: center; }
+.score-cell b { display: block; font-size: 22px; font-weight: 800; background: linear-gradient(120deg, var(--accent), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.1; }
+.score-cell span { font-size: 10px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
+.summary-recap { font-size: 12.5px; line-height: 1.55; color: var(--text); padding: 14px 16px; background: var(--glass-2); border: 1px solid var(--glass-brd); border-radius: 12px; }
+.summary-recap p { margin: 0 0 8px; }
+.summary-recap p:last-child { margin-bottom: 0; }
+
+/* Footer */
+.case-footer { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 26px; border-top: 1px solid var(--glass-brd); }
+.case-timer { font-size: 11px; color: var(--text-2); font-variant-numeric: tabular-nums; letter-spacing: 1.2px; font-weight: 700; }
+.case-nav { display: flex; gap: 8px; }
+.btn.btn-primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+  box-shadow: 0 10px 24px -10px var(--accent);
+}
+.btn.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 32px -10px var(--accent); border-color: var(--accent); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* Pinpoint phase: overlay shrinks to a docked strip; SVG underneath is interactive */
+body.case-pinpoint #case-overlay {
+  background: transparent;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  pointer-events: none; padding: 18px;
+}
+body.case-pinpoint .case-shell { width: min(720px, 100%); pointer-events: auto; margin: 0 auto; }
+body.case-pinpoint .case-body { padding: 14px 22px; min-height: 0; }
+body.case-pinpoint .case-strip { padding: 10px 22px; }
+body.case-pinpoint .case-header { padding: 14px 22px 10px; }
+body.case-pinpoint .case-footer { padding: 10px 22px; }
+body.case-pinpoint .case-pane:not([data-pane="pinpoint"]) { display: none; }
+body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
+
+/* SVG dual-mode (case-mode class on SVG root; mode flag in JS) */
+#pathway-svg.case-mode { cursor: crosshair; }
+#pathway-svg.case-mode .edge { stroke-width: 4; transition: stroke 0.15s, stroke-width 0.15s; }
+#pathway-svg.case-mode .edge-group { cursor: crosshair; }
+#pathway-svg.case-mode g.node:hover rect { stroke: var(--accent); stroke-width: 2.6; filter: drop-shadow(0 0 10px var(--accent)); }
+#pathway-svg.case-mode .edge-group:hover .edge { stroke: var(--accent); stroke-width: 5; }
+#pathway-svg.case-mode .edge-group.pinpoint-correct .edge { stroke: var(--up); stroke-width: 5.5; filter: drop-shadow(0 0 14px var(--up)); }
+#pathway-svg.case-mode .edge-group.pinpoint-wrong .edge { stroke: var(--down); stroke-width: 5; filter: drop-shadow(0 0 12px var(--down)); }
+#pathway-svg.case-mode g.node.pinpoint-correct rect { stroke: var(--up); stroke-width: 3; filter: drop-shadow(0 0 14px var(--up)); }
+#pathway-svg.case-mode g.node.pinpoint-wrong rect { stroke: var(--down); stroke-width: 3; filter: drop-shadow(0 0 12px var(--down)); }
+
+.pinpoint-feedback { font-size: 13px; line-height: 1.55; padding: 12px 14px; border-radius: 11px; margin-top: 12px; }
+.pinpoint-feedback.ok { background: color-mix(in srgb, var(--up) 16%, transparent); color: var(--up); border: 1px solid color-mix(in srgb, var(--up) 40%, transparent); }
+.pinpoint-feedback.bad { background: color-mix(in srgb, var(--down) 16%, transparent); color: var(--down); border: 1px solid color-mix(in srgb, var(--down) 40%, transparent); }
+
+/* Sidebar Enter Case button */
+.sub-header .case-enter-btn {
+  margin-left: auto; padding: 2px 8px; font-size: 9.5px; letter-spacing: 1.2px; font-weight: 800;
+  background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 5px;
+  cursor: pointer; font-family: inherit; transition: all 0.15s; text-transform: uppercase;
+}
+.sub-header .case-enter-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Reduced-motion: kill streaming caret + entry animation */
+@media (prefers-reduced-motion: reduce) {
+  .chat-msg.streaming::after { animation: none; opacity: 0; }
+  .case-shell { animation: none; }
+}
 </style>
 </head>
 <body>
@@ -947,6 +1139,80 @@ body.light .intro-next { color: #fff; }
       <p class="muted">Click a metabolite in the pathway or list, or any perturbation, for details.</p>
     </div>
   </aside>
+</div>
+
+<div id="case-overlay" aria-hidden="true">
+  <div class="case-shell" role="dialog" aria-modal="true" aria-labelledby="case-title">
+    <div class="case-header">
+      <div>
+        <div class="case-eyebrow"><span class="case-eyebrow-pw" id="case-pw-label">PATHWAY</span> · BIOCHEM MET LAB</div>
+        <h2 class="case-title" id="case-title">Loading case…</h2>
+        <div class="case-blurb" id="case-blurb"></div>
+      </div>
+      <button class="btn case-close" id="case-close" title="Close case (Esc)">Close ✕</button>
+    </div>
+
+    <div class="case-strip" id="case-strip">
+      <div class="case-phase-chip" data-phase="chat"><span class="chip-num">01</span><span>CHAT</span></div>
+      <div class="case-phase-chip" data-phase="labs"><span class="chip-num">02</span><span>LABS</span></div>
+      <div class="case-phase-chip" data-phase="explain"><span class="chip-num">03</span><span>EXPLAIN</span></div>
+      <div class="case-phase-chip" data-phase="pinpoint"><span class="chip-num">04</span><span>PINPOINT</span></div>
+      <div class="case-phase-chip" data-phase="mcq"><span class="chip-num">05</span><span>MCQ</span></div>
+      <div class="case-phase-chip" data-phase="summary"><span class="chip-num">06</span><span>SUMMARY</span></div>
+    </div>
+
+    <div class="case-body">
+      <section class="case-pane" data-pane="chat">
+        <div class="chat-log" id="case-chat-log"></div>
+        <div class="chat-turn-counter">Turn <span id="case-chat-turn">0</span> / <span id="case-chat-max">20</span></div>
+        <form class="chat-input" id="case-chat-form" autocomplete="off">
+          <input type="text" class="chat-text" id="case-chat-text" placeholder="Ask history, exam, vitals, or share your differential…" />
+          <button type="submit" class="btn btn-primary" id="case-chat-send">Send</button>
+        </form>
+        <div class="chat-hint">Tip: when you’re ready, hit <em>Continue →</em> to see the labs.</div>
+      </section>
+
+      <section class="case-pane" data-pane="labs">
+        <h3 class="pane-title">Labs panel</h3>
+        <p class="pane-sub">Flagged values are clinically meaningful; green means within range.</p>
+        <div class="labs-wrap"><table class="labs-table" id="case-labs-table"></table></div>
+      </section>
+
+      <section class="case-pane" data-pane="explain">
+        <h3 class="pane-title">Explain your read</h3>
+        <p class="pane-sub">Three short answers. Be specific — single words / short phrases.</p>
+        <form class="explain-grid" id="case-explain-form"></form>
+        <div class="feedback-card" id="case-feedback-card" hidden></div>
+      </section>
+
+      <section class="case-pane" data-pane="pinpoint">
+        <h3 class="pane-title" id="case-pinpoint-prompt">Click the failing step.</h3>
+        <p class="pane-sub" id="case-pinpoint-status">The overlay shrank so the metabolism map underneath is interactive. Click an enzyme arrow or a node.</p>
+        <div id="case-pinpoint-feedback"></div>
+      </section>
+
+      <section class="case-pane" data-pane="mcq">
+        <div class="mcq-prog" id="case-mcq-prog">Question 1 of 3</div>
+        <h3 class="pane-title" id="case-mcq-stem"></h3>
+        <div class="mcq-choices" id="case-mcq-choices"></div>
+        <div class="mcq-explain" id="case-mcq-explain" hidden></div>
+      </section>
+
+      <section class="case-pane" data-pane="summary">
+        <h3 class="pane-title">Case summary</h3>
+        <div class="score-grid" id="case-score-grid"></div>
+        <div class="summary-recap" id="case-summary-recap"></div>
+      </section>
+    </div>
+
+    <div class="case-footer">
+      <div class="case-timer" id="case-timer">0:00</div>
+      <div class="case-nav">
+        <button class="btn case-back" id="case-back">← Back</button>
+        <button class="btn btn-primary case-next" id="case-next">Continue →</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1876,7 +2142,8 @@ function renderEdges() {
 
     const fromPw = src.pathway, toPw = tgt.pathway;
     const pwActive = selectedPathway && (fromPw === selectedPathway || toPw === selectedPathway);
-    items.push(`<g class="edge-group${pwActive ? ' pw-active' : ''}" data-from-pw="${fromPw}" data-to-pw="${toPw}">${edgeParts.join('')}</g>`);
+    const edgeId = `${edge.e}:${edge.from}->${edge.to}`;
+    items.push(`<g class="edge-group${pwActive ? ' pw-active' : ''}" data-from-pw="${fromPw}" data-to-pw="${toPw}" data-edge-id="${escapeAttr(edgeId)}">${edgeParts.join('')}</g>`);
   }
   g.innerHTML = items.join('');
 }
@@ -2096,6 +2363,13 @@ document.getElementById('perturbations-list').addEventListener('click', (e) => {
 });
 
 document.getElementById('pathway-svg').addEventListener('click', (e) => {
+  // ---- Pinpoint dual-mode short-circuit (case-mode flag, not a refactor) ----
+  // When the case loop is in its pinpoint phase, route the click to the case
+  // runner. Existing perturbation / dive logic is untouched below.
+  if (caseMode === 'pinpoint') {
+    CaseRunner.onPinpointClick(e);
+    return;
+  }
   const node = e.target.closest('.node');
   if (node) {
     selectedMetabolite = node.dataset.name;
@@ -2246,6 +2520,643 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'f' || e.key === 'F') { focusBtn.click(); }
   else if (e.key === 't' || e.key === 'T') { themeBtn.click(); }
 });
+
+// ============================================================
+// CASE MODE — 5-phase interactive loop (vanilla JS state machine)
+// ============================================================
+// chat → labs → explain → pinpoint → mcq → summary
+//
+// State lives in CaseRunner.state. Existing perturbation simulator
+// code is NOT modified except for a guarded short-circuit at the
+// top of the SVG click handler that defers to onPinpointClick when
+// caseMode === 'pinpoint'.
+// ------------------------------------------------------------
+
+// Which pathways have a case JSON shipped today. Add to this list
+// when Carlos drops new cases under /cases/<pathway>.json.
+const AVAILABLE_CASES = ['glycolysis'];
+
+// Mode flag read by the pathway-svg click handler. null | 'pinpoint'.
+let caseMode = null;
+
+// Whether reduced motion is preferred — kills streaming + caret.
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------------- Mock backend (replace with Carlos's endpoints) ----------------
+// Frontend always tries POST first; falls back to canned reply on 4xx/5xx/network.
+async function caseApiChat(payload) {
+  try {
+    const res = await fetch('/api/case/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('fallback');
+    if (res.body && res.body.getReader) {
+      // Stream-style backend: collect into a string here, the renderer fakes streaming locally too.
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let out = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        out += dec.decode(value, { stream: true });
+      }
+      return out;
+    }
+    return await res.text();
+  } catch (e) {
+    return mockChatReply(payload);
+  }
+}
+
+async function caseApiGrade(payload) {
+  try {
+    const res = await fetch('/api/case/grade', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('fallback');
+    return await res.json();
+  } catch (e) {
+    return mockGrade(payload);
+  }
+}
+
+function mockChatReply(payload) {
+  const u = (payload.message || '').toLowerCase();
+  const c = payload.caseData || {};
+  if (!u) return 'Tell me what you’re thinking — start with a differential.';
+  if (u.match(/age|how old|year/)) return `Patient is ${c.patient?.age || 'unknown'}.`;
+  if (u.match(/sex|gender|boy|girl/)) return `Sex: ${c.patient?.sex || 'unknown'}.`;
+  if (u.match(/history|past|prior|sibling|family/)) return c.history || 'History unremarkable.';
+  if (u.match(/exam|vital|hr|rr|temp|liver|abdomen/)) return c.exam || 'Exam unremarkable.';
+  if (u.match(/glucose|sugar|hypoglyc/)) return 'Bedside glucose was 38 mg/dL. We’ll show the full lab panel next.';
+  if (u.match(/lab|cbc|lytes|chem|panel/)) return 'Hit Continue → to see the full lab panel.';
+  if (u.match(/differen|think|suspect|likely/)) return 'Good — keep going. What metabolic disorder fits hepatomegaly + fasting hypoglycemia + lactic acidosis in an infant?';
+  if (u.match(/von gierke|gsd|glycogen storage/)) return 'Strong call. Hold that thought — we’ll grade your reasoning in the Explain phase.';
+  return 'Noted. Ask another question or move on to labs when you’re ready.';
+}
+
+function mockGrade(payload) {
+  const c = payload.caseData;
+  const ans = payload.answers || {};
+  const out = {};
+  for (const k of Object.keys(c.explain.rubric)) {
+    const r = c.explain.rubric[k];
+    const a = (ans[k] || '').toLowerCase().trim();
+    let correct = false, note = '';
+    if (r.accepts) {
+      correct = r.accepts.some(s => a.includes(s.toLowerCase()));
+      if (!correct) note = `Expected something like: ${r.accepts.slice(0, 2).join(' / ')}.`;
+    } else if (r.mustMention) {
+      const hits = r.mustMention.filter(s => a.includes(s.toLowerCase())).length;
+      correct = hits >= (r.minHits || r.mustMention.length);
+      if (!correct) note = `Mention at least ${r.minHits || r.mustMention.length} of: ${r.mustMention.join(', ')}.`;
+    }
+    out[k] = { correct, note, weight: r.weight || 1 };
+  }
+  const total = Object.values(out).reduce((s, x) => s + (x.correct ? x.weight : 0), 0);
+  const max = Object.values(out).reduce((s, x) => s + x.weight, 0);
+  out._score = max ? total / max : 0;
+  return out;
+}
+
+// ---------------- State machine ----------------
+const PHASES = ['chat', 'labs', 'explain', 'pinpoint', 'mcq', 'summary'];
+const PHASE_LABELS = {
+  chat: 'Continue to labs →',
+  labs: 'Continue to explain →',
+  explain: 'Continue to pinpoint →',
+  pinpoint: 'Continue to MCQs →',
+  mcq: 'Show summary →',
+  summary: 'Close case'
+};
+
+const CaseRunner = {
+  state: null,
+  els: {}, // cached DOM lookups
+
+  cacheEls() {
+    if (this.els.shell) return;
+    const $ = id => document.getElementById(id);
+    Object.assign(this.els, {
+      overlay: $('case-overlay'),
+      shell: document.querySelector('.case-shell'),
+      pwLabel: $('case-pw-label'), title: $('case-title'), blurb: $('case-blurb'),
+      strip: $('case-strip'), timer: $('case-timer'),
+      backBtn: $('case-back'), nextBtn: $('case-next'), closeBtn: $('case-close'),
+      panes: document.querySelectorAll('.case-pane'),
+      chatLog: $('case-chat-log'), chatForm: $('case-chat-form'),
+      chatText: $('case-chat-text'), chatTurn: $('case-chat-turn'), chatMax: $('case-chat-max'),
+      labsTable: $('case-labs-table'),
+      explainForm: $('case-explain-form'), feedbackCard: $('case-feedback-card'),
+      pinpointPrompt: $('case-pinpoint-prompt'),
+      pinpointStatus: $('case-pinpoint-status'),
+      pinpointFeedback: $('case-pinpoint-feedback'),
+      mcqProg: $('case-mcq-prog'), mcqStem: $('case-mcq-stem'),
+      mcqChoices: $('case-mcq-choices'), mcqExplain: $('case-mcq-explain'),
+      scoreGrid: $('case-score-grid'), summaryRecap: $('case-summary-recap')
+    });
+  },
+
+  async open(pathway) {
+    this.cacheEls();
+    if (selectedPathway) exitDive();
+    let caseData;
+    try {
+      const res = await fetch(`/cases/${pathway}.json`);
+      if (!res.ok) throw new Error('case not found');
+      caseData = await res.json();
+    } catch (e) {
+      alert(`No case available for ${pathway}.\n(Tried /cases/${pathway}.json)`);
+      return;
+    }
+    this.init(caseData);
+  },
+
+  init(caseData) {
+    const now = Date.now();
+    this.state = {
+      caseData,
+      pathway: caseData.pathway,
+      phase: 'chat',
+      startedAt: now,
+      phaseStartedAt: now,
+      chatTurns: 0,
+      chatMessages: [],
+      labsViewed: false,
+      explainAnswers: { diagnosis: '', cause: '', mechanism: '' },
+      explainFeedback: null,
+      pinpointTarget: caseData.pinpoint.target,
+      pinpointAttempts: 0,
+      pinpointResolved: false,
+      pinpointWasRight: null,
+      mcqIdx: 0,
+      mcqAnswers: [], // [{picked, correct}]
+      timerHandle: null,
+      score: { explain: null, pinpoint: null, mcq: null }
+    };
+
+    // Header
+    const info = PATHWAY_INFO[caseData.pathway];
+    this.els.pwLabel.textContent = (info?.label || caseData.pathway).toUpperCase();
+    this.els.pwLabel.style.setProperty('--pw', `var(--pw-${caseData.pathway})`);
+    this.els.title.textContent = caseData.title;
+    this.els.blurb.textContent = caseData.blurb || '';
+    document.querySelector('.case-eyebrow').style.setProperty('--pw', `var(--pw-${caseData.pathway})`);
+
+    // Chat opening message
+    if (caseData.opening) {
+      this.state.chatMessages.push({ role: 'assistant', content: caseData.opening });
+    }
+    this.els.chatMax.textContent = caseData.scoring?.chatMaxTurns || 20;
+
+    // Explain form
+    this.buildExplainForm();
+
+    // Show overlay
+    this.els.overlay.classList.add('open');
+    document.body.classList.add('case-open');
+
+    // Timer tick
+    this.state.timerHandle = setInterval(() => this.tickTimer(), 1000);
+
+    this.goTo('chat');
+  },
+
+  close() {
+    if (this.state?.timerHandle) clearInterval(this.state.timerHandle);
+    this.els.overlay.classList.remove('open');
+    document.body.classList.remove('case-open', 'case-pinpoint');
+    caseMode = null;
+    document.getElementById('pathway-svg').classList.remove('case-mode');
+    // Clear any pinpoint feedback marks on the SVG
+    document.querySelectorAll('.pinpoint-correct, .pinpoint-wrong').forEach(el => el.classList.remove('pinpoint-correct', 'pinpoint-wrong'));
+    this.state = null;
+    renderAll();
+  },
+
+  goTo(phase) {
+    if (!this.state) return;
+    if (!PHASES.includes(phase)) return;
+    this.state.phase = phase;
+    this.state.phaseStartedAt = Date.now();
+
+    // SVG case-mode is bound to pinpoint specifically
+    if (phase === 'pinpoint') {
+      caseMode = 'pinpoint';
+      document.getElementById('pathway-svg').classList.add('case-mode');
+      document.body.classList.add('case-pinpoint');
+    } else {
+      caseMode = null;
+      document.getElementById('pathway-svg').classList.remove('case-mode');
+      document.body.classList.remove('case-pinpoint');
+    }
+
+    this.render();
+  },
+
+  next() {
+    if (!this.state) return;
+    const cur = this.state.phase;
+    const i = PHASES.indexOf(cur);
+    if (i === PHASES.length - 1) { this.close(); return; }
+    if (cur === 'explain' && !this.state.explainFeedback) {
+      // require grade before leaving explain
+      this.submitExplain();
+      return;
+    }
+    if (cur === 'pinpoint' && !this.state.pinpointResolved) {
+      // can leave only after correct OR retry+reveal
+      this.els.pinpointStatus.textContent = 'Make a click on the map first — pick an enzyme arrow or a node.';
+      return;
+    }
+    this.goTo(PHASES[i + 1]);
+  },
+
+  back() {
+    if (!this.state) return;
+    const i = PHASES.indexOf(this.state.phase);
+    if (i > 0) this.goTo(PHASES[i - 1]);
+  },
+
+  tickTimer() {
+    if (!this.state) return;
+    const dt = Math.floor((Date.now() - this.state.startedAt) / 1000);
+    const mm = String(Math.floor(dt / 60)).padStart(1, '0');
+    const ss = String(dt % 60).padStart(2, '0');
+    this.els.timer.textContent = `${mm}:${ss}`;
+  },
+
+  render() {
+    if (!this.state) return;
+    // Phase strip
+    const curIdx = PHASES.indexOf(this.state.phase);
+    this.els.strip.querySelectorAll('.case-phase-chip').forEach((chip, idx) => {
+      chip.classList.toggle('active', idx === curIdx);
+      chip.classList.toggle('done', idx < curIdx);
+    });
+    // Pane visibility
+    this.els.panes.forEach(p => p.classList.toggle('active', p.dataset.pane === this.state.phase));
+    // Nav buttons
+    this.els.backBtn.disabled = curIdx === 0;
+    this.els.nextBtn.textContent = PHASE_LABELS[this.state.phase];
+
+    const r = ({
+      chat: () => this.renderChat(),
+      labs: () => this.renderLabs(),
+      explain: () => this.renderExplain(),
+      pinpoint: () => this.renderPinpoint(),
+      mcq: () => this.renderMcq(),
+      summary: () => this.renderSummary()
+    })[this.state.phase];
+    if (r) r();
+  },
+
+  // ---- CHAT ----
+  renderChat() {
+    const log = this.els.chatLog;
+    log.innerHTML = '';
+    for (const m of this.state.chatMessages) {
+      const div = document.createElement('div');
+      div.className = `chat-msg ${m.role}`;
+      div.textContent = m.content;
+      log.appendChild(div);
+    }
+    log.scrollTop = log.scrollHeight;
+    this.els.chatTurn.textContent = this.state.chatTurns;
+    const max = +this.els.chatMax.textContent;
+    const capped = this.state.chatTurns >= max;
+    this.els.chatText.disabled = capped;
+    this.els.chatText.placeholder = capped ? 'Turn cap reached — continue to labs.' : 'Ask history, exam, vitals, or share your differential…';
+    document.getElementById('case-chat-send').disabled = capped;
+  },
+
+  async sendChat() {
+    if (!this.state) return;
+    const txt = this.els.chatText.value.trim();
+    if (!txt) return;
+    const max = this.state.caseData.scoring?.chatMaxTurns || 20;
+    if (this.state.chatTurns >= max) return;
+    this.state.chatTurns++;
+    this.state.chatMessages.push({ role: 'user', content: txt });
+    this.els.chatText.value = '';
+    this.renderChat();
+
+    // Streaming placeholder
+    const placeholder = document.createElement('div');
+    placeholder.className = 'chat-msg assistant streaming';
+    placeholder.textContent = '';
+    this.els.chatLog.appendChild(placeholder);
+    this.els.chatLog.scrollTop = this.els.chatLog.scrollHeight;
+
+    const reply = await caseApiChat({
+      caseId: this.state.caseData.id,
+      caseData: this.state.caseData,
+      message: txt,
+      history: this.state.chatMessages.slice(-10)
+    });
+
+    if (REDUCED_MOTION) {
+      placeholder.classList.remove('streaming');
+      placeholder.textContent = reply;
+    } else {
+      // Local fake-stream so it FEELS like Carlos's streaming endpoint
+      let i = 0;
+      const chunk = Math.max(1, Math.ceil(reply.length / 60));
+      const step = () => {
+        i += chunk;
+        placeholder.textContent = reply.slice(0, i);
+        this.els.chatLog.scrollTop = this.els.chatLog.scrollHeight;
+        if (i < reply.length) {
+          requestAnimationFrame(() => setTimeout(step, 18));
+        } else {
+          placeholder.classList.remove('streaming');
+          placeholder.textContent = reply;
+          this.state.chatMessages.push({ role: 'assistant', content: reply });
+          this.renderChat();
+        }
+      };
+      step();
+    }
+  },
+
+  // ---- LABS ----
+  renderLabs() {
+    this.state.labsViewed = true;
+    const labs = this.state.caseData.labs || [];
+    const rows = labs.map(l => `
+      <tr class="flag-${l.flag}">
+        <td>${escapeText(l.name)}</td>
+        <td class="lab-val">${escapeText(String(l.value))} ${escapeText(l.unit || '')}</td>
+        <td class="lab-ref">${escapeText(l.ref || '')}</td>
+        <td><span class="lab-pill">${escapeText((l.flag || 'normal').toUpperCase())}</span></td>
+      </tr>
+    `).join('');
+    this.els.labsTable.innerHTML = `
+      <thead><tr><th>Test</th><th style="text-align:right">Value</th><th>Reference</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    `;
+  },
+
+  // ---- EXPLAIN ----
+  buildExplainForm() {
+    const prompts = this.state.caseData.explain.prompts;
+    const html = ['diagnosis', 'cause', 'mechanism'].map(k => `
+      <div class="explain-field">
+        <label for="explain-${k}">${escapeText(prompts[k])}</label>
+        <input id="explain-${k}" name="${k}" type="text" placeholder="…" />
+      </div>
+    `).join('');
+    this.els.explainForm.innerHTML = html;
+  },
+  renderExplain() {
+    // restore values + feedback if previously graded
+    const ans = this.state.explainAnswers;
+    for (const k of Object.keys(ans)) {
+      const el = document.getElementById(`explain-${k}`);
+      if (el) el.value = ans[k];
+    }
+    if (this.state.explainFeedback) {
+      this.renderFeedbackCard();
+      this.els.feedbackCard.hidden = false;
+    } else {
+      this.els.feedbackCard.hidden = true;
+    }
+  },
+  async submitExplain() {
+    const ans = {};
+    for (const k of ['diagnosis', 'cause', 'mechanism']) {
+      const el = document.getElementById(`explain-${k}`);
+      ans[k] = el ? el.value.trim() : '';
+    }
+    this.state.explainAnswers = ans;
+    if (!ans.diagnosis && !ans.cause && !ans.mechanism) {
+      alert('Fill at least one field.');
+      return;
+    }
+    const fb = await caseApiGrade({ caseId: this.state.caseData.id, caseData: this.state.caseData, answers: ans });
+    this.state.explainFeedback = fb;
+    this.state.score.explain = fb._score ?? null;
+    this.renderFeedbackCard();
+    this.els.feedbackCard.hidden = false;
+  },
+  renderFeedbackCard() {
+    const fb = this.state.explainFeedback;
+    if (!fb) return;
+    const keys = Object.keys(fb).filter(k => k !== '_score');
+    const rows = keys.map(k => {
+      const r = fb[k];
+      const cls = r.correct ? 'correct' : 'incorrect';
+      const mark = r.correct ? '✓' : '✗';
+      const expected = this.state.caseData.explain.prompts[k];
+      const note = r.note ? `<span class="fb-note">${escapeText(r.note)}</span>` : '';
+      return `<div class="feedback-row ${cls}">
+        <span class="fb-key">${escapeText(k)}</span>
+        <span class="fb-val"><strong>${escapeText(this.state.explainAnswers[k] || '—')}</strong>${note}</span>
+        <span class="fb-mark">${mark}</span>
+      </div>`;
+    }).join('');
+    const pct = Math.round((fb._score || 0) * 100);
+    this.els.feedbackCard.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <strong style="font-size:13px">Feedback</strong>
+        <span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-2);font-weight:700">Score · <span style="color:var(--text);font-size:14px">${pct}%</span></span>
+      </div>
+      ${rows}
+    `;
+  },
+
+  // ---- PINPOINT (dual-mode SVG handler is at the bottom of this object) ----
+  renderPinpoint() {
+    const p = this.state.caseData.pinpoint;
+    this.els.pinpointPrompt.textContent = p.prompt;
+    if (!this.state.pinpointResolved) {
+      this.els.pinpointStatus.textContent = `The overlay shrank so the map underneath is interactive. Click an enzyme arrow or a node. (Attempt ${this.state.pinpointAttempts + 1} of 2.)`;
+      this.els.pinpointFeedback.innerHTML = '';
+    } else {
+      this.els.pinpointStatus.textContent = 'Step locked in — hit Continue → for the MCQs.';
+    }
+  },
+
+  onPinpointClick(e) {
+    if (!this.state || this.state.pinpointResolved) return;
+    const target = this.state.pinpointTarget;
+    let kind = null, id = null, hitEl = null;
+    const edgeGroup = e.target.closest('.edge-group');
+    const nodeGroup = e.target.closest('.node');
+    if (edgeGroup) {
+      kind = 'edge'; id = edgeGroup.dataset.edgeId; hitEl = edgeGroup;
+    } else if (nodeGroup) {
+      kind = 'node'; id = nodeGroup.dataset.name; hitEl = nodeGroup;
+    } else {
+      return;
+    }
+
+    const isCorrect = (target.type === kind) && (
+      (target.type === 'edge' && target.edgeId === id) ||
+      (target.type === 'node' && target.name === id)
+    );
+
+    this.state.pinpointAttempts++;
+    this.state.pinpointWasRight = isCorrect;
+
+    if (isCorrect) {
+      hitEl.classList.add('pinpoint-correct');
+      this.state.pinpointResolved = true;
+      this.state.score.pinpoint = this.state.pinpointAttempts === 1 ? 1.0 : 0.5;
+      this.els.pinpointFeedback.innerHTML = `<div class="pinpoint-feedback ok">${escapeText(this.state.caseData.pinpoint.correctMsg)}</div>`;
+      this.els.pinpointStatus.textContent = 'Step locked in — hit Continue → for the MCQs.';
+    } else if (this.state.pinpointAttempts < 2) {
+      hitEl.classList.add('pinpoint-wrong');
+      this.els.pinpointFeedback.innerHTML = `<div class="pinpoint-feedback bad">${escapeText(this.state.caseData.pinpoint.wrongMsg)}</div>`;
+      this.els.pinpointStatus.textContent = 'Not quite — one more try.';
+      setTimeout(() => hitEl.classList.remove('pinpoint-wrong'), 1400);
+    } else {
+      // Reveal the correct target
+      this.state.pinpointResolved = true;
+      this.state.score.pinpoint = 0;
+      const correctEl = this.locateTarget(target);
+      if (correctEl) correctEl.classList.add('pinpoint-correct');
+      this.els.pinpointFeedback.innerHTML = `<div class="pinpoint-feedback bad">${escapeText(this.state.caseData.pinpoint.revealMsg)}</div>`;
+      this.els.pinpointStatus.textContent = 'Continue → for the MCQs.';
+    }
+  },
+
+  locateTarget(target) {
+    if (target.type === 'edge') {
+      return document.querySelector(`.edge-group[data-edge-id="${cssEscape(target.edgeId)}"]`);
+    }
+    if (target.type === 'node') {
+      return document.querySelector(`g.node[data-name="${cssEscape(target.name)}"]`);
+    }
+    return null;
+  },
+
+  // ---- MCQ ----
+  renderMcq() {
+    const q = this.state.caseData.mcqs[this.state.mcqIdx];
+    if (!q) return this.goTo('summary');
+    const total = this.state.caseData.mcqs.length;
+    this.els.mcqProg.textContent = `Question ${this.state.mcqIdx + 1} of ${total}`;
+    this.els.mcqStem.textContent = q.stem;
+    const ans = this.state.mcqAnswers[this.state.mcqIdx];
+    this.els.mcqChoices.innerHTML = q.choices.map((c, i) => {
+      let cls = 'mcq-choice';
+      if (ans) {
+        if (i === q.correct) cls += ' correct';
+        else if (i === ans.picked) cls += ' incorrect';
+      }
+      return `<button class="${cls}" data-i="${i}" ${ans ? 'disabled' : ''}>${escapeText(c)}</button>`;
+    }).join('');
+    if (ans) {
+      this.els.mcqExplain.hidden = false;
+      this.els.mcqExplain.textContent = q.explanation;
+      this.els.nextBtn.textContent = this.state.mcqIdx === total - 1 ? 'Show summary →' : 'Next question →';
+    } else {
+      this.els.mcqExplain.hidden = true;
+      this.els.nextBtn.textContent = 'Pick an answer';
+      this.els.nextBtn.disabled = true;
+    }
+  },
+  pickMcq(idx) {
+    const cur = this.state.mcqIdx;
+    if (this.state.mcqAnswers[cur]) return; // already answered
+    const q = this.state.caseData.mcqs[cur];
+    this.state.mcqAnswers[cur] = { picked: idx, correct: idx === q.correct };
+    this.els.nextBtn.disabled = false;
+    this.renderMcq();
+  },
+  mcqAdvance() {
+    const total = this.state.caseData.mcqs.length;
+    if (this.state.mcqIdx < total - 1) {
+      this.state.mcqIdx++;
+      this.renderMcq();
+    } else {
+      // compute mcq score
+      const got = this.state.mcqAnswers.filter(a => a && a.correct).length;
+      this.state.score.mcq = total ? got / total : 0;
+      this.goTo('summary');
+    }
+  },
+
+  // ---- SUMMARY ----
+  renderSummary() {
+    // ensure scores defaulted
+    if (this.state.score.mcq == null) {
+      const total = this.state.caseData.mcqs.length;
+      const got = this.state.mcqAnswers.filter(a => a && a.correct).length;
+      this.state.score.mcq = total ? got / total : 0;
+    }
+    const w = this.state.caseData.scoring?.weights || { explain: 0.4, pinpoint: 0.3, mcq: 0.3 };
+    const composite = Object.keys(w).reduce((s, k) => s + ((this.state.score[k] ?? 0) * (w[k] || 0)), 0);
+    const dt = Math.floor((Date.now() - this.state.startedAt) / 1000);
+    const mm = Math.floor(dt / 60), ss = dt % 60;
+    const fmt = v => v == null ? '—' : `${Math.round(v * 100)}%`;
+    this.els.scoreGrid.innerHTML = `
+      <div class="score-cell"><b>${fmt(composite)}</b><span>Composite</span></div>
+      <div class="score-cell"><b>${fmt(this.state.score.explain)}</b><span>Explain</span></div>
+      <div class="score-cell"><b>${fmt(this.state.score.pinpoint)}</b><span>Pinpoint</span></div>
+      <div class="score-cell"><b>${fmt(this.state.score.mcq)}</b><span>MCQs</span></div>
+    `;
+    const got = this.state.mcqAnswers.filter(a => a && a.correct).length;
+    this.els.summaryRecap.innerHTML = `
+      <p><strong>Time:</strong> ${mm}:${String(ss).padStart(2,'0')} · <strong>Chat turns:</strong> ${this.state.chatTurns} · <strong>MCQs:</strong> ${got} / ${this.state.caseData.mcqs.length}</p>
+      <p><strong>Pinpoint:</strong> ${this.state.pinpointResolved ? (this.state.pinpointWasRight ? 'Correct on attempt ' + this.state.pinpointAttempts : 'Revealed after ' + this.state.pinpointAttempts + ' tries') : 'Not resolved'}.</p>
+      <p style="color:var(--text-2)">This case loop is a teaching scaffold. Stack the perturbations panel after closing to model the disorder on the live map: try <strong>von Gierke (GSD I)</strong> in the left sidebar.</p>
+    `;
+  }
+};
+
+// Small helper: cssEscape fallback for older browsers
+const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
+
+// ---------------- Wire up event listeners ----------------
+(function bindCaseEvents() {
+  document.getElementById('case-close').addEventListener('click', () => CaseRunner.close());
+  document.getElementById('case-back').addEventListener('click', () => CaseRunner.back());
+  document.getElementById('case-next').addEventListener('click', () => {
+    if (!CaseRunner.state) return;
+    if (CaseRunner.state.phase === 'mcq') { CaseRunner.mcqAdvance(); return; }
+    CaseRunner.next();
+  });
+  document.getElementById('case-chat-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    CaseRunner.sendChat();
+  });
+  document.getElementById('case-mcq-choices').addEventListener('click', (e) => {
+    const btn = e.target.closest('.mcq-choice');
+    if (!btn || btn.disabled) return;
+    CaseRunner.pickMcq(parseInt(btn.dataset.i, 10));
+  });
+})();
+
+// ESC closes the case overlay
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && CaseRunner.state) {
+    if (confirm('Close case? Progress will be lost.')) CaseRunner.close();
+  }
+}, true);
+
+// ---------------- Inject Enter Case button into eligible sub-headers ----------------
+(function injectCaseButtons() {
+  document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
+    const pw = h.dataset.pw;
+    if (!AVAILABLE_CASES.includes(pw)) return;
+    if (h.querySelector('.case-enter-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'case-enter-btn';
+    btn.type = 'button';
+    btn.textContent = 'Enter Case →';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // do not trigger pathway deep-dive
+      CaseRunner.open(pw);
+    });
+    h.appendChild(btn);
+  });
+})();
 </script>
 </body>
 </html>
