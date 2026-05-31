@@ -1,0 +1,85 @@
+{
+  "id": "onecarbon-b12",
+  "pathway": "onecarbon",
+  "title": "The pale vegan with paresthesias she didn't tell anyone about",
+  "blurb": "A macrocytic anemia with hypersegmented neutrophils — and a posterior column that's slowly going dark. The one lab that pins it: methylmalonic acid.",
+  "patient": {
+    "age": "52 years",
+    "sex": "F",
+    "complaint": "Fatigue, sore tongue, and 'pins and needles' in both feet for several months."
+  },
+  "opening": "52-year-old strict vegan for 9 years. Fatigue and a beefy, sore tongue for ~3 months. Tonight she came in after nearly falling on the stairs — she 'can't tell where her feet are' in the dark. CBC: Hgb 8.4, MCV 116, smear shows hypersegmented PMNs and macro-ovalocytes. LDH 880. Indirect bilirubin elevated. What do you want to ask, examine, or order next?",
+  "history": "Strict vegan ~9 years (no eggs, no dairy, no fortified foods). No alcohol. No metformin, no nitrous oxide, no PPI / H2 blocker. No GI surgery. Menses regular. Family history non-contributory.",
+  "exam": "HR 96, BP 118/72, RR 16, T 36.7, SpO2 98%. Pale conjunctivae, beefy glossitis, no scleral icterus today. Cardiac S1S2 no murmur. Neuro: vibration and proprioception lost to the knees bilaterally (posterior columns); positive Romberg; brisk reflexes; bilateral Babinski. Mini-mental status 27 / 30 with mild executive slowing.",
+  "labs": [
+    { "name": "Hemoglobin",            "value": 8.4,  "unit": "g/dL",   "ref": "12-15",     "flag": "low"    },
+    { "name": "MCV",                   "value": 116,  "unit": "fL",     "ref": "80-100",    "flag": "high"   },
+    { "name": "Peripheral smear",      "value": "Hypersegmented PMNs, macro-ovalocytes", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Reticulocyte index",    "value": 0.4,  "unit": "",       "ref": ">2",        "flag": "low"    },
+    { "name": "LDH",                   "value": 880,  "unit": "U/L",    "ref": "<250",      "flag": "high"   },
+    { "name": "Indirect bilirubin",    "value": 2.4,  "unit": "mg/dL",  "ref": "<1.0",      "flag": "high"   },
+    { "name": "Serum vitamin B12",     "value": 102,  "unit": "pg/mL",  "ref": ">300",      "flag": "low"    },
+    { "name": "Serum folate (RBC)",    "value": 425,  "unit": "ng/mL",  "ref": "150-450",   "flag": "normal" },
+    { "name": "Methylmalonic acid",    "value": 4.8,  "unit": "μmol/L", "ref": "<0.4",      "flag": "high"   },
+    { "name": "Homocysteine",          "value": 38,   "unit": "μmol/L", "ref": "<15",       "flag": "high"   }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause":     "Which folate-cycle enzyme step is functionally blocked?",
+      "mechanism": "Briefly: why do the neurologic findings happen here but NOT in pure folate deficiency, even though both cause megaloblastic anemia?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["b12 deficiency", "cobalamin deficiency", "vitamin b12 deficiency", "dietary b12", "cobalamin"] },
+      "cause":     { "weight": 1.0, "accepts": ["methionine synthase", "ms ", "ms (b12)", "ms(b12)", "methylcobalamin"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["methylmalonic", "myelin", "methionine"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the folate-cycle enzyme step whose B12 cofactor is missing.",
+    "target": { "type": "edge", "edgeId": "MS (B12):Homocysteine->Methionine" },
+    "correctMsg": "Yes — methionine synthase (MS). Without methylcobalamin, MS can't remethylate homocysteine to methionine. 5-methyl-THF is trapped (the 'methyl trap'), homocysteine rises, and methionine / SAM falls — hence the megaloblastic anemia AND the demyelinating neuropathy.",
+    "wrongMsg":   "Not quite. The cofactor that's missing here is methylcobalamin (B12). Which enzyme uses it to hand a methyl group from 5-methyl-THF onto homocysteine?",
+    "revealMsg":  "Target: MS (B12) — Homocysteine → Methionine. The 'methyl-folate trap' explains why this looks like a folate problem in the blood. The methylmalonic acid elevation and the neuropathy are why it isn't."
+  },
+  "mcqs": [
+    {
+      "stem": "Why is methylmalonic acid elevated in B12 deficiency but NOT in pure folate deficiency?",
+      "choices": [
+        "B12 (adenosylcobalamin) is the cofactor for methylmalonyl-CoA mutase; without it, methylmalonyl-CoA can't become succinyl-CoA",
+        "Folate deficiency suppresses MMA production",
+        "B12 deficiency directly degrades carnitine to MMA",
+        "MMA is filtered freely in folate deficiency"
+      ],
+      "correct": 0,
+      "explanation": "Two B12-dependent enzymes: methionine synthase (methylcobalamin, cytosol) and methylmalonyl-CoA mutase (adenosylcobalamin, mitochondria). Lose B12 → both stall → homocysteine ↑ AND MMA ↑. Folate deficiency hits only homocysteine. MMA is the discriminator and the marker of TRUE B12 deficiency."
+    },
+    {
+      "stem": "Why does B12 deficiency cause posterior-column and corticospinal myelopathy ('subacute combined degeneration'), but folate deficiency does not?",
+      "choices": [
+        "Methylmalonyl-CoA / methylmalonic acid disrupts odd-chain fatty acid handling and myelin synthesis; SAM deficiency impairs myelin basic protein methylation",
+        "Folate deficiency damages anterior horn cells exclusively",
+        "B12 is required for axonal transport of GABA",
+        "Folate replaces B12 in myelin sheaths"
+      ],
+      "correct": 0,
+      "explanation": "Two converging hits in myelinated tracts: (1) MMA accumulation interferes with normal long-chain fatty-acid synthesis used for myelin; (2) methionine / SAM falls → myelin basic protein methylation falters. Folate deficiency does not block either step — that's why pure folate deficiency does NOT cause the neuro syndrome, even though it does cause the megaloblastic anemia."
+    },
+    {
+      "stem": "If you can't tell whether this is dietary B12 deficiency vs pernicious anemia, what would help differentiate?",
+      "choices": [
+        "Anti-intrinsic-factor antibodies and a careful dietary / GI history (or methylmalonic acid response to oral B12)",
+        "Bone marrow biopsy",
+        "Serum copper",
+        "Schilling test (still routinely available in 2024)"
+      ],
+      "correct": 0,
+      "explanation": "Anti-IF antibodies (highly specific, ~50% sensitive) and anti-parietal-cell antibodies (sensitive, less specific) plus history (vegan vs gastric surgery / atrophic gastritis / autoimmune disease) drive the workup. The Schilling test is largely historical now."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

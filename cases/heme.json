@@ -1,0 +1,84 @@
+{
+  "id": "heme-lead",
+  "pathway": "heme",
+  "title": "The cranky toddler with a microcytic anemia",
+  "blurb": "A toddler in a peeling pre-1978 rowhouse with abdominal pain, mouthing the windowsill, and basophilic stippling on smear.",
+  "patient": {
+    "age": "3 years",
+    "sex": "M",
+    "complaint": "Two weeks of irritability, intermittent abdominal pain, and now a fall down the stairs."
+  },
+  "opening": "3-year-old boy brought in for two weeks of irritability, picky eating, and intermittent crampy abdominal pain. Today he fell down the stairs and seems unusually drowsy. The family rents a row house built in 1908; paint is visibly peeling on the porch. CBC shows Hgb 7.6, MCV 64, with basophilic stippling on smear. What do you want to ask, examine, or order?",
+  "history": "Born at term, developmentally normal until 6 months ago. Mom reports he mouths everything — the windowsill, paint chips, sometimes dirt from the porch (a pica history). Diet is bread, juice, and milk; iron-poor. Family rents in a 1908 row house with peeling paint. Older sister in kindergarten is fine. No travel.",
+  "exam": "HR 124, BP 92/58, RR 22, T 36.9, SpO2 99%. Listless but rousable. Conjunctivae pale, faint bluish line at the gingival margin (Burton's line). Abdomen soft, mildly tender, no peritonism. Neuro: no focal deficits but mildly ataxic gait. Wrist drop on the right.",
+  "labs": [
+    { "name": "Hemoglobin",            "value": 7.6,  "unit": "g/dL",   "ref": "11.5-13.5", "flag": "low"    },
+    { "name": "MCV",                   "value": 64,   "unit": "fL",     "ref": "75-87",     "flag": "low"    },
+    { "name": "Peripheral smear",      "value": "Basophilic stippling", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Serum iron",            "value": 88,   "unit": "μg/dL",  "ref": "50-120",    "flag": "normal" },
+    { "name": "Ferritin",              "value": 86,   "unit": "ng/mL",  "ref": "20-200",    "flag": "normal" },
+    { "name": "Whole blood lead",      "value": 78,   "unit": "μg/dL",  "ref": "<3.5",      "flag": "high"   },
+    { "name": "Free erythrocyte protoporphyrin (FEP / ZPP)", "value": 412, "unit": "μg/dL", "ref": "<35", "flag": "high" },
+    { "name": "Urine δ-ALA",           "value": 24,   "unit": "mg/L",   "ref": "<5",        "flag": "high"   },
+    { "name": "Urine coproporphyrin III", "value": "Markedly elevated", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause":     "What heme-synthesis enzyme is most characteristically inhibited?",
+      "mechanism": "Briefly: why a MICROCYTIC anemia, basophilic stippling, AND neurologic features all at once?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["lead poisoning", "plumbism", "lead intoxication", "lead toxicity", "lead encephalopathy"] },
+      "cause":     { "weight": 1.0, "accepts": ["ala dehydratase", "ala-d", "δ-ala dehydratase", "porphobilinogen synthase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["alA", "ferrochelatase", "iron"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the heme-synthesis enzyme most characteristically inhibited by lead.",
+    "target": { "type": "edge", "edgeId": "ALA dehydratase:δ-ALA->PBG" },
+    "correctMsg": "Yes — ALA dehydratase. Lead displaces the Zn²⁺ cofactor and the enzyme stops. ALA piles up (neurotoxic — the abdominal pain and ataxia). Lead ALSO knocks out ferrochelatase, blocking iron insertion → protoporphyrin accumulates → microcytic anemia.",
+    "wrongMsg":   "Not quite. Think about which early heme-synthesis enzyme is a zinc metalloenzyme that lead is happy to bind.",
+    "revealMsg":  "Target: ALA dehydratase (δ-ALA → PBG). Lead binds the zinc site. Don't forget the second hit: lead also inhibits ferrochelatase, which is why this is a microcytic anemia."
+  },
+  "mcqs": [
+    {
+      "stem": "Basophilic stippling in lead poisoning reflects which mechanistic step?",
+      "choices": [
+        "Inhibition of pyrimidine 5′-nucleotidase causing retained RNA in red cells",
+        "Direct lysis of red cell membranes by lead",
+        "Megaloblastic maturation of erythroid precursors",
+        "Iron deposition in mitochondria of erythroid precursors (ringed sideroblasts)"
+      ],
+      "correct": 0,
+      "explanation": "Lead inhibits red-cell pyrimidine 5′-nucleotidase. Retained ribosomal RNA precipitates as the punctate basophilic stippling seen on Wright stain. Ringed sideroblasts (choice D) ARE another finding in lead, but that's seen in the marrow, not on the peripheral smear."
+    },
+    {
+      "stem": "Which chelation regimen is appropriate first-line for this boy at a level of 78 μg/dL with encephalopathy?",
+      "choices": [
+        "Oral succimer (DMSA) alone",
+        "IV calcium-EDTA plus IM dimercaprol (BAL)",
+        "Deferoxamine",
+        "N-acetylcysteine"
+      ],
+      "correct": 1,
+      "explanation": "Lead level >70 with encephalopathy mandates IV calcium-EDTA WITH IM dimercaprol (BAL). BAL is started first to avoid redistribution of brain lead by EDTA. Succimer (oral DMSA) is appropriate for 45-69 μg/dL without encephalopathy. Deferoxamine is for iron. NAC is for acetaminophen."
+    },
+    {
+      "stem": "Why does the wrist drop appear before the encephalopathy resolves?",
+      "choices": [
+        "Lead preferentially damages motor axons of the radial nerve (peripheral motor neuropathy)",
+        "Lead causes a stroke in Wernicke’s area",
+        "Lead deposits in the wrist extensor tendons",
+        "Lead causes a myopathy of the wrist extensors"
+      ],
+      "correct": 0,
+      "explanation": "The classic adult finding is wrist drop from a peripheral motor neuropathy that preferentially affects extensor (radial) motor axons. In children, encephalopathy and abdominal colic dominate; peripheral neuropathy is less common but can appear."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

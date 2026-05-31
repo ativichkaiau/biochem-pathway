@@ -1,0 +1,84 @@
+{
+  "id": "urea-otc",
+  "pathway": "urea",
+  "title": "The day-3 male newborn who stopped feeding",
+  "blurb": "A previously well newborn who decompensates 48 hours after the first feed. The lab that distinguishes this disorder from its cousins is orotic acid in the urine.",
+  "patient": {
+    "age": "3 days",
+    "sex": "M",
+    "complaint": "Stopped feeding overnight, now hypotonic and breathing fast."
+  },
+  "opening": "3-day-old term boy, exclusively breastfed since hour 12. Mom called this morning because he refused two feeds, then became 'floppy.' On arrival he is lethargic with a GCS of 9, RR 64, and seizures on the monitor. Bedside glucose is normal. ABG shows respiratory alkalosis. Plasma ammonia comes back at 720 μmol/L. What do you want to ask, examine, or order next?",
+  "history": "Term boy, uncomplicated pregnancy and delivery, Apgars 9 / 9. Fed within the first hour, latched well, mom voluminous milk. Mother had a much older brother who died of 'something at the hospital' as a baby. Mom is healthy, no exposures.",
+  "exam": "HR 168, RR 64, T 36.4, SpO2 99%. Hypotonic with poor head control, anterior fontanelle full and tense. Periodic deep sighing breaths. Liver edge palpable 2 cm. Pupils mid-position reactive. No dysmorphism.",
+  "labs": [
+    { "name": "Plasma ammonia",         "value": 720,  "unit": "μmol/L", "ref": "<100 (newborn)", "flag": "high"   },
+    { "name": "pH",                     "value": 7.51, "unit": "",       "ref": "7.35-7.45",      "flag": "high"   },
+    { "name": "PaCO2",                  "value": 26,   "unit": "mmHg",   "ref": "35-45",          "flag": "low"    },
+    { "name": "Glucose",                "value": 74,   "unit": "mg/dL",  "ref": "45-90",          "flag": "normal" },
+    { "name": "BUN",                    "value": 2,    "unit": "mg/dL",  "ref": "5-18",           "flag": "low"    },
+    { "name": "Plasma citrulline",      "value": 4,    "unit": "μmol/L", "ref": "10-45",          "flag": "low"    },
+    { "name": "Plasma glutamine",       "value": 1340, "unit": "μmol/L", "ref": "475-745",        "flag": "high"   },
+    { "name": "Urine orotic acid",      "value": 84,   "unit": "mmol/mol Cr", "ref": "<2",        "flag": "high"   },
+    { "name": "Lactate",                "value": 1.6,  "unit": "mmol/L", "ref": "0.5-2.2",        "flag": "normal" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the most likely diagnosis?",
+      "cause":     "What enzyme is deficient?",
+      "mechanism": "Briefly: why is the urine orotic acid elevated, and how does that distinguish this from CPS-I deficiency?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["otc deficiency", "ornithine transcarbamylase", "otc", "ornithine transcarbamoylase"] },
+      "cause":     { "weight": 1.0, "accepts": ["otc", "ornithine transcarbamylase", "ornithine transcarbamoylase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["carbamoyl", "orotic", "pyrimidine"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the urea-cycle enzyme that fails in OTC deficiency.",
+    "target": { "type": "edge", "edgeId": "OTC:Carbamoyl-P->Citrulline" },
+    "correctMsg": "Yes — ornithine transcarbamylase. With OTC blocked, mitochondrial carbamoyl-P backs up into the cytosol and gets shunted into pyrimidine synthesis (CAD pathway) → orotic acid spills into the urine. Citrulline is LOW because it can't be made.",
+    "wrongMsg":   "Not quite. Look for the step where carbamoyl phosphate is joined with ornithine.",
+    "revealMsg":  "Target: OTC (Carbamoyl-P → Citrulline). Loss-of-function here gives the classic low-citrulline / high-orotic-acid / high-ammonia neonatal phenotype."
+  },
+  "mcqs": [
+    {
+      "stem": "Why is OTC deficiency the only urea-cycle defect that classically presents with HIGH urine orotic acid?",
+      "choices": [
+        "Carbamoyl-P accumulates in OTC deficiency and is shunted into the cytosolic pyrimidine pathway",
+        "OTC is required for orotate degradation",
+        "Aspartate accumulation drives orotate synthesis",
+        "All urea-cycle defects raise orotic acid equally"
+      ],
+      "correct": 0,
+      "explanation": "In OTC deficiency, mitochondrial carbamoyl-P (which CPS-I keeps making) can't proceed to citrulline and overflows into the cytosolic CAD pathway → carbamoyl-aspartate → dihydroorotate → orotate. CPS-I deficiency removes the source of carbamoyl-P, so orotate is NORMAL or low. That distinction is the classic exam point."
+    },
+    {
+      "stem": "Why is plasma ammonia toxic AND the patient hyperventilating?",
+      "choices": [
+        "Ammonia crosses the blood–brain barrier and is detoxified by astrocyte glutamine synthetase, which depletes α-KG and drives cerebral edema; brainstem chemoreceptors respond with hyperventilation → respiratory alkalosis",
+        "Ammonia directly stimulates respiratory muscles",
+        "Hypoglycemia drives hyperventilation",
+        "Hyperammonemia produces a high anion gap acidosis with respiratory compensation"
+      ],
+      "correct": 0,
+      "explanation": "In astrocytes, ammonia + glutamate → glutamine (via glutamine synthetase). This is osmotically active and pulls α-KG out of the TCA cycle. The combination of osmotic edema and α-KG depletion creates the encephalopathy. Centrally-driven hyperventilation produces the classic neonatal respiratory ALKALOSIS — UCDs are NOT acidotic, distinguishing them from organic acidemias."
+    },
+    {
+      "stem": "Initial management of this baby's hyperammonemia includes all EXCEPT:",
+      "choices": [
+        "Protein-free IV dextrose + insulin to suppress catabolism",
+        "Sodium benzoate / sodium phenylacetate (or phenylbutyrate) for alternative N excretion",
+        "Hemodialysis given ammonia >500",
+        "High-protein feeds to provide essential amino acids"
+      ],
+      "correct": 3,
+      "explanation": "Stop protein, drive anabolism with glucose + insulin, use scavengers (Na-benzoate / phenylacetate) to bypass the broken urea cycle by excreting hippurate and phenylacetylglutamine, and hemodialyze for ammonia >500 (or persistent encephalopathy)."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}
