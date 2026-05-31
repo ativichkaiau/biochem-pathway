@@ -2382,13 +2382,13 @@ document.getElementById('pathway-svg').addEventListener('click', (e) => {
   }
   const lbl = e.target.closest('.pathway-label[data-pw]');
   if (lbl) {
-    openPathway(lbl.dataset.pw);
+    openPathway(lbl.dataset.pw, { shift: e.shiftKey });
   }
 });
 
 document.querySelector('aside.right').addEventListener('click', (e) => {
   const head = e.target.closest('.sub-header[data-pw]');
-  if (head) { openPathway(head.dataset.pw); return; }
+  if (head) { openPathway(head.dataset.pw, { shift: e.shiftKey }); return; }
   const row = e.target.closest('.metabolite-row');
   if (row) {
     selectedMetabolite = row.dataset.name;
@@ -2424,16 +2424,17 @@ function exitDive() {
   renderAll();
 }
 
-// Click-on-pathway dispatcher: if the pathway has a case JSON, open the case;
-// otherwise fall back to the existing deep-dive (visual highlight + detail card).
-// `AVAILABLE_CASES` and `CaseRunner` are defined later but hoisting + late
-// invocation make the forward reference safe.
-function openPathway(pw) {
-  if (typeof AVAILABLE_CASES !== 'undefined' && AVAILABLE_CASES.includes(pw)) {
+// Click-on-pathway dispatcher.
+//   plain click  →  deep-dive (focus + pathway detail card)
+//   shift+click  →  open the case (when /cases/<pw>.json exists)
+// Callers pass { shift: e.shiftKey } when forwarding the event.
+function openPathway(pw, opts) {
+  opts = opts || {};
+  if (opts.shift && typeof AVAILABLE_CASES !== 'undefined' && AVAILABLE_CASES.includes(pw)) {
     CaseRunner.open(pw);
-  } else {
-    enterDive(pw);
+    return;
   }
+  enterDive(pw);
 }
 
 // ---- Day / night theme ----
@@ -3165,9 +3166,11 @@ document.addEventListener('keydown', (e) => {
     if (!AVAILABLE_CASES.includes(pw)) return;
     if (h.querySelector('.case-enter-btn')) return;
     h.classList.add('has-case');
+    h.title = 'Click to focus this pathway · Shift+click to start the case';
     const btn = document.createElement('span');
     btn.className = 'case-enter-btn';
-    btn.textContent = '▶ CASE';
+    btn.textContent = '⇧ CASE';
+    btn.title = 'Shift+click anywhere on this row to start the case';
     // No own click listener — bubbling to the sub-header handles it.
     h.appendChild(btn);
   });
