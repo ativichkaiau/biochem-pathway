@@ -1,0 +1,84 @@
+{
+  "id": "tca-fluoroacetate",
+  "pathway": "tca",
+  "title": "The farmer's son who tasted from the tin",
+  "blurb": "A textbook 'lethal synthesis': an innocuous molecule that the cell's own enzymes convert into a tight-binding TCA poison.",
+  "patient": {
+    "age": "4 years",
+    "sex": "M",
+    "complaint": "Found unresponsive in the locked equipment shed; mother says he 'was tasting things from a tin'."
+  },
+  "opening": "4-year-old boy on a working farm. Found ~20 minutes after wandering into a locked equipment shed; he had a brief generalized tonic-clonic seizure en route. Initial pH 7.04 with a 32-point anion gap and lactate 12. The tin beside him reads 'Compound 1080 — sodium fluoroacetate — pest control'. Cardiac monitor now shows runs of ventricular ectopy. What do you want to ask EMS, examine, or order next?",
+  "history": "Healthy boy, no prior ingestions. The farm uses Compound 1080 (sodium fluoroacetate) as a coyote bait. Empty tin found beside him.",
+  "exam": "HR 178 irregular, BP 88/52, RR 30, T 36.6, SpO2 99% on 100% non-rebreather. Pale, diaphoretic, GCS 9. Cardiac monitor shows runs of ventricular ectopy. Abdomen soft. Pupils 4 mm reactive.",
+  "labs": [
+    { "name": "pH",             "value": 7.04, "unit": "",       "ref": "7.35-7.45", "flag": "low"  },
+    { "name": "HCO3",           "value": 8,    "unit": "mmol/L", "ref": "22-28",     "flag": "low"  },
+    { "name": "Anion gap",      "value": 32,   "unit": "mmol/L", "ref": "8-12",      "flag": "high" },
+    { "name": "Lactate",        "value": 12.4, "unit": "mmol/L", "ref": "0.5-2.2",   "flag": "high" },
+    { "name": "Serum citrate (send-out)", "value": "Markedly elevated", "unit": "", "ref": "low μmol/L range", "flag": "high" },
+    { "name": "Ammonia",        "value": 92,   "unit": "umol/L", "ref": "<50",       "flag": "high" },
+    { "name": "Potassium",      "value": 2.8,  "unit": "mmol/L", "ref": "3.5-5.0",   "flag": "low"  },
+    { "name": "Ionized calcium","value": 0.84, "unit": "mmol/L", "ref": "1.10-1.32", "flag": "low"  },
+    { "name": "Glucose",        "value": 162,  "unit": "mg/dL",  "ref": "70-110",    "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is your diagnosis (be specific about the agent and the mechanism class)?",
+      "cause":     "What is the precise enzyme blocked after the 'lethal synthesis'?",
+      "mechanism": "Briefly: why does this poisoning produce seizures, ventricular arrhythmia, AND hypocalcemia?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["fluoroacetate", "1080", "lethal synthesis"] },
+      "cause":     { "weight": 1.0, "accepts": ["aconitase", "fluorocitrate"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["citrate", "tca", "calcium"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the TCA enzyme blocked by fluorocitrate.",
+    "target": { "type": "edge", "edgeId": "Aconitase:Citrate->Isocitrate" },
+    "correctMsg": "Yes — aconitase. The cell innocently converts fluoroacetate → fluoroacetyl-CoA → fluorocitrate, which then ties up the very next enzyme. Citrate piles up; TCA flux collapses.",
+    "wrongMsg":   "Not quite. Fluoroacetate isn't the inhibitor — the body BUILDS the inhibitor (fluorocitrate). Which enzyme acts on citrate?",
+    "revealMsg":  "Target: Aconitase (Citrate → Isocitrate). Fluorocitrate is a near-irreversible tight-binding inhibitor — the textbook 'lethal synthesis'."
+  },
+  "mcqs": [
+    {
+      "stem": "Why is fluoroacetate called a 'lethal synthesis' poison?",
+      "choices": [
+        "The molecule is harmless until the cell's own enzymes convert it into a tight-binding inhibitor (fluorocitrate)",
+        "It synthesizes a lethal antibody to TCA enzymes",
+        "It triggers de novo synthesis of pro-apoptotic factors",
+        "It is the product of an esterification done in vivo"
+      ],
+      "correct": 0,
+      "explanation": "Coined by Sir Rudolph Peters in 1952. Fluoroacetate is itself benign; the cell's own machinery (acetyl-CoA synthetase, then citrate synthase) builds fluoroacetyl-CoA → fluorocitrate, which then ties up aconitase. The poison is made by the victim."
+    },
+    {
+      "stem": "Why does the patient develop hypocalcemia and ventricular arrhythmia?",
+      "choices": [
+        "Citrate chelates ionized calcium in plasma",
+        "Acidosis directly suppresses calcium channels",
+        "Hypothermia stuns the myocardium",
+        "Acute renal failure dumps phosphate"
+      ],
+      "correct": 0,
+      "explanation": "Citrate is a calcium chelator — the same reason blood-bank PRBCs (citrated) drop ionized calcium in massive transfusion. Massive citrate elevation lowers ionized Ca²⁺, prolonging QT and predisposing to ventricular arrhythmia, and lowers seizure threshold."
+    },
+    {
+      "stem": "Why does serum citrate climb so high in this poisoning?",
+      "choices": [
+        "Aconitase is blocked, but citrate synthase keeps producing citrate from acetyl-CoA + OAA",
+        "Citrate synthase is activated by fluorocitrate",
+        "The kidney reabsorbs citrate avidly under acidosis",
+        "Renal failure prevents citrate excretion"
+      ],
+      "correct": 0,
+      "explanation": "Citrate synthase is upstream of the block and keeps running. With aconitase locked, citrate can't proceed to isocitrate — it accumulates intracellularly and spills into plasma."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

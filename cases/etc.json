@@ -1,0 +1,84 @@
+{
+  "id": "etc-cyanide",
+  "pathway": "etc",
+  "title": "The fire victim with a lethal lactate",
+  "blurb": "Pulled from a smoldering polyurethane fire. Full arterial oxygen, lactate 16, and a venous SO₂ that should not exist. The mitochondria are starving in a sea of oxygen.",
+  "patient": {
+    "age": "47 years",
+    "sex": "F",
+    "complaint": "Pulled from a burning living-room sofa. Confused, breathing hard, lactate skyrocketing."
+  },
+  "opening": "47-year-old woman, pulled 15 minutes ago from a smoldering polyurethane couch fire. Initial GCS 11. ABG on 100% non-rebreather: pH 6.94, PaO₂ 480, SaO₂ 100%, lactate 16. CO-Hb 8%, MetHb 1%. Skin is cherry-red, conjunctivae too. Cardiac monitor: sinus tach. Tell me what you want to ask the medics, examine on her, or order next.",
+  "history": "Lives alone. The couch caught fire from a space heater, heavy black smoke. EMS reported a 'bitter almond' odor in the room. No known cardiac, pulmonary, or psychiatric history. Last seen well 30 min ago.",
+  "exam": "HR 138, BP 80/40, RR 32, T 36.8, SpO2 100% on 100% NRB. GCS 11 (E3 V3 M5). Cherry-red skin and conjunctivae. No soot in the upper airway, no facial burns, no stridor, breath sounds clear. Pupils mid-position, sluggish.",
+  "labs": [
+    { "name": "pH",          "value": 6.94, "unit": "",       "ref": "7.35-7.45", "flag": "low"    },
+    { "name": "HCO3",        "value": 6,    "unit": "mmol/L", "ref": "22-28",     "flag": "low"    },
+    { "name": "Lactate",     "value": 16.0, "unit": "mmol/L", "ref": "0.5-2.2",   "flag": "high"   },
+    { "name": "PaO2",        "value": 480,  "unit": "mmHg",   "ref": ">80",       "flag": "normal" },
+    { "name": "SaO2",        "value": 100,  "unit": "%",      "ref": ">95",       "flag": "normal" },
+    { "name": "Venous SO2",  "value": 92,   "unit": "%",      "ref": "60-80",     "flag": "high"   },
+    { "name": "COHb",        "value": 8,    "unit": "%",      "ref": "<5",        "flag": "high"   },
+    { "name": "MetHb",       "value": 1,    "unit": "%",      "ref": "<2",        "flag": "normal" },
+    { "name": "Glucose",     "value": 188,  "unit": "mg/dL",  "ref": "70-110",    "flag": "high"   }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the most likely poisoning here?",
+      "cause":     "What specific enzyme is being inhibited?",
+      "mechanism": "Briefly: why is the venous oxygen saturation HIGHER than normal even as the patient acidifies?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["cyanide", "cn poisoning", "cyanide poisoning", "cn-"] },
+      "cause":     { "weight": 1.0, "accepts": ["complex iv", "cytochrome c oxidase", "cytochrome a3", "cytochrome oxidase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["oxygen", "etc", "extract"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the electron transport chain step blocked by cyanide.",
+    "target": { "type": "edge", "edgeId": "Complex IV:Cyt c (red)->H2O" },
+    "correctMsg": "Yes — Complex IV (cytochrome c oxidase). CN⁻ binds the Fe³⁺ in cytochrome a₃ and blocks O₂ reduction. The cell can't use the oxygen the lungs are delivering — hence the arterialized venous blood.",
+    "wrongMsg":   "Not quite. The oxygen the patient is breathing is reaching the cell. The block is at the LAST step, where electrons reach O₂.",
+    "revealMsg":  "Target: Complex IV (Cyt c (red) → H₂O). With this step blocked, the mitochondrion can't accept the electron load or consume oxygen."
+  },
+  "mcqs": [
+    {
+      "stem": "Which feature most argues for cyanide over isolated CO poisoning?",
+      "choices": [
+        "Cherry-red skin",
+        "Coma",
+        "Severe lactic acidosis with PaO₂ 480 and venous SO₂ 92%",
+        "Soot in the upper airway"
+      ],
+      "correct": 2,
+      "explanation": "CO poisoning lowers oxygen DELIVERY (carboxyhemoglobin). Cyanide impairs oxygen UTILIZATION at Complex IV. The combination of full arterial oxygenation, profound lactic acidosis, AND an arterialized venous saturation is the cyanide fingerprint."
+    },
+    {
+      "stem": "What is the preferred immediate antidote in this fire-victim scenario?",
+      "choices": [
+        "Hydroxocobalamin",
+        "Methylene blue",
+        "Sodium thiosulfate alone",
+        "Amyl nitrite (induced methemoglobinemia)"
+      ],
+      "correct": 0,
+      "explanation": "Hydroxocobalamin binds CN⁻ directly to form cyanocobalamin (B12). It's preferred in smoke / fire victims because inducing methemoglobinemia with nitrites is risky on top of likely concurrent CO. Sodium thiosulfate is adjunctive (donates sulfur to rhodanese)."
+    },
+    {
+      "stem": "Why is lactate elevated despite full arterial oxygenation?",
+      "choices": [
+        "Blocked Complex IV → ETC stalls → NADH ↑↑ → forces pyruvate → lactate to regenerate NAD⁺",
+        "Cyanide directly activates LDH",
+        "Hyperventilation shifts the oxygen-dissociation curve",
+        "Smoke contains lactic acid"
+      ],
+      "correct": 0,
+      "explanation": "Electrons pile up at NADH because Complex IV can't pass them to O₂. NAD⁺ becomes limiting, so the cell ferments pyruvate to lactate (via LDH) to regenerate NAD⁺ and keep glycolysis going. The mitochondria, full of oxygen they can't use, starve for ATP."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

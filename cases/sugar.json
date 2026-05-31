@@ -1,0 +1,84 @@
+{
+  "id": "sugar-galactosemia",
+  "pathway": "sugar",
+  "title": "The newborn vomiting after every feed",
+  "blurb": "An inborn error of carbohydrate metabolism that presents in the first week of life — vomiting, jaundice, hepatomegaly, and a curious affinity for E. coli sepsis.",
+  "patient": {
+    "age": "6 days",
+    "sex": "F",
+    "complaint": "Vomits after every breastfeed, turning yellow, now lethargic and febrile."
+  },
+  "opening": "6-day-old breastfed girl, born at term to non-consanguineous parents. Began vomiting after each feed on day 3. Jaundice has spread from the face to the chest. Tonight she is lethargic and febrile to 38.5 °C. CBC: WBC 22k with bandemia. Bedside glucose normal. Blood culture pending. Lens exam shows bilateral oil-droplet opacities. What do you want to ask, examine, or order next?",
+  "history": "Pregnancy uneventful. Apgars 8 / 9. Latching well at first. Mother is well, breastfeeding exclusively, no formula. No environmental exposures. No family history reported, but the parents seem reticent — eventually they share that a sibling died at 3 weeks of unexplained 'sepsis'.",
+  "exam": "Vitals: HR 178, RR 60, T 38.5, SpO2 99%. Weight down 9% since birth. Lethargic, mildly icteric to chest, anterior fontanelle full. Liver edge 3 cm below the costal margin; spleen tip palpable. Bilateral oil-droplet lens opacities on red reflex. Cap refill 3 sec. No focal neuro signs.",
+  "labs": [
+    { "name": "Glucose",          "value": 64,   "unit": "mg/dL",  "ref": "45-95",     "flag": "normal" },
+    { "name": "Total bilirubin",  "value": 18.4, "unit": "mg/dL",  "ref": "<12",       "flag": "high"   },
+    { "name": "Direct bilirubin", "value": 5.2,  "unit": "mg/dL",  "ref": "<2",        "flag": "high"   },
+    { "name": "AST",              "value": 240,  "unit": "U/L",    "ref": "<50",       "flag": "high"   },
+    { "name": "ALT",              "value": 165,  "unit": "U/L",    "ref": "<40",       "flag": "high"   },
+    { "name": "PT (INR)",         "value": 1.9,  "unit": "",       "ref": "<1.3",      "flag": "high"   },
+    { "name": "Urine reducing substance (Clinitest)", "value": "Positive", "unit": "", "ref": "Negative", "flag": "high"   },
+    { "name": "Urine glucose (dipstick)",             "value": "Negative", "unit": "", "ref": "Negative", "flag": "normal" },
+    { "name": "Blood culture",    "value": "E. coli", "unit": "",  "ref": "Negative",  "flag": "high"   }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the most likely diagnosis?",
+      "cause":     "What specific enzyme is deficient?",
+      "mechanism": "Briefly: why E. coli sepsis, cataracts, AND liver disease all at once?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["classic galactosemia", "galactosemia"] },
+      "cause":     { "weight": 1.0, "accepts": ["galt", "galactose-1-phosphate uridyltransferase", "galactose 1 phosphate uridyl"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["galactose-1-p", "galactitol", "e. coli"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the enzyme step that fails in classic galactosemia.",
+    "target": { "type": "edge", "edgeId": "GALT → G1P:Galactose-1-P->Glucose-6-P" },
+    "correctMsg": "Yes — GALT (galactose-1-phosphate uridyltransferase). Without it, galactose-1-P accumulates (hepatotoxic) and overflow galactose is reduced by aldose reductase to galactitol — the cataract substrate.",
+    "wrongMsg":   "Not quite. Think about which enzyme handles galactose-1-phosphate. (Galactokinase deficiency is the milder cataracts-only variant.)",
+    "revealMsg":  "Target: GALT (Galactose-1-P → Glucose-6-P, with UDP-glucose / UDP-galactose shuffle). Its failure traps Gal-1-P."
+  },
+  "mcqs": [
+    {
+      "stem": "Why is the urine Clinitest (reducing substance) positive while the dipstick (glucose oxidase) is negative?",
+      "choices": [
+        "Clinitest reacts with any reducing sugar; the dipstick is specific for glucose",
+        "Dipstick is more sensitive than Clinitest",
+        "Galactose is glucose-oxidase positive",
+        "The dipstick was contaminated"
+      ],
+      "correct": 0,
+      "explanation": "Clinitest = nonspecific reducing-substance test (positive for galactose, lactose, fructose). The dipstick uses glucose oxidase and only reacts with glucose. A positive Clinitest with a negative dipstick is the classic clue for galactosuria."
+    },
+    {
+      "stem": "Why are infants with classic galactosemia at striking risk of E. coli sepsis in the first weeks of life?",
+      "choices": [
+        "Galactose-1-P impairs neutrophil bactericidal function",
+        "Hyperammonemia suppresses the immune system",
+        "Hepatic dysfunction blocks complement synthesis",
+        "Antibodies to E. coli cross-react with galactose"
+      ],
+      "correct": 0,
+      "explanation": "Accumulated galactose-1-P interferes with neutrophil function. The clinical fingerprint of classic galactosemia is jaundice + hepatomegaly + E. coli sepsis in a neonate started on breast milk or lactose formula."
+    },
+    {
+      "stem": "Why do these infants develop bilateral cataracts?",
+      "choices": [
+        "Galactose is reduced to galactitol by aldose reductase in the lens",
+        "Bilirubin deposits in the lens",
+        "Vitamin A deficiency from cholestasis",
+        "Direct toxicity of galactose to lens epithelium"
+      ],
+      "correct": 0,
+      "explanation": "When galactose can't enter the GALT pathway, aldose reductase converts it to galactitol. Galactitol osmotically traps water in the lens, clouding it. The same mechanism causes the isolated cataracts seen in galactokinase deficiency."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}
