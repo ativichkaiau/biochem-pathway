@@ -1,0 +1,85 @@
+{
+  "id": "glycogen-ppp-g6pd",
+  "pathway": "glycogen-ppp",
+  "title": "The soldier on primaquine and a cola-colored urine",
+  "blurb": "The most common enzyme deficiency in the world — silent until an oxidative trigger arrives. Bite cells and Heinz bodies on the smear.",
+  "patient": {
+    "age": "23 years",
+    "sex": "M",
+    "complaint": "Severe back pain, dark brown urine, and 'feeling like he's about to faint' three days after starting an antimalarial."
+  },
+  "opening": "23-year-old soldier of Mediterranean descent, deployed last week and started on primaquine for terminal prophylaxis. Three days in, he developed back and flank pain, severe fatigue, and tea-colored urine. CBC: Hgb 7.8 (was 14.2 at baseline), reticulocyte index 4.2. Smear shows bite cells, blister cells, and Heinz bodies on supravital stain. Haptoglobin undetectable, LDH 1840, indirect bilirubin 5.4. What do you want to ask, examine, or order?",
+  "history": "Healthy. Mediterranean (Sephardic Jewish) ancestry on father's side. No prior medications. One episode of jaundice as a child after eating fava beans on a school trip — labeled as 'viral hepatitis' at the time but resolved spontaneously. No transfusion history.",
+  "exam": "HR 124, BP 102/64, RR 22, T 37.4, SpO2 99%. Mildly icteric sclerae, pale conjunctivae. Mild splenomegaly. Cardiac systolic flow murmur. Lungs clear. Back tenderness diffusely. Urine grossly brown.",
+  "labs": [
+    { "name": "Hemoglobin",          "value": 7.8,  "unit": "g/dL",  "ref": "13-17",     "flag": "low"    },
+    { "name": "MCV",                 "value": 92,   "unit": "fL",    "ref": "80-100",    "flag": "normal" },
+    { "name": "Reticulocyte index",  "value": 4.2,  "unit": "",      "ref": ">2",        "flag": "high"   },
+    { "name": "Peripheral smear",    "value": "Bite cells, blister cells; supravital stain: Heinz bodies", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Haptoglobin",         "value": "<10","unit": "mg/dL", "ref": "30-200",    "flag": "low"    },
+    { "name": "LDH",                 "value": 1840, "unit": "U/L",   "ref": "<250",      "flag": "high"   },
+    { "name": "Indirect bilirubin",  "value": 5.4,  "unit": "mg/dL", "ref": "<1.0",      "flag": "high"   },
+    { "name": "Direct Coombs",       "value": "Negative", "unit": "", "ref": "Negative", "flag": "normal" },
+    { "name": "Urine hemoglobin",    "value": "Positive (intravascular hemolysis)", "unit": "", "ref": "Negative", "flag": "high" },
+    { "name": "Quantitative G6PD assay (delay until 3 mo after episode)", "value": "<10% of normal (deferred)", "unit": "", "ref": "Normal activity", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause":     "What enzyme is deficient — and what does it normally produce?",
+      "mechanism": "Briefly: why are RBCs uniquely vulnerable, and what is a 'bite cell' / 'Heinz body' showing?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["g6pd deficiency", "g-6-pd deficiency", "g6pd", "glucose-6-phosphate dehydrogenase deficiency"] },
+      "cause":     { "weight": 1.0, "accepts": ["g6pd", "glucose-6-phosphate dehydrogenase", "g-6-pd"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["nadph", "glutathione", "oxidative"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the PPP step that fails in G6PD deficiency.",
+    "target": { "type": "edge", "edgeId": "G6PD:Glucose-6-P->6-PG" },
+    "correctMsg": "Yes — G6PD. The rate-limiting step of the oxidative pentose phosphate pathway. Without G6PD-derived NADPH, glutathione (GSSG → GSH) can't be reduced, oxidative stress wins, hemoglobin precipitates as Heinz bodies, and splenic macrophages 'bite' chunks off → bite cells.",
+    "wrongMsg":   "Not quite. The committed step of the oxidative branch of the PPP — the one that produces NADPH right at the start.",
+    "revealMsg":  "Target: G6PD (Glucose-6-P → 6-PG). NADPH made here is the RBC's only oxidative defense — RBCs have no mitochondria, so no Krebs-derived NADPH."
+  },
+  "mcqs": [
+    {
+      "stem": "Why are red blood cells uniquely vulnerable to G6PD deficiency compared to other tissues?",
+      "choices": [
+        "RBCs lack mitochondria, so the PPP is their ONLY source of NADPH — and NADPH is required to keep glutathione reduced",
+        "RBCs do not express catalase",
+        "Hemoglobin auto-oxidizes faster than other hemoproteins",
+        "RBCs cannot synthesize new G6PD protein"
+      ],
+      "correct": 3,
+      "explanation": "All true to some extent, but the deepest reason is choice D combined with all the others: mature RBCs are anucleate and CANNOT replace the G6PD enzyme as it ages and loses activity. Variant enzymes (e.g., G6PD A-) are unstable; old RBCs lose all activity. Plus no mitochondrial NADPH backup. Young reticulocytes have enough enzyme; older RBCs hemolyze."
+    },
+    {
+      "stem": "Which classes of drugs / exposures are highest-risk for triggering hemolysis?",
+      "choices": [
+        "Primaquine, sulfa antibiotics, dapsone, nitrofurantoin, methylene blue, rasburicase, naphthalene, and fava beans",
+        "ACE inhibitors and beta-blockers",
+        "Penicillins and macrolides",
+        "Statins"
+      ],
+      "correct": 0,
+      "explanation": "The classic oxidant exposures. Sepsis itself also triggers hemolysis (an oxidative stress in its own right). Methylene blue can both treat and trigger — it's an oxidant in G6PD-deficient cells. Rasburicase is contraindicated in G6PD deficiency."
+    },
+    {
+      "stem": "Why is quantitative G6PD testing deferred until ~3 months after an acute episode?",
+      "choices": [
+        "Reticulocytes have fresh, fully active G6PD enzyme; testing in the acute hemolytic window can give a falsely normal result",
+        "Heinz bodies interfere with the assay",
+        "Hyperbilirubinemia quenches the fluorescent signal",
+        "Acute hemolysis suppresses HMP shunt flux"
+      ],
+      "correct": 0,
+      "explanation": "After hemolysis, the bone marrow releases reticulocytes loaded with new (active) enzyme. A 'normal' G6PD assay during or just after an episode can mislead — the surviving cells are the ones with the most enzyme. Defer the quantitative assay 2-3 months."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

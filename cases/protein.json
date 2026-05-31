@@ -1,0 +1,85 @@
+{
+  "id": "protein-msud",
+  "pathway": "protein",
+  "title": "The 10-day-old who smells like maple syrup",
+  "blurb": "A neonatal acidotic crisis with a distinctive sweet odor and a deficient enzyme in the same family as PDH and α-KGDH.",
+  "patient": {
+    "age": "10 days",
+    "sex": "F",
+    "complaint": "Poor feeding for 3 days, now lethargic with arching back posturing."
+  },
+  "opening": "10-day-old breastfed girl, well at discharge on day 2. Last 3 days: progressively poor feeding, irritability, episodes of opisthotonic posturing. Today she is barely rousable. Nursing student notes her urine and cerumen smell strongly of maple syrup. Bedside glucose 78. ABG pH 7.20 with anion gap 22, lactate 2.4 (only mildly up). Plasma amino acid panel pending. Mom is exhausted. What do you want to ask, examine, or order?",
+  "history": "Term, uncomplicated pregnancy and delivery, Apgars 9/9. Exclusively breastfed. Two unaffected older siblings. Parents are first cousins. Older sibling has had no metabolic problems. No medications.",
+  "exam": "HR 174, RR 60, T 36.5, SpO2 99%. Lethargic, hypertonic, intermittent opisthotonic posturing. Anterior fontanelle full. No dysmorphism. Sweet maple-syrup odor on the diapers and the ear canals. No hepatomegaly.",
+  "labs": [
+    { "name": "pH",                 "value": 7.20, "unit": "",       "ref": "7.35-7.45", "flag": "low"  },
+    { "name": "Anion gap",          "value": 22,   "unit": "mmol/L", "ref": "8-12",      "flag": "high" },
+    { "name": "Lactate",            "value": 2.4,  "unit": "mmol/L", "ref": "0.5-2.2",   "flag": "high" },
+    { "name": "Ammonia",            "value": 96,   "unit": "μmol/L", "ref": "<100 (neonate)", "flag": "normal" },
+    { "name": "Glucose",            "value": 78,   "unit": "mg/dL",  "ref": "45-90",     "flag": "normal" },
+    { "name": "Plasma leucine",     "value": 2240, "unit": "μmol/L", "ref": "70-170",    "flag": "high" },
+    { "name": "Plasma valine",      "value": 920,  "unit": "μmol/L", "ref": "120-310",   "flag": "high" },
+    { "name": "Plasma isoleucine",  "value": 480,  "unit": "μmol/L", "ref": "40-110",    "flag": "high" },
+    { "name": "Plasma alloisoleucine", "value": "Detected (pathognomonic)", "unit": "", "ref": "Absent", "flag": "high" },
+    { "name": "Urine DNPH test",    "value": "Strongly positive (α-keto acids)", "unit": "", "ref": "Negative", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause":     "What enzyme complex is deficient?",
+      "mechanism": "Briefly: why does the diagnostic 'sweet' odor come AND why neuro symptoms dominate over an ammonia crisis?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["msud", "maple syrup urine disease", "maple syrup urine"] },
+      "cause":     { "weight": 1.0, "accepts": ["bckdh", "branched-chain alpha-keto acid dehydrogenase", "branched chain alpha keto acid dehydrogenase", "branched-chain α-keto acid dehydrogenase", "branched chain ketoacid dehydrogenase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["leucine", "α-keto", "branched"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "BCKDH belongs to the family of α-keto-acid dehydrogenases that also includes PDH. Click the TCA-cycle cousin that catalyzes the SAME reaction motif (α-keto acid + CoA → CoA-thioester + CO₂ + NADH).",
+    "target": { "type": "edge", "edgeId": "α-KGDH:α-KG->Succinyl-CoA" },
+    "correctMsg": "Yes — α-KGDH. PDH, α-KGDH, and BCKDH are sister enzymes (same E1 / E2 / E3 architecture, all use TPP / lipoate / FAD / NAD / CoA). BCKDH is missing in MSUD, but the SAME motif is preserved at PDH and α-KGDH. That's also why arsenite, dichloroacetate, and certain lipoate disorders hit all three.",
+    "wrongMsg":   "Not quite. Look in the TCA cycle for the other α-keto-acid dehydrogenase (the one that turns a 5-carbon α-keto acid into a 4-carbon CoA-thioester).",
+    "revealMsg":  "Target: α-KGDH (α-KG → Succinyl-CoA). PDH (pyruvate → acetyl-CoA) is the other cousin. All three share the E1-E2-E3 subunit family, use thiamine + lipoate, and are coordinately regulated."
+  },
+  "mcqs": [
+    {
+      "stem": "Which branched-chain amino acid (and its α-keto acid) drives most of the neurotoxicity in MSUD?",
+      "choices": [
+        "Leucine (and α-ketoisocaproate) — competes with other large neutral amino acids at the BBB, impairs astrocyte function, and reaches dramatic concentrations",
+        "Isoleucine",
+        "Valine",
+        "Methionine"
+      ],
+      "correct": 0,
+      "explanation": "Leucine and its keto acid α-ketoisocaproate (KIC) are the dominant neurotoxins. KIC concentrations correlate with encephalopathy and cerebral edema. Treatment is monitored largely by plasma leucine levels."
+    },
+    {
+      "stem": "Which vitamin sometimes partially rescues MSUD when the variant impairs the cofactor binding site?",
+      "choices": [
+        "Thiamine (B1) — TPP is the BCKDH cofactor",
+        "Pyridoxine (B6)",
+        "Riboflavin (B2)",
+        "Vitamin B12"
+      ],
+      "correct": 0,
+      "explanation": "BCKDH uses thiamine pyrophosphate. Thiamine-responsive variants exist and can dramatically reduce plasma branched-chain AAs. Always trial high-dose thiamine in MSUD."
+    },
+    {
+      "stem": "Acute management of a MSUD crisis includes all of the following EXCEPT:",
+      "choices": [
+        "Stop all enteral protein; deliver high-calorie glucose + insulin to reverse catabolism; supplement isoleucine and valine (paradoxically) to balance the AA pool",
+        "Hemodialysis for severe encephalopathy or rapid leucine reduction",
+        "Initiate restricted branched-chain AA medical formula",
+        "Loading dose of valproate to control seizures"
+      ],
+      "correct": 3,
+      "explanation": "AVOID valproate in any organic acidemia / inborn error of metabolism — it depletes carnitine and can precipitate hyperammonemic crisis. Stop protein, force anabolism, supplement Ile/Val (because leucine restriction tips the AA pool), and dialyze if needed."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

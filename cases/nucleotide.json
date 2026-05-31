@@ -1,0 +1,84 @@
+{
+  "id": "nucleotide-lesch-nyhan",
+  "pathway": "nucleotide",
+  "title": "The toddler who bites his own lips",
+  "blurb": "An X-linked disorder of purine salvage. Self-mutilation, dystonia, and a uric acid level that doesn't belong in a 2-year-old.",
+  "patient": {
+    "age": "2 years",
+    "sex": "M",
+    "complaint": "Self-biting (lips, fingers), worsening 'stiffness', orange crystals in his diapers."
+  },
+  "opening": "2-year-old boy referred for evaluation of self-injury and motor regression. He has been biting his lower lip and fingertips, sometimes drawing blood; his parents now mitten his hands. He was a normal infant but developmental milestones have slowed — he's not yet walking. Mother noticed orange-pink gritty residue in his diapers. Uric acid is 13.4. Maternal uncle has gout and intellectual disability. What do you want to ask, examine, or order?",
+  "history": "Born at term, met early milestones. From ~6 months on, hypotonia evolving into dystonia. From 18 months on, episodes of self-directed biting. Mom states 'he doesn't want to hurt himself — he cries when he does it.' Diet: typical toddler.",
+  "exam": "Active, dystonic, hyperreflexic. Choreoathetoid movements of the upper extremities. Tongue and lip lacerations (self-inflicted), fingertips with healed bite marks. No dysmorphism. Mild cognitive delay.",
+  "labs": [
+    { "name": "Serum uric acid",        "value": 13.4, "unit": "mg/dL", "ref": "<5.5 (child)",  "flag": "high"   },
+    { "name": "Urine uric acid : Cr",   "value": 4.6,  "unit": "",      "ref": "<2.0",         "flag": "high"   },
+    { "name": "Urine sediment",         "value": "Orange-pink urate crystals", "unit": "", "ref": "Negative", "flag": "high" },
+    { "name": "Serum creatinine",       "value": 0.6,  "unit": "mg/dL", "ref": "<0.7",          "flag": "normal" },
+    { "name": "BUN",                    "value": 14,   "unit": "mg/dL", "ref": "5-18",          "flag": "normal" },
+    { "name": "AST / ALT",              "value": "32 / 28", "unit": "U/L", "ref": "<40",       "flag": "normal" },
+    { "name": "Erythrocyte HGPRT activity", "value": "Undetectable", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "HGPRT1 sequencing",      "value": "Pathogenic loss-of-function variant", "unit": "", "ref": "Wild-type", "flag": "high" },
+    { "name": "Brain MRI",              "value": "Subtle basal ganglia signal change", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause":     "Which enzyme is deficient?",
+      "mechanism": "Briefly: why does losing a SALVAGE enzyme drive uric acid SO high?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["lesch-nyhan", "lesch nyhan", "hgprt deficiency"] },
+      "cause":     { "weight": 1.0, "accepts": ["hgprt", "hypoxanthine-guanine phosphoribosyltransferase", "hypoxanthine guanine phosphoribosyl"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["salvage", "prpp", "de novo"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the purine SALVAGE step that fails in this disorder. (It's the cofactor-style arrow that loops hypoxanthine back to IMP.)",
+    "target": { "type": "edge", "edgeId": "HGPRT salvage:Hypoxanthine->IMP" },
+    "correctMsg": "Yes — HGPRT. It normally rescues hypoxanthine back to IMP (and guanine back to GMP) using PRPP. Without HGPRT, PRPP piles up and feedback inhibition on de novo synthesis is released → de novo purine synthesis runs uncontrolled → hyperuricemia.",
+    "wrongMsg":   "Not quite. The block isn't in degradation — it's the loop that BRINGS hypoxanthine back as a usable purine nucleotide.",
+    "revealMsg":  "Target: HGPRT salvage (Hypoxanthine → IMP). The faded arrow back from hypoxanthine to IMP is the missing recycling step."
+  },
+  "mcqs": [
+    {
+      "stem": "Why is uric acid SO elevated when only a salvage enzyme is missing?",
+      "choices": [
+        "Loss of HGPRT raises PRPP availability AND drops nucleotide feedback inhibition → de novo synthesis spins, and any hypoxanthine/guanine that isn't salvaged drains to uric acid",
+        "HGPRT normally degrades uric acid",
+        "HGPRT inhibits xanthine oxidase under normal conditions",
+        "Uric acid is the direct product of HGPRT"
+      ],
+      "correct": 0,
+      "explanation": "PRPP that would have been used for salvage builds up and drives de novo synthesis (which itself uses PRPP). Plus, the IMP/GMP feedback on the de novo committed step (PRPP amidotransferase) is relieved. Both effects push the system to crank out purines that ultimately catabolize to uric acid."
+    },
+    {
+      "stem": "Allopurinol is started for the hyperuricemia. Which feature of the disorder will it NOT correct?",
+      "choices": [
+        "The neurological / behavioral phenotype",
+        "Renal urate stones",
+        "Tophaceous gout",
+        "Hyperuricosuria"
+      ],
+      "correct": 0,
+      "explanation": "Allopurinol (and rasburicase) lowers uric acid by blocking xanthine oxidase — it prevents the gout, stones, and nephropathy. The CNS phenotype (self-mutilation, dystonia, intellectual disability) is uric-acid-independent and unfortunately is NOT reversed by uric-acid lowering."
+    },
+    {
+      "stem": "Why is the disorder X-linked, with affected males and a maternal uncle's similar history?",
+      "choices": [
+        "HPRT1 is on Xq26",
+        "It is autosomal dominant with sex-limited expression",
+        "Y-chromosome microdeletion",
+        "Mitochondrial inheritance"
+      ],
+      "correct": 0,
+      "explanation": "HPRT1 is on Xq26. Affected hemizygous males inherit the variant from carrier mothers. The pattern of an affected uncle on the maternal side + an affected nephew is classic X-linked recessive."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

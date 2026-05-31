@@ -1,0 +1,84 @@
+{
+  "id": "ethanol-methanol",
+  "pathway": "ethanol",
+  "title": "Three roommates and the gallon jug labeled 'antifreeze'",
+  "blurb": "A toxic alcohol with a deceptive latent period. Lethal not because of the parent molecule, but because of what alcohol dehydrogenase makes from it.",
+  "patient": {
+    "age": "34 years",
+    "sex": "M",
+    "complaint": "Vomiting, severe headache, and 'snow' in his vision — drank an unlabeled clear liquid at a party last night."
+  },
+  "opening": "34-year-old man, present 18 hours after drinking from a clear unlabeled jug at a party. He felt 'a little drunk' last night, slept normally, woke up with severe occipital headache, nausea, and now describes seeing 'snow.' Two roommates who drank smaller amounts feel ill but well; one declines evaluation. ABG: pH 7.10, anion gap 28, lactate 4. Serum osmolar gap 22. Visual acuity is 20/200 bilaterally despite normal pupils. Funduscopic exam shows disc edema. What do you want to ask, examine, or order?",
+  "history": "Healthy. No regular medications. The jug had a faded 'antifreeze' label and a sticker that said 'denatured.' He estimates he drank ~150 mL. Roommate brought the rest of the jug; it tested positive for methanol on quick screen.",
+  "exam": "HR 96, BP 134/82, RR 26 with Kussmaul respirations, T 36.8, SpO2 99%. Lethargic but conversive. Pupils 4 mm and equal but visual acuity grossly impaired. Funduscopy: bilateral optic disc edema. Tachypneic, no rales. Abdomen soft.",
+  "labs": [
+    { "name": "pH",                "value": 7.10, "unit": "",       "ref": "7.35-7.45", "flag": "low"  },
+    { "name": "HCO3",              "value": 9,    "unit": "mmol/L", "ref": "22-28",     "flag": "low"  },
+    { "name": "Anion gap",         "value": 28,   "unit": "mmol/L", "ref": "8-12",      "flag": "high" },
+    { "name": "Osmolar gap",       "value": 22,   "unit": "mOsm/kg","ref": "<10",       "flag": "high" },
+    { "name": "Lactate",           "value": 4.0,  "unit": "mmol/L", "ref": "0.5-2.2",   "flag": "high" },
+    { "name": "Serum ethanol",     "value": 0,    "unit": "mg/dL",  "ref": "0",         "flag": "normal" },
+    { "name": "Serum methanol",    "value": 64,   "unit": "mg/dL",  "ref": "<20 (toxic >20)", "flag": "high" },
+    { "name": "Serum formate",     "value": 28,   "unit": "mg/dL",  "ref": "<3",        "flag": "high" },
+    { "name": "Visual acuity",     "value": "20/200 OU", "unit": "", "ref": "20/20",    "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause":     "Which enzyme makes the actual toxin — and which antidote blocks it?",
+      "mechanism": "Briefly: why is visual loss + Kussmaul + an osmolar AND anion gap the giveaway?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["methanol poisoning", "methanol toxicity", "methanol intoxication", "methanol"] },
+      "cause":     { "weight": 1.0, "accepts": ["adh", "alcohol dehydrogenase", "fomepizole"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["formate", "anion", "osmolar"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the enzyme that converts methanol into its toxic downstream metabolite (and that fomepizole blocks).",
+    "target": { "type": "edge", "edgeId": "ADH:Ethanol->Acetaldehyde" },
+    "correctMsg": "Yes — alcohol dehydrogenase. ADH happily oxidizes methanol → formaldehyde → formate (the actual neurotoxin). Fomepizole competitively inhibits ADH (Ki for methanol » Km for ethanol, so blocking ADH lets methanol be excreted unchanged via the kidney).",
+    "wrongMsg":   "Not quite. The toxic alcohols hijack the SAME enzyme that handles ethanol. Block that enzyme and the parent molecule is excreted intact.",
+    "revealMsg":  "Target: ADH (Ethanol → Acetaldehyde). For methanol AND ethylene glycol, the strategy is identical: shut down ADH (fomepizole > ethanol drip) and dialyze."
+  },
+  "mcqs": [
+    {
+      "stem": "Why is formate (not methanol itself) the cause of the optic neuritis and acidosis?",
+      "choices": [
+        "Formate inhibits cytochrome c oxidase (Complex IV) in the optic nerve and contributes a strong organic acid to the anion gap; it accumulates because human formate dehydrogenase is folate-dependent and slow",
+        "Methanol is osmotically toxic to retinal photoreceptors directly",
+        "Formate directly chelates retinal copper",
+        "Methanol crystallizes in retinal vessels"
+      ],
+      "correct": 0,
+      "explanation": "Formate inhibits Complex IV → ATP starvation in metabolically active tissue (retina, basal ganglia, optic nerve) → demyelination and infarction. Formate is a strong acid, contributing to the anion gap. Folate (or folinic acid) speeds formate clearance via 10-formyl-THF dehydrogenase; it is given empirically in methanol poisoning."
+    },
+    {
+      "stem": "Why is the osmolar gap LARGE early in methanol poisoning but shrinks as the patient gets sicker?",
+      "choices": [
+        "Methanol is an osmotically active small molecule; as ADH converts it to formate, the osmolar gap falls and the anion gap rises",
+        "Osmolar gap is unrelated to methanol",
+        "Lactate replaces methanol in the osmolar gap",
+        "Bicarbonate exhaustion lowers serum osmolality"
+      ],
+      "correct": 0,
+      "explanation": "Methanol contributes ~3 mOsm per 10 mg/dL; as it gets metabolized to formate, methanol falls (osmolar gap shrinks) and formate rises (anion gap grows). A LARGE anion gap with a NORMAL osmolar gap is consistent with late presentation."
+    },
+    {
+      "stem": "Why is fomepizole preferred over an ethanol drip when both are available?",
+      "choices": [
+        "Predictable dosing, no CNS depression, no need for level monitoring, no hypoglycemia",
+        "Fomepizole reverses formate directly",
+        "Ethanol potentiates methanol toxicity at the retina",
+        "Fomepizole speeds renal excretion of methanol"
+      ],
+      "correct": 0,
+      "explanation": "Both block ADH. Fomepizole has predictable pharmacokinetics, no CNS / respiratory depression, no continuous level monitoring, and no hypoglycemia or pancreatitis risk — easier and safer than an ethanol drip. Hemodialysis is added for high methanol levels, severe acidosis, visual impairment, or end-organ involvement."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "id": "sterol-fh",
+  "pathway": "sterol",
+  "title": "The teenager with tendon xanthomas and an LDL of 386",
+  "blurb": "Premature coronary disease running through a family. Tendon xanthomas in a teenager. A receptor problem treated, paradoxically, with an enzyme inhibitor.",
+  "patient": {
+    "age": "16 years",
+    "sex": "M",
+    "complaint": "Lumps over the Achilles tendons, gritty yellowish discoloration of the eyelids."
+  },
+  "opening": "16-year-old boy referred from sports medicine for bilateral tender Achilles 'lumps' and yellow plaques around his eyelids. Father had a fatal MI at 42; paternal grandfather at 38. Fasting lipid panel: total cholesterol 462, LDL 386, HDL 38, triglycerides 110. He is otherwise asymptomatic. What do you want to ask, examine, or order next?",
+  "history": "Active athlete, no smoking, no drugs. Diet is unremarkable (not particularly bad). Father died of MI at 42, paternal grandfather at 38, paternal aunt had a stent at 50. Mother and maternal family unaffected.",
+  "exam": "Vitals normal. Bilateral firm, non-tender Achilles tendon thickening (xanthomas). Subtle xanthelasma over both upper eyelids. Corneal arcus visible in a 16-year-old. Cardiac exam normal. No bruits.",
+  "labs": [
+    { "name": "Total cholesterol", "value": 462, "unit": "mg/dL", "ref": "<200",  "flag": "high"   },
+    { "name": "LDL-C",             "value": 386, "unit": "mg/dL", "ref": "<100",  "flag": "high"   },
+    { "name": "HDL-C",             "value": 38,  "unit": "mg/dL", "ref": ">40",   "flag": "low"    },
+    { "name": "Triglycerides",     "value": 110, "unit": "mg/dL", "ref": "<150",  "flag": "normal" },
+    { "name": "Lipoprotein(a)",    "value": 92,  "unit": "mg/dL", "ref": "<30",   "flag": "high"   },
+    { "name": "ApoB",              "value": 184, "unit": "mg/dL", "ref": "<90",   "flag": "high"   },
+    { "name": "TSH",               "value": 1.8, "unit": "mIU/L", "ref": "0.4-4.0","flag": "normal" },
+    { "name": "Fasting glucose",   "value": 88,  "unit": "mg/dL", "ref": "70-100","flag": "normal" },
+    { "name": "LDLR / APOB / PCSK9 panel", "value": "Pathogenic LDLR variant (heterozygous)", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the most likely diagnosis?",
+      "cause":     "Which enzyme do first-line drugs target to lower his LDL — and why does targeting that enzyme work even though the disease is a RECEPTOR problem?",
+      "mechanism": "Briefly: explain the tendon xanthomas and corneal arcus mechanistically."
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["familial hypercholesterolemia", "heterozygous familial hypercholesterolemia", "fh"] },
+      "cause":     { "weight": 1.0, "accepts": ["hmg-coa reductase", "hmg coa reductase", "statin"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["ldl", "macrophage", "xanthoma"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the cholesterol-synthesis enzyme that statins inhibit.",
+    "target": { "type": "edge", "edgeId": "HMG-CoA reductase:Acetyl-CoA->Mevalonate" },
+    "correctMsg": "Yes — HMG-CoA reductase. The committed, rate-limiting step of cholesterol biosynthesis. Inhibiting it lowers intracellular cholesterol → SREBP-2 upregulates LDLR transcription → hepatocytes pull more LDL out of plasma using the patient's REMAINING functional LDL receptors. That's why a receptor disease responds to an enzyme inhibitor.",
+    "wrongMsg":   "Not quite. Look one step up from squalene — the rate-limiting step that statins block.",
+    "revealMsg":  "Target: HMG-CoA reductase (Acetyl-CoA → Mevalonate). Inhibition triggers compensatory LDLR upregulation — exploiting the fact that he still has one working LDLR allele."
+  },
+  "mcqs": [
+    {
+      "stem": "Why do tendon xanthomas and corneal arcus appear so early in heterozygous FH?",
+      "choices": [
+        "Macrophages take up modified (oxidized / aggregated) LDL via scavenger receptors that are NOT downregulated by intracellular cholesterol — and they accumulate in tendons, eyelids, and cornea",
+        "Cholesterol crystallizes directly out of plasma at high concentrations",
+        "Mast-cell mediated lipid deposition",
+        "Local lipoprotein lipase deficiency in tendons"
+      ],
+      "correct": 0,
+      "explanation": "LDLR is feedback-regulated. Macrophage scavenger receptors (SR-A, CD36) take up modified LDL without feedback inhibition. Sustained high LDL drives macrophage cholesterol loading → foam cells → tendon xanthomas, xanthelasma, corneal arcus, and atherosclerotic plaque."
+    },
+    {
+      "stem": "What additional therapy is appropriate when a maximally dosed high-intensity statin still leaves LDL above goal in heterozygous FH?",
+      "choices": [
+        "Add ezetimibe (NPC1L1 inhibitor) and consider a PCSK9 monoclonal antibody",
+        "Cholestyramine plus niacin only",
+        "Lifestyle alone",
+        "Switch to a low-intensity statin"
+      ],
+      "correct": 0,
+      "explanation": "Step-wise: maximum-tolerated statin → add ezetimibe (~25% additional LDL reduction) → add PCSK9 inhibitor (alirocumab / evolocumab, ~60% additional LDL reduction by sparing LDLR). For homozygous FH or LDL-apheresis-dependent disease, consider evinacumab (ANGPTL3) or lomitapide."
+    },
+    {
+      "stem": "If genetic testing had revealed a gain-of-function PCSK9 variant instead, what would the mechanism be?",
+      "choices": [
+        "PCSK9 binds LDLR and targets it for lysosomal degradation; more PCSK9 = fewer LDL receptors on hepatocytes = higher plasma LDL",
+        "PCSK9 directly oxidizes LDL particles",
+        "PCSK9 inhibits HMG-CoA reductase competitively",
+        "PCSK9 is a serine protease that degrades apoB"
+      ],
+      "correct": 0,
+      "explanation": "PCSK9 binds the hepatocyte LDL receptor and routes it to the lysosome instead of recycling. Gain-of-function PCSK9 = more LDLR degradation = fewer receptors at the surface = higher plasma LDL. Loss-of-function PCSK9 is protective — the basis for PCSK9 monoclonals."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

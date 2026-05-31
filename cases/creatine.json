@@ -1,0 +1,84 @@
+{
+  "id": "creatine-gamt",
+  "pathway": "creatine",
+  "title": "The toddler with intellectual disability and an empty brain creatine peak",
+  "blurb": "A rare but treatable cerebral creatine deficiency. The MRS lights it up before anyone else does.",
+  "patient": {
+    "age": "2.5 years",
+    "sex": "M",
+    "complaint": "Global developmental delay, autistic features, recent onset of dystonia and seizures."
+  },
+  "opening": "2.5-year-old boy with global developmental delay since infancy. Receptive language minimal, no expressive words. Last 6 months: stereotypies, self-injurious behavior, and now intermittent dystonic posturing of the right arm. He had a witnessed generalized seizure last week. Brain MRI shows mild T2 hyperintensity of the globi pallidi. The neuroradiologist ordered MRS. What do you want to ask, examine, or order?",
+  "history": "Term, normal pregnancy, no perinatal events. Concerns from 6 months on. Older sister is unaffected. No consanguinity reported. Newborn screening was normal (creatine disorders are not on most panels).",
+  "exam": "Vitals normal for age. Microcephaly trending. Limited eye contact, poor social engagement. Hypotonic at rest with dystonic posturing of right upper extremity intermittently. Brisk reflexes. No dysmorphism. Genitalia normal.",
+  "labs": [
+    { "name": "Brain MRS — creatine peak",      "value": "Absent",          "unit": "", "ref": "Normal peak", "flag": "low"  },
+    { "name": "Plasma guanidinoacetate (GAA)",  "value": 18.4,              "unit": "μmol/L", "ref": "<2",  "flag": "high" },
+    { "name": "Plasma creatine",                "value": 5,                 "unit": "μmol/L", "ref": "17-100", "flag": "low" },
+    { "name": "Urine GAA / Cr",                 "value": "Markedly elevated","unit": "", "ref": "Normal",   "flag": "high" },
+    { "name": "Urine creatine / Cr",            "value": "Low",             "unit": "", "ref": "Normal",   "flag": "low"  },
+    { "name": "Serum creatinine",               "value": 0.3,               "unit": "mg/dL",  "ref": "0.3-0.7", "flag": "normal" },
+    { "name": "GAMT enzyme activity (fibroblasts)", "value": "<5% of normal","unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "GAMT gene sequencing",           "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" },
+    { "name": "EEG",                            "value": "Generalized epileptiform discharges", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis (the specific cerebral creatine deficiency)?",
+      "cause":     "Which enzyme is deficient?",
+      "mechanism": "Briefly: why does loss of THIS enzyme matter to the brain, and why is plasma GAA elevated?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["gamt deficiency", "gamt", "guanidinoacetate methyltransferase deficiency", "cerebral creatine deficiency"] },
+      "cause":     { "weight": 1.0, "accepts": ["gamt", "guanidinoacetate methyltransferase", "guanidinoacetate n-methyltransferase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["creatine", "atp", "guanidinoacetate"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the methylation step that fails in this disorder.",
+    "target": { "type": "edge", "edgeId": "GAMT (SAM):Guanidinoacetate->Creatine" },
+    "correctMsg": "Yes — GAMT (guanidinoacetate methyltransferase). It uses SAM to methylate guanidinoacetate → creatine. Loss of GAMT means no creatine, GAA piles up (it's a GABA-A antagonist → seizures), and the brain loses its phosphocreatine ATP buffer.",
+    "wrongMsg":   "Not quite. The step uses SAM to deliver a methyl onto an arginine-glycine product to make creatine.",
+    "revealMsg":  "Target: GAMT (SAM) (Guanidinoacetate → Creatine). GAMT is the LARGEST consumer of SAM-derived methyl groups in the body. Without it, GAA accumulates AND creatine / phosphocreatine fall."
+  },
+  "mcqs": [
+    {
+      "stem": "Why does GAMT deficiency cause seizures even before MRS picks up the missing creatine peak?",
+      "choices": [
+        "Guanidinoacetate is a partial agonist at GABA-A receptors with epileptogenic properties; it accumulates upstream of the GAMT block",
+        "Creatine is a direct anticonvulsant; absence simply unmasks underlying epilepsy",
+        "Phosphocreatine depletion induces hypoglycemia",
+        "Methionine accumulation is excitotoxic"
+      ],
+      "correct": 0,
+      "explanation": "GAA acts as a partial GABA-A agonist that interferes with normal GABAergic inhibition — it's the direct epileptogen. Treatment of GAMT deficiency is creatine supplementation PLUS ornithine (to suppress AGAT, reducing GAA production) PLUS dietary arginine restriction."
+    },
+    {
+      "stem": "Treatment of GAMT deficiency includes all EXCEPT:",
+      "choices": [
+        "Oral creatine monohydrate",
+        "Ornithine supplementation (to inhibit AGAT and lower GAA)",
+        "Dietary arginine restriction",
+        "High-dose pyridoxine"
+      ],
+      "correct": 3,
+      "explanation": "The triad is creatine (replace what GAMT can't make), ornithine (downregulate the upstream step at AGAT, lowering toxic GAA), and arginine restriction (less substrate for AGAT). Pyridoxine has no specific role in GAMT deficiency."
+    },
+    {
+      "stem": "Why is GAMT considered the body's largest methyl sink?",
+      "choices": [
+        "Creatine biosynthesis consumes a major fraction of total daily SAM, second only to phosphatidylcholine synthesis (and often the largest in growing children)",
+        "Creatine is methylated repeatedly during its lifetime",
+        "Each phosphocreatine cycle consumes SAM",
+        "Creatinine excretion requires SAM"
+      ],
+      "correct": 0,
+      "explanation": "Creatine synthesis is one of the two dominant SAM consumers (the other is phosphatidylcholine via PEMT). This is why methionine / B12 / folate sufficiency matters in growing children, and why creatine supplementation is sometimes argued to spare SAM for other methylation reactions."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

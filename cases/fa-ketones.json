@@ -1,0 +1,85 @@
+{
+  "id": "fa-ketones-mcad",
+  "pathway": "fa-ketones",
+  "title": "The toddler who didn't wake up from her nap",
+  "blurb": "The most common defect of fatty-acid oxidation — a stunningly normal-appearing baby until fasting tips her into hypoketotic hypoglycemia.",
+  "patient": {
+    "age": "18 months",
+    "sex": "F",
+    "complaint": "Found limp after a long afternoon nap during a stomach bug. Glucose 28 at home."
+  },
+  "opening": "18-month-old previously healthy girl. Two days of viral gastroenteritis with poor PO intake. Slept 6 hours through the afternoon. Mom couldn't rouse her; EMS bedside glucose 28 mg/dL. In the ED she perks up with D10, but the chemistry panel is striking. Lactate 1.4, BUN 6, AST 142. Urine ketones are NEGATIVE. Acylcarnitine profile is pending. What do you want to ask, examine, or order next?",
+  "history": "Born at term, never been sick before. Eats well. No known family history of metabolic disease. Older sibling died at 14 months of 'crib death / SIDS' — autopsy unrevealing. No medications.",
+  "exam": "HR 138, BP 90/52, RR 28, T 37.1, SpO2 98%. After dextrose: alert, interactive, tracking. Liver edge palpable 2 cm below the costal margin, no spleen. No dysmorphism. Neuro exam normal once euglycemic. Anterior fontanelle closed.",
+  "labs": [
+    { "name": "Glucose",                "value": 28,   "unit": "mg/dL",  "ref": "70-110",   "flag": "low"    },
+    { "name": "Urine ketones",          "value": "Negative", "unit": "", "ref": "Trace–small in fasting", "flag": "low" },
+    { "name": "β-OH-butyrate (serum)",  "value": 0.2,  "unit": "mmol/L", "ref": "1.5-3.5 during hypoglycemia", "flag": "low" },
+    { "name": "Free fatty acids",       "value": 2.4,  "unit": "mmol/L", "ref": "0.3-0.6",  "flag": "high"   },
+    { "name": "FFA : β-OHB ratio",      "value": "12 : 1",  "unit": "", "ref": "<2 : 1 in fasting hypoglycemia", "flag": "high" },
+    { "name": "AST",                    "value": 142,  "unit": "U/L",    "ref": "<40",      "flag": "high"   },
+    { "name": "Lactate",                "value": 1.4,  "unit": "mmol/L", "ref": "0.5-2.2",  "flag": "normal" },
+    { "name": "Ammonia",                "value": 84,   "unit": "μmol/L", "ref": "<50",      "flag": "high"   },
+    { "name": "Acylcarnitine (C8 medium-chain)", "value": "Markedly elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Urine organic acids",    "value": "Medium-chain dicarboxylic aciduria + hexanoylglycine", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause":     "Which step of fatty-acid oxidation is broken?",
+      "mechanism": "Briefly: why hypoglycemia WITHOUT ketones (and why a sibling died of presumed SIDS)?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["mcad", "medium-chain acyl-coa dehydrogenase deficiency", "medium chain acyl-coa dehydrogenase", "mcad deficiency"] },
+      "cause":     { "weight": 1.0, "accepts": ["mcad", "acyl-coa dehydrogenase", "medium-chain", "β-oxidation"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["ketone", "fast", "glucose"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the fatty-acid oxidation step that fails in this disorder.",
+    "target": { "type": "edge", "edgeId": "β-ox spiral:Acyl-CoA->Acetyl-CoA" },
+    "correctMsg": "Yes — the β-oxidation spiral. MCAD catalyzes the first dehydrogenation specifically on medium-chain (C6-C12) acyl-CoA. Without it, the cell can't generate acetyl-CoA from fat → no fuel for ketogenesis during fasting AND no acetyl-CoA to drive pyruvate carboxylase for gluconeogenesis → hypoketotic hypoglycemia.",
+    "wrongMsg":   "Not quite. The block is on the mitochondrial side of the carnitine shuttle — the cycle that takes acyl-CoA down to acetyl-CoA, two carbons at a time.",
+    "revealMsg":  "Target: β-ox spiral (Acyl-CoA → Acetyl-CoA). MCAD is the C6-C12 dehydrogenase in that cycle. The fingerprint lab is hexanoyl-glycine + C8 acylcarnitine + dicarboxylic aciduria."
+  },
+  "mcqs": [
+    {
+      "stem": "Why are ketones inappropriately LOW for the degree of fasting and hypoglycemia?",
+      "choices": [
+        "β-oxidation generates the acetyl-CoA that ketogenesis (HMGCS / HMG-CoA lyase) uses; if β-ox fails, ketogenesis has no substrate",
+        "Ketogenesis is inhibited by hypoglycemia",
+        "Insulin levels remain elevated, suppressing ketogenesis",
+        "Carnitine is depleted and ketones spill into urine without entering serum"
+      ],
+      "correct": 0,
+      "explanation": "Hepatic ketogenesis (acetyl-CoA → acetoacetyl-CoA → HMG-CoA → acetoacetate) is downstream of β-oxidation. Without the supply of mitochondrial acetyl-CoA from fatty-acid breakdown, the ketogenesis machinery has nothing to act on. That's the 'hypoketotic' part of hypoketotic hypoglycemia."
+    },
+    {
+      "stem": "Why does hypoglycemia happen at all — couldn't gluconeogenesis maintain glucose?",
+      "choices": [
+        "β-oxidation normally supplies the acetyl-CoA that allosterically activates pyruvate carboxylase; if β-ox fails, gluconeogenesis falters too",
+        "Glycogen reserves are absent in toddlers",
+        "MCAD deficiency directly inhibits PEPCK",
+        "Insulin is paradoxically elevated"
+      ],
+      "correct": 0,
+      "explanation": "Two-hit deficit: ketogenesis fails AND gluconeogenesis is impaired because mitochondrial acetyl-CoA is the allosteric activator of pyruvate carboxylase (PC). No β-ox-derived acetyl-CoA → PC underactive → less OAA → less PEP via PEPCK → impaired gluconeogenesis during the fast."
+    },
+    {
+      "stem": "Why is MCAD historically over-represented in 'SIDS' / unexplained infant death?",
+      "choices": [
+        "Pre-newborn-screen, an infant's first prolonged fast (often during a viral illness) was the first clinical presentation — and could be fatal",
+        "MCAD causes apnea via direct brainstem toxicity",
+        "MCAD raises ammonia to seizure-inducing levels",
+        "MCAD prevents surfactant synthesis"
+      ],
+      "correct": 0,
+      "explanation": "Before universal MS/MS newborn screening for MCAD (1990s–2000s), the first symptomatic episode — typically a febrile illness with prolonged fasting in a previously well infant — could be lethal. The sibling history in this case is the giveaway. Modern newborn screening detects elevated C8 acylcarnitine."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

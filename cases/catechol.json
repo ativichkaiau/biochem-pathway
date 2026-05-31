@@ -1,0 +1,84 @@
+{
+  "id": "catechol-pku",
+  "pathway": "catechol",
+  "title": "The skipped newborn screen and the fair-haired baby",
+  "blurb": "An untreated home-birth infant presenting at 8 months with developmental delay, a musty odor, and a pale phenotype her parents never expected.",
+  "patient": {
+    "age": "8 months",
+    "sex": "F",
+    "complaint": "Not meeting milestones; mom thinks she smells 'mousy'."
+  },
+  "opening": "8-month-old, born at home, never had the newborn screen done. Pediatrician sees her today for a delayed visit. She isn't rolling, has poor head control, and tracks faces only intermittently. Parents are both brown-haired with hazel eyes; she has very fair skin, blond hair, and bright-blue eyes. Mom mentions a faint musty odor in her sweat that has been there since birth. What do you want to ask, examine, or order next?",
+  "history": "Home birth, mom declined newborn screening. Pregnancy uneventful. Two older siblings are healthy and dark-haired. No maternal medications or maternal hyperphenylalaninemia. Diet: breast milk and some pureed cereals.",
+  "exam": "Vitals normal for age. Anthropometrics: head circumference at 5th centile (was 30th at birth — microcephaly trend). Fair skin, blond hair, blue eyes, eczema on cheeks. Hypertonic with brisk reflexes. Persistent tongue thrust. No dysmorphism.",
+  "labs": [
+    { "name": "Plasma phenylalanine", "value": 1840, "unit": "μmol/L", "ref": "<120",  "flag": "high"   },
+    { "name": "Plasma tyrosine",     "value": 38,   "unit": "μmol/L", "ref": "45-110","flag": "low"    },
+    { "name": "Phe / Tyr ratio",     "value": 48,   "unit": "",       "ref": "<2",    "flag": "high"   },
+    { "name": "Dihydrobiopterin (BH₂)", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Tetrahydrobiopterin (BH₄) loading test", "value": "Non-responsive", "unit": "", "ref": "Responsive in BH₄ defects", "flag": "high" },
+    { "name": "Urine pterins",       "value": "Normal pattern (no neopterin/biopterin defect)", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Urine phenylpyruvate / phenylacetate", "value": "Elevated", "unit": "", "ref": "Negative", "flag": "high" },
+    { "name": "Brain MRI",           "value": "Mild diffuse white matter signal abnormality", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "PAH gene sequencing", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis (and please say whether classical or BH₄-responsive)?",
+      "cause":     "Which enzyme is deficient?",
+      "mechanism": "Briefly: why are the hair and skin pale, and why the developmental regression?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["pku", "phenylketonuria", "classic pku", "classical pku"] },
+      "cause":     { "weight": 1.0, "accepts": ["pah", "phenylalanine hydroxylase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["tyrosine", "melanin", "phenylalanine"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the enzyme step that fails in classical PKU.",
+    "target": { "type": "edge", "edgeId": "PAH (BH4):Phenylalanine->Tyrosine" },
+    "correctMsg": "Yes — PAH (phenylalanine hydroxylase), BH₄-dependent. Phe can't be hydroxylated to Tyr, so Phe and its abnormal metabolites (phenylpyruvate, phenylacetate, phenyllactate) accumulate. Tyr becomes essential — and melanin synthesis suffers because tyrosinase needs Tyr.",
+    "wrongMsg":   "Not quite. Look at the very first step that converts Phe into the next amino acid in the catecholamine cascade.",
+    "revealMsg":  "Target: PAH (BH₄) — Phenylalanine → Tyrosine. Note the BH₄ cofactor: defects in BH₄ synthesis or recycling (DHPR, GTPCH1, PTPS, SR) mimic PKU but with additional CNS features."
+  },
+  "mcqs": [
+    {
+      "stem": "Why does PKU produce the fair / blond / blue-eyed phenotype?",
+      "choices": [
+        "Tyrosinase requires tyrosine to make melanin; low tyrosine blocks melanin synthesis",
+        "Phenylalanine directly inhibits melanocyte mitosis",
+        "BH₄ is required for melanin synthesis",
+        "Phenylketones are toxic to melanocytes"
+      ],
+      "correct": 0,
+      "explanation": "Tyrosinase converts tyrosine → DOPA → DOPAquinone → melanin. With low circulating tyrosine and (locally) impaired tyrosinase, melanin synthesis is reduced. Hair, skin, and iris pigmentation lighten."
+    },
+    {
+      "stem": "What is the cornerstone of treatment?",
+      "choices": [
+        "Strict low-phenylalanine diet (medical formula, restricted natural protein, no aspartame); supplement tyrosine; BH₄ (sapropterin) if responsive",
+        "Levodopa replacement",
+        "High-protein diet to dilute phenylalanine",
+        "Chelation"
+      ],
+      "correct": 0,
+      "explanation": "Dietary phenylalanine restriction is lifelong, with specialized formula providing protein and other amino acids. Supplement tyrosine. Some PKU variants are BH₄-responsive (sapropterin = BH₄ analog). Avoid aspartame (it's hydrolyzed to phenylalanine)."
+    },
+    {
+      "stem": "A different child with HIGH phenylalanine, LOW tyrosine, abnormal urine pterins, and dystonia has NORMAL PAH gene sequencing. What's the likely defect?",
+      "choices": [
+        "A defect in BH₄ synthesis or recycling (e.g., DHPR, GTPCH1, PTPS, SR deficiency)",
+        "PAH promoter polymorphism",
+        "Tyrosinemia type 1",
+        "Maternal PKU"
+      ],
+      "correct": 0,
+      "explanation": "BH₄ is also the cofactor for tyrosine hydroxylase, tryptophan hydroxylase, and NO synthase. A BH₄ disorder gives PKU-like Phe / Tyr labs PLUS dopamine and serotonin deficiency → dystonia, drooling, autonomic features. Treatment adds BH₄ and neurotransmitter precursors (L-DOPA + carbidopa, 5-HTP)."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}
