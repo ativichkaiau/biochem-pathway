@@ -876,41 +876,29 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
   .case-shell { animation: none; }
 }
 
-/* ===== Retractable side tabs (panel handles on the inner edge) ===== */
-.side-tab {
-  position: fixed; top: 50%; transform: translateY(-50%);
-  z-index: 5;
-  width: 22px; height: 72px;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid var(--glass-brd);
-  color: var(--text-2);
-  cursor: pointer; font-family: inherit;
-  font-size: 17px; line-height: 1; padding: 0;
-  transition: color 0.16s, border-color 0.16s, box-shadow 0.16s, background 0.16s;
-  user-select: none;
+/* ===== Collapsible sections inside each side panel ===== */
+.collapse-chev {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; flex-shrink: 0;
+  font-size: 9px; line-height: 1; color: var(--text-2);
+  transition: transform 0.18s ease, color 0.15s;
+  cursor: pointer; user-select: none;
 }
-.side-tab:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 8px 22px -10px var(--accent), 0 0 0 1px var(--glass-hi) inset;
-}
-.side-tab-left  { left: 310px; border-radius: 0 10px 10px 0; border-left: none; }
-.side-tab-right { right: 310px; border-radius: 10px 0 0 10px; border-right: none; }
-.side-tab-chev { display: inline-block; transition: transform 0.2s ease; }
-/* When panel is hidden the tab snaps to the viewport edge and the chevron flips */
-body:has(.layout.hide-left)  .side-tab-left  { left: 0; }
-body:has(.layout.hide-right) .side-tab-right { right: 0; }
-body:has(.layout.hide-left)  .side-tab-left  .side-tab-chev,
-body:has(.layout.hide-right) .side-tab-right .side-tab-chev { transform: rotate(180deg); }
-/* Hide tabs while any overlay is up so they don't float on top of glass cards */
-body:has(#intro:not(.hidden))    .side-tab,
-body:has(#cases-browser.open)    .side-tab,
-body:has(#help-modal.open)       .side-tab,
-body:has(#cmd-palette.open)      .side-tab,
-body.case-open:not(.case-pinpoint) .side-tab { display: none; }
-@media (prefers-reduced-motion: reduce) { .side-tab, .side-tab-chev { transition: none; } }
+.collapse-chev:hover { color: var(--text); }
+/* PERTURBATIONS panel: collapse each category */
+.category-header { cursor: pointer; user-select: none; transition: color 0.12s; }
+.category-header:hover { color: var(--text); }
+.category-header .collapse-chev { margin-left: auto; }
+.category-header.collapsed .collapse-chev { transform: rotate(-90deg); }
+.pert-cat-body { display: block; }
+.category-header.collapsed + .pert-cat-body { display: none; }
+/* METABOLITES panel: collapse each pathway group via chevron-only target */
+.sub-header .collapse-chev { color: var(--text-2); }
+.sub-header .case-enter-btn { margin-left: auto; }
+.sub-header.has-case .collapse-chev { margin-left: 6px; }
+.sub-header:not(.has-case) .collapse-chev { margin-left: auto; }
+.sub-header.collapsed .collapse-chev { transform: rotate(-90deg); }
+.sub-header.collapsed + div { display: none; }
 
 /* ===== Perturbation summary / quick-start chips (top of left panel) ===== */
 .pert-summary { margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--glass-brd); }
@@ -1433,9 +1421,6 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     </div>
   </div>
 </div>
-
-<button class="side-tab side-tab-left"  id="side-tab-left"  type="button" title="Hide / show perturbations  ( [ )" aria-label="Toggle perturbations panel"><span class="side-tab-chev">‹</span></button>
-<button class="side-tab side-tab-right" id="side-tab-right" type="button" title="Hide / show metabolite states  ( ] )" aria-label="Toggle metabolite panel"><span class="side-tab-chev">›</span></button>
 
 <div id="cases-browser" aria-hidden="true">
   <div class="cases-shell">
@@ -2458,6 +2443,9 @@ function renderEdges() {
   g.innerHTML = items.join('');
 }
 
+// Track which perturbation categories are currently collapsed (across re-renders).
+const _pertCollapsed = new Set();
+
 const QUICK_PERTS = [
   { id: 'insulin',    label: 'Insulin' },
   { id: 'starvation', label: 'Starvation' },
@@ -2502,7 +2490,9 @@ function renderPerturbationList() {
   }
   const html = [];
   for (const cat of Object.keys(grouped)) {
-    html.push(`<div class="category-header"><div class="category-dot"></div>${escapeText(cat)}</div>`);
+    const collapsed = _pertCollapsed.has(cat);
+    html.push(`<div class="category-header${collapsed ? ' collapsed' : ''}" data-cat="${escapeAttr(cat)}"><div class="category-dot"></div>${escapeText(cat)}<span class="collapse-chev">▼</span></div>`);
+    html.push('<div class="pert-cat-body">');
     for (const p of grouped[cat]) {
       const isActive = activePerturbations.has(p.id);
       html.push(
@@ -2515,6 +2505,7 @@ function renderPerturbationList() {
         `</div>`
       );
     }
+    html.push('</div>');
   }
   list.innerHTML = html.join('');
 }
@@ -2727,6 +2718,18 @@ document.getElementById('pert-summary').addEventListener('click', (e) => {
   }
 });
 
+// Collapse / expand a perturbation category when its header is clicked
+document.getElementById('perturbations-list').addEventListener('click', (e) => {
+  const catHead = e.target.closest('.category-header');
+  if (catHead) {
+    const c = catHead.dataset.cat;
+    if (_pertCollapsed.has(c)) _pertCollapsed.delete(c);
+    else _pertCollapsed.add(c);
+    renderPerturbationList();
+    return;
+  }
+});
+
 document.getElementById('perturbations-list').addEventListener('click', (e) => {
   const el = e.target.closest('.perturbation');
   if (!el) return;
@@ -2761,7 +2764,13 @@ document.getElementById('pathway-svg').addEventListener('click', (e) => {
 });
 
 document.querySelector('aside.right').addEventListener('click', (e) => {
+  // The chevron toggles collapse only — it preempts pathway-focus click
+  const chev = e.target.closest('.collapse-chev');
   const head = e.target.closest('.sub-header[data-pw]');
+  if (chev && head) {
+    head.classList.toggle('collapsed');
+    return;
+  }
   if (head) { openPathway(head.dataset.pw, { shift: e.shiftKey }); return; }
   const row = e.target.closest('.metabolite-row');
   if (row) {
@@ -2770,6 +2779,18 @@ document.querySelector('aside.right').addEventListener('click', (e) => {
     renderAll();
   }
 });
+
+// Inject the collapse chevron into each metabolite sub-header on first load
+(function injectCollapseChevrons() {
+  document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
+    if (h.querySelector('.collapse-chev')) return;
+    const chev = document.createElement('span');
+    chev.className = 'collapse-chev';
+    chev.title = 'Collapse / expand this group';
+    chev.textContent = '▼';
+    h.appendChild(chev);
+  });
+})();
 
 document.getElementById('reset-btn').addEventListener('click', () => {
   activePerturbations.clear();
@@ -3535,10 +3556,6 @@ document.addEventListener('keydown', (e) => {
     if (confirm('Close case? Progress will be lost.')) CaseRunner.close();
   }
 }, true);
-
-// ---------------- Retractable side tabs (delegate to existing toggles) ----------------
-document.getElementById('side-tab-left').addEventListener('click', () => document.getElementById('toggle-left').click());
-document.getElementById('side-tab-right').addEventListener('click', () => document.getElementById('toggle-right').click());
 
 // ---------------- Command palette (⌘K / / ) ----------------
 // One unified searcher across cases, pathways, metabolites, perturbations.
