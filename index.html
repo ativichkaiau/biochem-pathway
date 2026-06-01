@@ -875,6 +875,214 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
   .chat-msg.streaming::after { animation: none; opacity: 0; }
   .case-shell { animation: none; }
 }
+
+/* ===== Perturbation summary / quick-start chips (top of left panel) ===== */
+.pert-summary { margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--glass-brd); }
+.pert-summary-label {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 10px; font-weight: 700; letter-spacing: 1.4px; color: var(--text-2);
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.pert-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.pert-quick-chip {
+  font-family: inherit; font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  cursor: pointer; transition: all 0.12s; white-space: nowrap;
+}
+.pert-quick-chip:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px); }
+.pert-active-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 4px 3px 9px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+}
+.pert-active-chip-x {
+  display: inline-flex; width: 16px; height: 16px; border-radius: 50%;
+  cursor: pointer; align-items: center; justify-content: center;
+  font-size: 11px; line-height: 1; font-weight: 700;
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  transition: background 0.12s, color 0.12s;
+}
+.pert-active-chip-x:hover { background: var(--down); color: #fff; }
+.pert-clear-btn {
+  font-family: inherit; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  color: var(--text-2); cursor: pointer; background: transparent; border: none;
+  text-transform: uppercase; padding: 0;
+}
+.pert-clear-btn:hover { color: var(--down); }
+
+/* ===== Cases browser: a glass card grid of every shipped case ===== */
+#cases-browser {
+  position: fixed; inset: 0; z-index: 65;
+  display: none; padding: 36px 24px; overflow: auto;
+  background: radial-gradient(120% 120% at 8% 8%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 55%),
+              radial-gradient(120% 120% at 96% 96%, color-mix(in srgb, var(--purple) 12%, transparent), transparent 55%),
+              linear-gradient(180deg, rgba(8,10,15,0.86), rgba(5,7,11,0.96));
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  animation: cbIn 0.25s ease both;
+}
+body.light #cases-browser {
+  background: radial-gradient(120% 120% at 8% 8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
+              radial-gradient(120% 120% at 96% 96%, color-mix(in srgb, var(--purple) 12%, transparent), transparent 55%),
+              linear-gradient(180deg, rgba(243,246,251,0.88), rgba(228,234,243,0.96));
+}
+@keyframes cbIn { from { opacity: 0; } to { opacity: 1; } }
+#cases-browser.open { display: block; }
+.cases-shell { max-width: 1180px; margin: 0 auto; }
+.cases-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 18px; margin-bottom: 22px;
+  padding: 22px 26px; border-radius: 20px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--glass-brd);
+  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 40px 100px -40px var(--shadow);
+}
+.cases-head-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: 1.8px; color: var(--accent); margin-bottom: 6px; }
+.cases-head-title { font-size: 26px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.6px; }
+.cases-head-title span {
+  background: linear-gradient(120deg, var(--accent), var(--purple));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cases-head-sub { color: var(--text-2); font-size: 13px; margin: 0; line-height: 1.5; }
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 14px;
+}
+.case-card {
+  position: relative;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid var(--glass-brd);
+  border-radius: 16px;
+  padding: 16px 18px 16px 26px;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.case-card::before {
+  content: ''; position: absolute; top: 14px; bottom: 14px; left: 12px;
+  width: 4px; border-radius: 3px;
+  background: var(--pw, var(--accent));
+  box-shadow: 0 0 16px var(--pw, var(--accent));
+  opacity: 0.85;
+}
+.case-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--pw, var(--accent));
+  box-shadow: 0 18px 38px -18px color-mix(in srgb, var(--pw, var(--accent)) 60%, transparent);
+}
+.case-card-pw {
+  font-size: 9.5px; letter-spacing: 1.8px; font-weight: 700;
+  color: var(--pw, var(--accent)); text-transform: uppercase;
+  margin: 0 0 7px;
+}
+.case-card-title { font-size: 14.5px; font-weight: 700; margin: 0 0 7px; letter-spacing: -0.2px; line-height: 1.3; color: var(--text); }
+.case-card-blurb { font-size: 12px; line-height: 1.5; color: var(--text-2); margin: 0 0 12px; }
+.case-card-cta {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10.5px; font-weight: 800; letter-spacing: 1px;
+  color: var(--pw, var(--accent));
+  text-transform: uppercase;
+}
+.cases-close { padding: 6px 14px; flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) { #cases-browser, .case-card { animation: none; transition: none; } }
+
+/* ===== Help modal (header "?" button) ===== */
+#help-modal {
+  position: fixed; inset: 0; z-index: 70;
+  display: none; place-items: center; padding: 24px;
+  background: linear-gradient(180deg, rgba(8,10,15,0.7), rgba(5,7,11,0.85));
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  animation: cbIn 0.2s ease both;
+}
+body.light #help-modal { background: linear-gradient(180deg, rgba(243,246,251,0.7), rgba(228,234,243,0.85)); }
+#help-modal.open { display: grid; }
+.help-card {
+  width: min(620px, 100%); max-width: 100%;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--glass-brd); border-radius: 22px;
+  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 40px 100px -30px var(--shadow);
+  padding: 26px 30px 24px;
+}
+.help-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 8px; }
+.help-card-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: 1.8px; color: var(--accent); margin-bottom: 6px; }
+.help-card-title { font-size: 22px; font-weight: 800; margin: 0; letter-spacing: -0.4px; }
+.help-card-section { margin-top: 18px; }
+.help-card-section h4 {
+  margin: 0 0 8px; font-size: 10.5px; letter-spacing: 1.6px; color: var(--text-2);
+  text-transform: uppercase; font-weight: 700;
+}
+.help-row { display: flex; gap: 14px; align-items: center; padding: 7px 0; font-size: 12.5px; line-height: 1.4; border-top: 1px solid var(--glass-brd); }
+.help-row:first-of-type { border-top: none; }
+.help-row .help-keys { display: flex; gap: 4px; align-items: center; min-width: 120px; }
+.help-row .help-desc { flex: 1; color: var(--text-2); }
+kbd.help-key {
+  font-family: inherit; font-size: 11px; font-weight: 700;
+  background: var(--glass-2); border: 1px solid var(--glass-brd);
+  padding: 2px 8px; border-radius: 6px; color: var(--text);
+  min-width: 22px; text-align: center;
+}
+.help-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--glass-brd); }
+
+/* ===== Command palette (⌘K / / ) ===== */
+#cmd-palette {
+  position: fixed; inset: 0; z-index: 75;
+  display: none; padding-top: 90px; padding-left: 24px; padding-right: 24px;
+  background: linear-gradient(180deg, rgba(8,10,15,0.55), rgba(5,7,11,0.75));
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  animation: cbIn 0.18s ease both;
+}
+body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0.6), rgba(228,234,243,0.85)); }
+#cmd-palette.open { display: grid; place-items: start center; }
+.cmd-box {
+  width: min(660px, 100%);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--glass-brd); border-radius: 14px;
+  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 40px 100px -30px var(--shadow);
+  overflow: hidden;
+}
+.cmd-input {
+  width: 100%; padding: 16px 22px;
+  font-size: 15px; font-family: inherit;
+  background: transparent; border: none; outline: none;
+  color: var(--text); border-bottom: 1px solid var(--glass-brd);
+  box-sizing: border-box;
+}
+.cmd-input::placeholder { color: var(--text-2); }
+.cmd-results { max-height: 50vh; overflow-y: auto; padding: 6px; }
+.cmd-group-label {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 1.6px;
+  color: var(--text-2); padding: 12px 12px 4px;
+  text-transform: uppercase;
+}
+.cmd-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 8px 12px; border-radius: 8px;
+  cursor: pointer; font-size: 13px; user-select: none;
+}
+.cmd-item:hover, .cmd-item.active { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.cmd-item.active .cmd-item-label { color: var(--accent); }
+.cmd-item-ico { width: 22px; flex-shrink: 0; text-align: center; font-size: 13px; opacity: 0.85; }
+.cmd-pw-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--pw, var(--accent)); flex-shrink: 0; box-shadow: 0 0 8px var(--pw, var(--accent)); }
+.cmd-item-body { flex: 1; min-width: 0; }
+.cmd-item-label { color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmd-item-sub { color: var(--text-2); font-size: 10.5px; margin-top: 1px; letter-spacing: 0.3px; }
+.cmd-empty { padding: 22px; text-align: center; color: var(--text-2); font-size: 13px; }
+.cmd-hint {
+  padding: 9px 14px; font-size: 10.5px; color: var(--text-2);
+  border-top: 1px solid var(--glass-brd);
+  display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap;
+}
+.cmd-hint kbd.help-key { font-size: 10px; padding: 1px 6px; }
+@media (prefers-reduced-motion: reduce) { #cmd-palette { animation: none; } }
 </style>
 </head>
 <body>
@@ -1037,6 +1245,8 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
     </div>
   </div>
   <div class="header-actions">
+    <button class="btn" id="cases-btn" title="Browse all clinical cases"><span class="ico">📋</span><span class="lbl">Cases</span></button>
+    <button class="btn" id="help-btn" title="Help &amp; shortcuts  ( ? )"><span class="ico">?</span><span class="lbl">Help</span></button>
     <button class="btn" id="theme-btn" title="Toggle day / night mode  ( t )"><span class="ico">☀</span><span class="lbl">Day</span></button>
     <button class="btn toggle-btn active" id="toggle-left" title="Show / hide perturbations panel  ( [ )"><span class="ico">◧</span><span class="lbl">Perturbations</span></button>
     <button class="btn toggle-btn active" id="toggle-right" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Metabolites</span><span class="ico">◨</span></button>
@@ -1048,6 +1258,7 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
 <div class="layout">
   <aside id="perturbations-aside">
     <h2>Perturbations / Integrations</h2>
+    <div id="pert-summary"></div>
     <div id="perturbations-list"></div>
   </aside>
 
@@ -1142,6 +1353,63 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
       <p class="muted">Click a metabolite in the pathway or list, or any perturbation, for details.</p>
     </div>
   </aside>
+</div>
+
+<div id="cmd-palette" aria-hidden="true">
+  <div class="cmd-box" role="dialog" aria-label="Command palette">
+    <input id="cmd-input" class="cmd-input" type="text" placeholder="Find a case, pathway, metabolite, or perturbation…" autocomplete="off" spellcheck="false">
+    <div id="cmd-results" class="cmd-results"></div>
+    <div class="cmd-hint">
+      <span><kbd class="help-key">↑</kbd> <kbd class="help-key">↓</kbd> navigate · <kbd class="help-key">↵</kbd> select</span>
+      <span><kbd class="help-key">Esc</kbd> close</span>
+    </div>
+  </div>
+</div>
+
+<div id="help-modal" aria-hidden="true">
+  <div class="help-card" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="help-card-head">
+      <div>
+        <div class="help-card-eyebrow">? HELP &amp; SHORTCUTS</div>
+        <h2 class="help-card-title" id="help-title">How Biochem Met works</h2>
+      </div>
+      <button class="btn" id="help-close">Close ✕</button>
+    </div>
+    <div class="help-card-section">
+      <h4>Click affordances</h4>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">Click</kbd></span><span class="help-desc">a metabolite → see its role, state, and what's driving the change</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">Click</kbd></span><span class="help-desc">a pathway label / sidebar group → focus that pathway (dim the rest)</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">⇧</kbd><span style="margin:0 4px">+</span><kbd class="help-key">Click</kbd></span><span class="help-desc">a pathway → start its 5-phase clinical case</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">Click</kbd></span><span class="help-desc">a perturbation in the left panel → toggle it on / off; effects stack</span></div>
+    </div>
+    <div class="help-card-section">
+      <h4>Keyboard</h4>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">⌘</kbd><kbd class="help-key">K</kbd><span style="margin:0 4px;opacity:0.5">or</span><kbd class="help-key">/</kbd></span><span class="help-desc">Open the command palette — search anything</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">t</kbd></span><span class="help-desc">Toggle day / night theme</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">f</kbd></span><span class="help-desc">Focus mode — hide both side panels</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">[</kbd><kbd class="help-key">]</kbd></span><span class="help-desc">Toggle left / right panel individually</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">?</kbd></span><span class="help-desc">Open this help (Esc to close)</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">Esc</kbd></span><span class="help-desc">Close the topmost overlay or exit deep-dive</span></div>
+    </div>
+    <div class="help-actions">
+      <button class="btn" id="help-replay-intro">Replay intro</button>
+      <button class="btn btn-primary" id="help-browse-cases">Browse cases</button>
+    </div>
+  </div>
+</div>
+
+<div id="cases-browser" aria-hidden="true">
+  <div class="cases-shell">
+    <div class="cases-head">
+      <div>
+        <div class="cases-head-eyebrow">📋 CLINICAL CASES</div>
+        <h2 class="cases-head-title">Pick a <span>case</span></h2>
+        <p class="cases-head-sub">15 teaching cases, one per pathway. Click any card to start the 5-phase loop.</p>
+      </div>
+      <button class="btn cases-close" id="cases-close" title="Close (Esc)">Close ✕</button>
+    </div>
+    <div class="cases-grid" id="cases-grid"></div>
+  </div>
 </div>
 
 <div id="case-overlay" aria-hidden="true">
@@ -2151,7 +2419,43 @@ function renderEdges() {
   g.innerHTML = items.join('');
 }
 
+const QUICK_PERTS = [
+  { id: 'insulin',    label: 'Insulin' },
+  { id: 'starvation', label: 'Starvation' },
+  { id: 'dka',        label: 'DKA' },
+  { id: 'hypoxia',    label: 'Hypoxia' },
+  { id: 'cyanide',    label: 'Cyanide' },
+  { id: 'rotenone',   label: 'Rotenone' }
+];
+
+function renderPertSummary() {
+  const el = document.getElementById('pert-summary');
+  if (!el) return;
+  if (activePerturbations.size === 0) {
+    const chips = QUICK_PERTS.map(q => `<button class="pert-quick-chip" data-pertid="${escapeAttr(q.id)}" title="Toggle ${escapeAttr(q.label)}">${escapeText(q.label)}</button>`).join('');
+    el.innerHTML = `<div class="pert-summary">
+      <div class="pert-summary-label">Try one to start</div>
+      <div class="pert-chips">${chips}</div>
+    </div>`;
+    return;
+  }
+  const items = [...activePerturbations].map(id => {
+    const p = P.find(x => x.id === id);
+    if (!p) return '';
+    const shortName = p.name.split(/[()]/)[0].trim();
+    return `<span class="pert-active-chip" data-pertid="${escapeAttr(p.id)}">${escapeText(shortName)}<span class="pert-active-chip-x" data-rmpert="${escapeAttr(p.id)}" title="Remove">×</span></span>`;
+  }).join('');
+  el.innerHTML = `<div class="pert-summary">
+    <div class="pert-summary-label">
+      <span>Active · ${activePerturbations.size}</span>
+      <button class="pert-clear-btn" id="pert-clear-all">Clear all</button>
+    </div>
+    <div class="pert-chips">${items}</div>
+  </div>`;
+}
+
 function renderPerturbationList() {
+  renderPertSummary();
   const list = document.getElementById('perturbations-list');
   const grouped = {};
   for (const p of P) {
@@ -2353,6 +2657,37 @@ function escapeAttr(s) {
 renderPerturbationList();
 renderAll();
 
+// Quick-start chips + active chips at top of left panel
+document.getElementById('pert-summary').addEventListener('click', (e) => {
+  // remove an active perturbation via the × pill
+  const rm = e.target.closest('[data-rmpert]');
+  if (rm) {
+    activePerturbations.delete(rm.dataset.rmpert);
+    selectedPerturbation = null;
+    renderPerturbationList();
+    renderAll();
+    return;
+  }
+  // "Clear all" button
+  if (e.target.id === 'pert-clear-all') {
+    activePerturbations.clear();
+    selectedPerturbation = null;
+    renderPerturbationList();
+    renderAll();
+    return;
+  }
+  // empty-state quick chip → toggle that perturbation on
+  const chip = e.target.closest('[data-pertid]');
+  if (chip && chip.classList.contains('pert-quick-chip')) {
+    const id = chip.dataset.pertid;
+    activePerturbations.add(id);
+    selectedPerturbation = id;
+    selectedMetabolite = null;
+    renderPerturbationList();
+    renderAll();
+  }
+});
+
 document.getElementById('perturbations-list').addEventListener('click', (e) => {
   const el = e.target.closest('.perturbation');
   if (!el) return;
@@ -2535,6 +2870,8 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === ']') { layoutEl.classList.toggle('hide-right'); syncToggleButtons(); }
   else if (e.key === 'f' || e.key === 'F') { focusBtn.click(); }
   else if (e.key === 't' || e.key === 'T') { themeBtn.click(); }
+  else if (e.key === '?') { e.preventDefault(); openHelp(); }
+  else if (e.key === '/') { e.preventDefault(); openCmdPalette(); }
 });
 
 // ============================================================
@@ -3149,12 +3486,247 @@ const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).
   });
 })();
 
-// ESC closes the case overlay
+// ESC closes the topmost overlay
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && CaseRunner.state) {
+  if (e.key !== 'Escape') return;
+  if (cmdPaletteOpen())   { e.preventDefault(); closeCmdPalette(); return; }
+  if (helpOpen())         { e.preventDefault(); closeHelp(); return; }
+  if (casesBrowserOpen()) { e.preventDefault(); closeCasesBrowser(); return; }
+  if (CaseRunner.state) {
     if (confirm('Close case? Progress will be lost.')) CaseRunner.close();
   }
 }, true);
+
+// ---------------- Command palette (⌘K / / ) ----------------
+// One unified searcher across cases, pathways, metabolites, perturbations.
+// Index is built once on first open (so it sees the final state of M, P, etc.).
+let cmdIndex = null;
+let cmdResults = [];
+let cmdActiveIdx = 0;
+
+function buildCmdIndex() {
+  const items = [];
+  for (const c of CASES_INDEX) {
+    const info = PATHWAY_INFO[c.pathway];
+    items.push({
+      type: 'case', pw: c.pathway,
+      label: c.title,
+      sub: `Case · ${info?.label || c.pathway}`,
+      keywords: (c.title + ' ' + c.blurb + ' ' + (info?.label || c.pathway) + ' case').toLowerCase(),
+      action: () => CaseRunner.open(c.pathway)
+    });
+  }
+  for (const [key, info] of Object.entries(PATHWAY_INFO)) {
+    items.push({
+      type: 'pathway', pw: key,
+      label: info.label,
+      sub: `Pathway · ${info.short || ''}`,
+      keywords: (info.label + ' ' + (info.short || '') + ' ' + (info.desc || '') + ' pathway focus dive').toLowerCase(),
+      action: () => enterDive(key)
+    });
+  }
+  for (const [name, m] of Object.entries(M)) {
+    const pwLabel = PATHWAY_INFO[m.pathway]?.label || m.pathway;
+    items.push({
+      type: 'metabolite', pw: m.pathway,
+      label: name,
+      sub: `Metabolite · ${pwLabel}`,
+      keywords: (name + ' ' + (m.info || '') + ' ' + pwLabel + ' metabolite').toLowerCase(),
+      action: () => {
+        if (selectedPathway) exitDive();
+        selectedMetabolite = name;
+        selectedPerturbation = null;
+        renderAll();
+      }
+    });
+  }
+  for (const p of P) {
+    items.push({
+      type: 'perturbation', ico: '⚡',
+      label: p.name,
+      sub: `Toggle · ${p.cat}`,
+      keywords: (p.name + ' ' + (p.desc || '') + ' ' + (p.cat || '') + ' ' + (p.inhibits || []).join(' ') + ' ' + (p.activates || []).join(' ') + ' perturbation drug condition').toLowerCase(),
+      action: () => {
+        if (activePerturbations.has(p.id)) activePerturbations.delete(p.id);
+        else activePerturbations.add(p.id);
+        selectedPerturbation = p.id;
+        selectedMetabolite = null;
+        renderPerturbationList();
+        renderAll();
+      }
+    });
+  }
+  return items;
+}
+
+function openCmdPalette() {
+  if (!cmdIndex) cmdIndex = buildCmdIndex();
+  const input = document.getElementById('cmd-input');
+  input.value = '';
+  cmdActiveIdx = 0;
+  renderCmdResults('');
+  document.getElementById('cmd-palette').classList.add('open');
+  setTimeout(() => input.focus(), 30);
+}
+function closeCmdPalette() { document.getElementById('cmd-palette').classList.remove('open'); }
+function cmdPaletteOpen() { return document.getElementById('cmd-palette').classList.contains('open'); }
+
+function renderCmdResults(q) {
+  const norm = q.toLowerCase().trim();
+  if (!norm) {
+    // Empty query: suggest all 15 cases as the most useful default
+    cmdResults = cmdIndex.filter(x => x.type === 'case');
+  } else {
+    cmdResults = cmdIndex.filter(x => x.keywords.includes(norm));
+    cmdResults.sort((a, b) => {
+      const aL = a.label.toLowerCase(), bL = b.label.toLowerCase();
+      const ax = aL === norm ? 0 : (aL.startsWith(norm) ? 1 : 2);
+      const bx = bL === norm ? 0 : (bL.startsWith(norm) ? 1 : 2);
+      if (ax !== bx) return ax - bx;
+      const tp = { case: 0, pathway: 1, perturbation: 2, metabolite: 3 };
+      return (tp[a.type] || 9) - (tp[b.type] || 9);
+    });
+    cmdResults = cmdResults.slice(0, 60);
+  }
+  cmdActiveIdx = 0;
+  const grouped = {};
+  for (const r of cmdResults) (grouped[r.type] = grouped[r.type] || []).push(r);
+  const order = ['case', 'pathway', 'perturbation', 'metabolite'];
+  const groupLabels = { case: 'Cases', pathway: 'Pathways · click to focus', perturbation: 'Perturbations · click to toggle', metabolite: 'Metabolites' };
+  const html = [];
+  let globalIdx = 0;
+  for (const type of order) {
+    const items = grouped[type];
+    if (!items || !items.length) continue;
+    html.push(`<div class="cmd-group-label">${groupLabels[type]}</div>`);
+    for (const r of items) {
+      const isActive = globalIdx === cmdActiveIdx;
+      const pwStyle = r.pw ? ` style="--pw: var(--pw-${r.pw})"` : '';
+      const left = r.pw ? `<span class="cmd-pw-dot"${pwStyle}></span>` : `<span class="cmd-item-ico">${r.ico || '◌'}</span>`;
+      html.push(`<div class="cmd-item ${isActive ? 'active' : ''}" data-idx="${globalIdx}"${pwStyle}>`
+        + left
+        + `<div class="cmd-item-body"><div class="cmd-item-label">${escapeText(r.label)}</div><div class="cmd-item-sub">${escapeText(r.sub || '')}</div></div>`
+        + `</div>`);
+      globalIdx++;
+    }
+  }
+  if (!html.length) html.push('<div class="cmd-empty">No matches. Try part of a case title, a pathway name, a metabolite, or a drug.</div>');
+  document.getElementById('cmd-results').innerHTML = html.join('');
+}
+
+function updateCmdActive() {
+  document.querySelectorAll('.cmd-item').forEach(it => it.classList.toggle('active', +it.dataset.idx === cmdActiveIdx));
+  const active = document.querySelector('.cmd-item.active');
+  if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
+}
+
+function cmdSelect() {
+  const r = cmdResults[cmdActiveIdx];
+  if (!r) return;
+  closeCmdPalette();
+  r.action();
+}
+
+document.getElementById('cmd-input').addEventListener('input', (e) => renderCmdResults(e.target.value));
+document.getElementById('cmd-input').addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); cmdActiveIdx = Math.min(cmdResults.length - 1, cmdActiveIdx + 1); updateCmdActive(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); cmdActiveIdx = Math.max(0, cmdActiveIdx - 1); updateCmdActive(); }
+  else if (e.key === 'Enter') { e.preventDefault(); cmdSelect(); }
+});
+document.getElementById('cmd-results').addEventListener('click', (e) => {
+  const item = e.target.closest('.cmd-item');
+  if (!item) return;
+  cmdActiveIdx = +item.dataset.idx;
+  cmdSelect();
+});
+document.getElementById('cmd-palette').addEventListener('click', (e) => {
+  if (e.target.id === 'cmd-palette') closeCmdPalette();
+});
+
+// Global Cmd+K / Ctrl+K listener (capture so it beats the input check below).
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+    e.preventDefault();
+    if (cmdPaletteOpen()) closeCmdPalette();
+    else openCmdPalette();
+  }
+}, true);
+
+// ---------------- Help modal (header "?" button) ----------------
+function openHelp()  { document.getElementById('help-modal').classList.add('open'); }
+function closeHelp() { document.getElementById('help-modal').classList.remove('open'); }
+function helpOpen()  { return document.getElementById('help-modal').classList.contains('open'); }
+
+document.getElementById('help-btn').addEventListener('click', openHelp);
+document.getElementById('help-close').addEventListener('click', closeHelp);
+document.getElementById('help-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'help-modal') closeHelp();
+});
+document.getElementById('help-replay-intro').addEventListener('click', () => {
+  closeHelp();
+  if (typeof setIntroStep === 'function') setIntroStep(0);
+  document.getElementById('intro').classList.remove('hidden');
+});
+document.getElementById('help-browse-cases').addEventListener('click', () => {
+  closeHelp();
+  openCasesBrowser();
+});
+
+// ---------------- Cases browser (header "📋 Cases" button) ----------------
+// Lightweight in-memory manifest. When the user opens the browser we render
+// these cards; clicking a card delegates to CaseRunner.open(pathway), which
+// fetches /cases/<pathway>.json under the hood.
+const CASES_INDEX = [
+  { pathway: 'glycolysis',    title: 'The 5-month-old with hepatomegaly and morning seizures', blurb: 'Inborn error of carbohydrate metabolism with a deceptive triad: hypoglycemia, lactic acidosis, and hepatomegaly.' },
+  { pathway: 'glycogen-ppp',  title: 'The soldier on primaquine and a cola-colored urine',     blurb: 'The most common enzyme deficiency in the world — silent until an oxidative trigger arrives. Bite cells and Heinz bodies on the smear.' },
+  { pathway: 'tca',           title: "The farmer's son who tasted from the tin",              blurb: "A textbook 'lethal synthesis': an innocuous molecule that the cell's own enzymes convert into a tight-binding TCA poison." },
+  { pathway: 'fa-ketones',    title: "The toddler who didn't wake up from her nap",            blurb: 'The most common defect of fatty-acid oxidation — a stunningly normal baby until fasting tips her into hypoketotic hypoglycemia.' },
+  { pathway: 'protein',       title: 'The 10-day-old who smells like maple syrup',             blurb: 'A neonatal acidotic crisis with a distinctive sweet odor and a deficient enzyme in the same family as PDH and α-KGDH.' },
+  { pathway: 'urea',          title: 'The day-3 male newborn who stopped feeding',             blurb: 'A previously well newborn who decompensates 48 hours after the first feed. The discriminating lab: orotic acid in the urine.' },
+  { pathway: 'sterol',        title: 'The teenager with tendon xanthomas and an LDL of 386',   blurb: 'Premature coronary disease running through a family. A receptor problem treated, paradoxically, with an enzyme inhibitor.' },
+  { pathway: 'heme',          title: 'The cranky toddler with a microcytic anemia',            blurb: 'A toddler in a peeling pre-1978 rowhouse with abdominal pain, mouthing the windowsill, and basophilic stippling on smear.' },
+  { pathway: 'nucleotide',    title: 'The toddler who bites his own lips',                     blurb: 'An X-linked disorder of purine salvage. Self-mutilation, dystonia, and a uric acid level that does not belong in a 2-year-old.' },
+  { pathway: 'sugar',         title: 'The newborn vomiting after every feed',                  blurb: 'Inborn error of carbohydrate metabolism that presents in the first week of life — vomiting, jaundice, hepatomegaly, and E. coli sepsis.' },
+  { pathway: 'ethanol',       title: "Three roommates and the gallon jug labeled 'antifreeze'", blurb: 'A toxic alcohol with a deceptive latent period. Lethal not because of the parent molecule, but because of what ADH makes from it.' },
+  { pathway: 'onecarbon',     title: "The pale vegan with paresthesias she didn't tell anyone about", blurb: 'A macrocytic anemia with hypersegmented neutrophils — and a posterior column that is slowly going dark. The one lab that pins it: methylmalonic acid.' },
+  { pathway: 'catechol',      title: 'The skipped newborn screen and the fair-haired baby',    blurb: 'An untreated home-birth infant presenting at 8 months with developmental delay, a musty odor, and a pale phenotype her parents never expected.' },
+  { pathway: 'creatine',      title: 'The toddler with intellectual disability and an empty brain creatine peak', blurb: 'A rare but treatable cerebral creatine deficiency. The MRS lights it up before anyone else does.' },
+  { pathway: 'etc',           title: 'The fire victim with a lethal lactate',                  blurb: 'Pulled from a smoldering polyurethane fire. Full arterial oxygen, lactate 16, and a venous SO₂ that should not exist. Mitochondria starving in a sea of oxygen.' }
+];
+
+function renderCasesGrid() {
+  const grid = document.getElementById('cases-grid');
+  grid.innerHTML = CASES_INDEX.map(c => {
+    const info = PATHWAY_INFO[c.pathway];
+    const label = (info && info.label) ? info.label : c.pathway;
+    return `<div class="case-card" data-pathway="${escapeAttr(c.pathway)}" style="--pw: var(--pw-${c.pathway})">
+      <div class="case-card-pw">${escapeText(label)}</div>
+      <h3 class="case-card-title">${escapeText(c.title)}</h3>
+      <p class="case-card-blurb">${escapeText(c.blurb)}</p>
+      <div class="case-card-cta">Start case →</div>
+    </div>`;
+  }).join('');
+}
+
+function openCasesBrowser() {
+  renderCasesGrid();
+  document.getElementById('cases-browser').classList.add('open');
+}
+function closeCasesBrowser() {
+  document.getElementById('cases-browser').classList.remove('open');
+}
+function casesBrowserOpen() { return document.getElementById('cases-browser').classList.contains('open'); }
+
+document.getElementById('cases-btn').addEventListener('click', openCasesBrowser);
+document.getElementById('cases-close').addEventListener('click', closeCasesBrowser);
+document.getElementById('cases-browser').addEventListener('click', (e) => {
+  if (e.target.id === 'cases-browser') { closeCasesBrowser(); return; }
+  const card = e.target.closest('.case-card');
+  if (card) {
+    closeCasesBrowser();
+    CaseRunner.open(card.dataset.pathway);
+  }
+});
 
 // ---------------- Inject a small "CASE" badge into eligible sub-headers ----------------
 // The badge is a visual signal that this pathway has a case. The click target is
