@@ -876,6 +876,42 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
   .case-shell { animation: none; }
 }
 
+/* ===== Retractable side tabs (panel handles on the inner edge) ===== */
+.side-tab {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  z-index: 5;
+  width: 22px; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--glass-brd);
+  color: var(--text-2);
+  cursor: pointer; font-family: inherit;
+  font-size: 17px; line-height: 1; padding: 0;
+  transition: color 0.16s, border-color 0.16s, box-shadow 0.16s, background 0.16s;
+  user-select: none;
+}
+.side-tab:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 8px 22px -10px var(--accent), 0 0 0 1px var(--glass-hi) inset;
+}
+.side-tab-left  { left: 310px; border-radius: 0 10px 10px 0; border-left: none; }
+.side-tab-right { right: 310px; border-radius: 10px 0 0 10px; border-right: none; }
+.side-tab-chev { display: inline-block; transition: transform 0.2s ease; }
+/* When panel is hidden the tab snaps to the viewport edge and the chevron flips */
+body:has(.layout.hide-left)  .side-tab-left  { left: 0; }
+body:has(.layout.hide-right) .side-tab-right { right: 0; }
+body:has(.layout.hide-left)  .side-tab-left  .side-tab-chev,
+body:has(.layout.hide-right) .side-tab-right .side-tab-chev { transform: rotate(180deg); }
+/* Hide tabs while any overlay is up so they don't float on top of glass cards */
+body:has(#intro:not(.hidden))    .side-tab,
+body:has(#cases-browser.open)    .side-tab,
+body:has(#help-modal.open)       .side-tab,
+body:has(#cmd-palette.open)      .side-tab,
+body.case-open:not(.case-pinpoint) .side-tab { display: none; }
+@media (prefers-reduced-motion: reduce) { .side-tab, .side-tab-chev { transition: none; } }
+
 /* ===== Perturbation summary / quick-start chips (top of left panel) ===== */
 .pert-summary { margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--glass-brd); }
 .pert-summary-label {
@@ -1397,6 +1433,9 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     </div>
   </div>
 </div>
+
+<button class="side-tab side-tab-left"  id="side-tab-left"  type="button" title="Hide / show perturbations  ( [ )" aria-label="Toggle perturbations panel"><span class="side-tab-chev">‹</span></button>
+<button class="side-tab side-tab-right" id="side-tab-right" type="button" title="Hide / show metabolite states  ( ] )" aria-label="Toggle metabolite panel"><span class="side-tab-chev">›</span></button>
 
 <div id="cases-browser" aria-hidden="true">
   <div class="cases-shell">
@@ -3496,6 +3535,10 @@ document.addEventListener('keydown', (e) => {
     if (confirm('Close case? Progress will be lost.')) CaseRunner.close();
   }
 }, true);
+
+// ---------------- Retractable side tabs (delegate to existing toggles) ----------------
+document.getElementById('side-tab-left').addEventListener('click', () => document.getElementById('toggle-left').click());
+document.getElementById('side-tab-right').addEventListener('click', () => document.getElementById('toggle-right').click());
 
 // ---------------- Command palette (⌘K / / ) ----------------
 // One unified searcher across cases, pathways, metabolites, perturbations.
