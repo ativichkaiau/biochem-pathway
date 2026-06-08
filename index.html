@@ -2923,8 +2923,9 @@ focusBtn.addEventListener('click', () => {
 
 document.addEventListener('keydown', (e) => {
   const tag = (e.target.tagName || '').toLowerCase();
-  if (tag === 'input' || tag === 'textarea' || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (introOpen()) return;
+  if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable || e.metaKey || e.ctrlKey || e.altKey) return;
+  // Don't let single-key shortcuts leak through any open overlay.
+  if (introOpen() || casesBrowserOpen() || helpOpen() || cmdPaletteOpen() || CaseRunner.state) return;
   if (e.key === 'Escape' && selectedPathway) { exitDive(); return; }
   if (e.key === '[') { layoutEl.classList.toggle('hide-left'); syncToggleButtons(); }
   else if (e.key === ']') { layoutEl.classList.toggle('hide-right'); syncToggleButtons(); }
@@ -3707,8 +3708,10 @@ document.getElementById('cmd-palette').addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
     e.preventDefault();
-    if (cmdPaletteOpen()) closeCmdPalette();
-    else openCmdPalette();
+    if (cmdPaletteOpen()) { closeCmdPalette(); return; }
+    // Don't stack the palette on top of another modal / the intro / a case.
+    if (introOpen() || casesBrowserOpen() || helpOpen() || CaseRunner.state) return;
+    openCmdPalette();
   }
 }, true);
 
