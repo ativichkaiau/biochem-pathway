@@ -55,6 +55,10 @@
   --pw-catechol: #d176d6;
   --pw-creatine: #7dd3fc;
   --pw-etc: #94a3f0;
+  --pw-polyol: #d9b35c;
+  --pw-bilirubin: #e8c14a;
+  --pw-sphingo: #67c9a8;
+  --pw-gag: #b39ddb;
 }
 body.light {
   --bg: #f6f8fa;
@@ -104,6 +108,10 @@ body.light {
   --pw-catechol: #a21caf;
   --pw-creatine: #0369a1;
   --pw-etc: #4338ca;
+  --pw-polyol: #8a6d1f;
+  --pw-bilirubin: #9a7d00;
+  --pw-sphingo: #0f766e;
+  --pw-gag: #6d4ca8;
 }
 html, body { height: 100%; }
 body {
@@ -1287,7 +1295,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   </aside>
 
   <main>
-    <svg id="pathway-svg" width="2460" height="1540" viewBox="0 0 2460 1540" xmlns="http://www.w3.org/2000/svg">
+    <svg id="pathway-svg" width="2460" height="1900" viewBox="0 0 2460 1900" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
           <polygon id="mk-arrow" points="0 0, 10 5, 0 10" fill="#4d5560" />
@@ -1325,6 +1333,9 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <text x="1985" y="956" class="pathway-label" data-pw="onecarbon" style="--pw: var(--pw-onecarbon)">FOLATE · METHIONINE</text>
       <text x="745" y="1456" class="pathway-label" data-pw="catechol" style="--pw: var(--pw-catechol)">CATECHOLAMINES</text>
       <text x="1560" y="1146" class="pathway-label" data-pw="creatine" style="--pw: var(--pw-creatine)">CREATINE</text>
+      <text x="442" y="114" class="pathway-label" data-pw="polyol" style="--pw: var(--pw-polyol);font-size:10px">POLYOL</text>
+      <text x="1740" y="1360" class="pathway-label" data-pw="bilirubin" style="--pw: var(--pw-bilirubin)">BILIRUBIN / HEME DEGRADATION</text>
+      <text x="430" y="1600" class="pathway-label" data-pw="sphingo" style="--pw: var(--pw-sphingo)">SPHINGOLIPIDS · lysosomal storage</text>
 
       <g id="edges"></g>
       <g id="nodes"></g>
@@ -1369,6 +1380,12 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     <div id="list-catechol"></div>
     <div class="sub-header" data-pw="creatine" style="--pw: var(--pw-creatine)">Creatine</div>
     <div id="list-creatine"></div>
+    <div class="sub-header" data-pw="polyol" style="--pw: var(--pw-polyol)">Polyol (sorbitol)</div>
+    <div id="list-polyol"></div>
+    <div class="sub-header" data-pw="bilirubin" style="--pw: var(--pw-bilirubin)">Bilirubin · heme degradation</div>
+    <div id="list-bilirubin"></div>
+    <div class="sub-header" data-pw="sphingo" style="--pw: var(--pw-sphingo)">Sphingolipids</div>
+    <div id="list-sphingo"></div>
     <div class="sub-header" data-pw="etc" style="--pw: var(--pw-etc)">ETC / Cofactors</div>
     <div id="list-etc"></div>
 
@@ -1663,6 +1680,23 @@ const M = {
   'Guanidinoacetate':{ x: 1560, y: 1175, pathway: 'creatine', info: 'Made from arginine + glycine (AGAT, kidney). First step of creatine synthesis.' },
   'Creatine':        { x: 1720, y: 1175, pathway: 'creatine', info: 'Methylated from guanidinoacetate (GAMT, uses SAM — a major methyl sink). Taken up by muscle/brain.' },
   'Phosphocreatine': { x: 1875, y: 1175, pathway: 'creatine', info: 'Rapid ATP buffer (creatine kinase). Spontaneously cyclizes to creatinine (excreted ∝ muscle mass — a renal marker).' },
+
+  // ==== POLYOL (SORBITOL) PATHWAY ====
+  'Sorbitol':        { x: 470, y: 142, pathway: 'polyol', info: 'Sugar alcohol from glucose via aldose reductase (uses NADPH). Trapped intracellularly — osmotic damage in lens, nerve, kidney, retina under hyperglycemia (diabetic complications). Also the route to seminal fructose.' },
+
+  // ==== BILIRUBIN / HEME DEGRADATION ====
+  'Biliverdin':      { x: 1740, y: 1400, pathway: 'bilirubin', info: 'Green pigment from heme ring opening (heme oxygenase, releases CO + Fe²⁺). The bruise-green color.' },
+  'Bilirubin (UCB)': { x: 1900, y: 1400, pathway: 'bilirubin', info: 'Unconjugated bilirubin — lipid-soluble, albumin-bound, neurotoxic (kernicterus in neonates). Indirect bilirubin on the lab panel.' },
+  'Conj. bilirubin': { x: 2075, y: 1400, pathway: 'bilirubin', info: 'Conjugated (direct) bilirubin — water-soluble after UGT1A1 adds glucuronate. Secreted into bile (MRP2). Defective secretion = Dubin-Johnson.' },
+  'Urobilinogen':    { x: 2245, y: 1400, pathway: 'bilirubin', info: 'Made by gut bacteria from conjugated bilirubin. Some → stercobilin (brown stool); some reabsorbed → urobilin (yellow urine).' },
+
+  // ==== SPHINGOLIPIDS (lysosomal degradation) ====
+  'Ceramide':        { x: 620, y: 1710, pathway: 'sphingo', info: 'Central hub of sphingolipid metabolism: sphingosine + fatty acid. Built de novo from serine + palmitoyl-CoA; the convergence point of all sphingolipid degradation.' },
+  'Sphingomyelin':   { x: 430, y: 1650, pathway: 'sphingo', info: 'Ceramide + phosphocholine. Degraded by sphingomyelinase → ceramide. Sphingomyelinase deficiency = Niemann-Pick A/B (cherry-red macula, hepatosplenomegaly).' },
+  'Glucocerebroside':{ x: 430, y: 1775, pathway: 'sphingo', info: 'Ceramide + glucose. Degraded by β-glucocerebrosidase. Deficiency = Gaucher (most common; Gaucher cells, hepatosplenomegaly, bone crises) — treatable with enzyme replacement.' },
+  'GM2 ganglioside': { x: 830, y: 1650, pathway: 'sphingo', info: 'Complex ganglioside. Degraded by hexosaminidase A. Deficiency = Tay-Sachs (cherry-red macula, no hepatosplenomegaly, fatal by ~age 4). Sandhoff if Hex A+B.' },
+  'Galactocerebroside': { x: 830, y: 1775, pathway: 'sphingo', info: 'Ceramide + galactose; a major myelin lipid. Degraded by galactocerebrosidase. Deficiency = Krabbe (globoid cells, peripheral neuropathy, optic atrophy).' },
+  'Sulfatide':       { x: 1040, y: 1775, pathway: 'sphingo', info: 'Sulfated galactocerebroside. Degraded by arylsulfatase A. Deficiency = metachromatic leukodystrophy (central + peripheral demyelination, ataxia).' },
 };
 
 // ============================================
@@ -1839,6 +1873,23 @@ const E = [
   { e: '+Gly', from: 'Glycine', to: 'Guanidinoacetate', cofactor: true, curved: true, noLabel: true },
   { e: 'GAMT (SAM)', from: 'Guanidinoacetate', to: 'Creatine' },
   { e: 'creatine kinase', from: 'Creatine', to: 'Phosphocreatine' },
+
+  // ==== POLYOL (SORBITOL) ====
+  { e: 'Aldose reductase', from: 'Glucose', to: 'Sorbitol', curved: true, labelT: 0.42, labelOff: -16 },
+  { e: 'Sorbitol DH', from: 'Sorbitol', to: 'Fructose', curved: true, labelT: 0.55 },
+
+  // ==== BILIRUBIN / HEME DEGRADATION ====
+  { e: 'Heme oxygenase', from: 'Heme', to: 'Biliverdin' },
+  { e: 'Biliverdin reductase', from: 'Biliverdin', to: 'Bilirubin (UCB)' },
+  { e: 'UGT1A1', from: 'Bilirubin (UCB)', to: 'Conj. bilirubin' },
+  { e: 'gut bacteria', from: 'Conj. bilirubin', to: 'Urobilinogen' },
+
+  // ==== SPHINGOLIPIDS (degradation → ceramide) ====
+  { e: 'Sphingomyelinase', from: 'Sphingomyelin', to: 'Ceramide' },
+  { e: 'β-Glucocerebrosidase', from: 'Glucocerebroside', to: 'Ceramide' },
+  { e: 'Hexosaminidase A', from: 'GM2 ganglioside', to: 'Ceramide', curved: true },
+  { e: 'Galactocerebrosidase', from: 'Galactocerebroside', to: 'Ceramide', curved: true },
+  { e: 'Arylsulfatase A', from: 'Sulfatide', to: 'Galactocerebroside' },
 ];
 
 // ============================================
@@ -2271,7 +2322,19 @@ const PATHWAY_INFO = {
   etc: { label: 'ETC / OxPhos', short: 'NADH/FADH₂ → O₂; H⁺ gradient → ATP',
     desc: 'Five complexes drive the electron cascade. Complexes I, III, IV pump H⁺ across the inner mitochondrial membrane; ATP synthase uses the proton motive force to make ~28-30 ATP per glucose under aerobic conditions.',
     keyEnzymes: ['Complex I', 'Complex II', 'Complex III', 'Complex IV', 'ATP Synthase'],
-    clinical: 'Rotenone (CI), antimycin A (CIII), cyanide / CO / azide (CIV), oligomycin (V), DNP (uncoupler), hypoxia, metformin.' }
+    clinical: 'Rotenone (CI), antimycin A (CIII), cyanide / CO / azide (CIV), oligomycin (V), DNP (uncoupler), hypoxia, metformin.' },
+  polyol: { label: 'Polyol (Sorbitol)', short: 'Glucose → Sorbitol → Fructose',
+    desc: 'Aldose reductase reduces glucose to sorbitol (using NADPH); sorbitol dehydrogenase oxidizes it to fructose. Tissues with aldose reductase but little sorbitol DH (lens, retina, nerve, kidney) trap sorbitol — osmotic and oxidative injury under hyperglycemia.',
+    keyEnzymes: ['Aldose reductase', 'Sorbitol DH'],
+    clinical: 'Diabetic cataracts, peripheral neuropathy, retinopathy, nephropathy. Same aldose-reductase mechanism makes galactitol in galactosemia. Source of seminal fructose.' },
+  bilirubin: { label: 'Bilirubin / Heme degradation', short: 'Heme → biliverdin → bilirubin → bile',
+    desc: 'Senescent RBC heme is opened by heme oxygenase (→ biliverdin + CO + Fe²⁺), reduced to unconjugated bilirubin (lipid-soluble, neurotoxic), conjugated by hepatic UGT1A1 (water-soluble), secreted in bile, and converted by gut bacteria to urobilinogen / stercobilin.',
+    keyEnzymes: ['Heme oxygenase', 'Biliverdin reductase', 'UGT1A1'],
+    clinical: 'Neonatal jaundice / kernicterus, Gilbert (mild UGT1A1 ↓), Crigler-Najjar (UGT1A1 absent), Dubin-Johnson (MRP2 secretion defect), hemolytic vs obstructive jaundice.' },
+  sphingo: { label: 'Sphingolipids', short: 'Ceramide hub · lysosomal storage diseases',
+    desc: 'Ceramide is the metabolic hub: built de novo from serine + palmitoyl-CoA, and the convergence point for degradation of sphingomyelin, cerebrosides, gangliosides, and sulfatides. Each lysosomal hydrolase maps to a storage disease when deficient.',
+    keyEnzymes: ['Sphingomyelinase', 'β-Glucocerebrosidase', 'Hexosaminidase A', 'Galactocerebrosidase', 'Arylsulfatase A'],
+    clinical: 'Niemann-Pick (sphingomyelinase), Gaucher (glucocerebrosidase), Tay-Sachs (hexosaminidase A), Krabbe (galactocerebrosidase), metachromatic leukodystrophy (arylsulfatase A), Fabry (α-galactosidase A).' }
 };
 
 // ============================================
@@ -2513,7 +2576,7 @@ function renderPerturbationList() {
 }
 
 function renderMetaboliteLists(state) {
-  const groups = { glycolysis: [], 'glycogen-ppp': [], tca: [], 'fa-ketones': [], protein: [], urea: [], sterol: [], heme: [], nucleotide: [], sugar: [], ethanol: [], onecarbon: [], catechol: [], creatine: [], etc: [] };
+  const groups = { glycolysis: [], 'glycogen-ppp': [], tca: [], 'fa-ketones': [], protein: [], urea: [], sterol: [], heme: [], nucleotide: [], sugar: [], ethanol: [], onecarbon: [], catechol: [], creatine: [], polyol: [], bilirubin: [], sphingo: [], etc: [] };
   for (const [name, m] of Object.entries(M)) {
     if (groups[m.pathway]) groups[m.pathway].push(name);
   }
@@ -2532,6 +2595,9 @@ function renderMetaboliteLists(state) {
     onecarbon: 'list-onecarbon',
     catechol: 'list-catechol',
     creatine: 'list-creatine',
+    polyol: 'list-polyol',
+    bilirubin: 'list-bilirubin',
+    sphingo: 'list-sphingo',
     etc: 'list-etc'
   };
   for (const pathway of Object.keys(groups)) {
@@ -2642,6 +2708,9 @@ function renderDetail(state) {
         onecarbon: 'Folate / Methionine',
         catechol: 'Catecholamines',
         creatine: 'Creatine',
+        polyol: 'Polyol (Sorbitol)',
+        bilirubin: 'Bilirubin / Heme degradation',
+        sphingo: 'Sphingolipids',
         etc: 'ETC / OxPhos'
       };
       d.innerHTML = `
