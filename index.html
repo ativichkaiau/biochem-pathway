@@ -2444,7 +2444,9 @@ function renderEdges() {
 }
 
 // Track which perturbation categories are currently collapsed (across re-renders).
-const _pertCollapsed = new Set();
+// Seeded with every category so an opened panel starts as a compact list of
+// headers; the user expands the ones they want.
+const _pertCollapsed = new Set(P.map(p => p.cat));
 
 const QUICK_PERTS = [
   { id: 'insulin',    label: 'Insulin' },
@@ -2780,9 +2782,11 @@ document.querySelector('aside.right').addEventListener('click', (e) => {
   }
 });
 
-// Inject the collapse chevron into each metabolite sub-header on first load.
+// Inject the collapse chevron into each metabolite sub-header on first load,
+// and start every group collapsed so an opened panel is a compact header list.
 (function injectCollapseChevrons() {
   document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
+    h.classList.add('collapsed');
     if (h.querySelector('.collapse-chev')) return;
     const chev = document.createElement('span');
     chev.className = 'collapse-chev';
