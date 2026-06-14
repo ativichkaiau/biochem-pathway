@@ -287,7 +287,7 @@ main {
   background: transparent;
 }
 
-#pathway-svg { display: block; min-width: 2560px; }
+#pathway-svg { display: block; min-width: 2460px; }
 
 .node { cursor: pointer; }
 .node rect {
@@ -1287,7 +1287,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   </aside>
 
   <main>
-    <svg id="pathway-svg" width="2560" height="1700" viewBox="0 0 2560 1700" xmlns="http://www.w3.org/2000/svg">
+    <svg id="pathway-svg" width="2460" height="1540" viewBox="0 0 2460 1540" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
           <polygon id="mk-arrow" points="0 0, 10 5, 0 10" fill="#4d5560" />
@@ -2444,7 +2444,9 @@ function renderEdges() {
 }
 
 // Track which perturbation categories are currently collapsed (across re-renders).
-const _pertCollapsed = new Set();
+// Seeded with every category so the panel starts fully collapsed (compact list
+// of headers); the user expands the ones they want.
+const _pertCollapsed = new Set(P.map(p => p.cat));
 
 const QUICK_PERTS = [
   { id: 'insulin',    label: 'Insulin' },
@@ -2780,9 +2782,12 @@ document.querySelector('aside.right').addEventListener('click', (e) => {
   }
 });
 
-// Inject the collapse chevron into each metabolite sub-header on first load
+// Inject the collapse chevron into each metabolite sub-header on first load,
+// and start every group collapsed so the panel opens as a compact list of
+// pathway headers.
 (function injectCollapseChevrons() {
   document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
+    h.classList.add('collapsed');
     if (h.querySelector('.collapse-chev')) return;
     const chev = document.createElement('span');
     chev.className = 'collapse-chev';
