@@ -21,6 +21,7 @@
   --neutral: #6e7681;
   --gluco: #d29922;
   --purple: #bc8cff;
+  --rate: #ffd166;
   --edge: #4d5560;
   --chip: #0d1117;
   --lbl-sterol: #f0a0c8;
@@ -75,6 +76,7 @@ body.light {
   --neutral: #6e7781;
   --gluco: #9a6700;
   --purple: #8250df;
+  --rate: #b7791f;
   --edge: #aab2bd;
   --chip: #ffffff;
   --lbl-sterol: #bf3989;
@@ -350,6 +352,11 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
 
 .edge { fill: none; stroke: var(--edge); stroke-width: 1.4; }
 #mk-arrow { fill: var(--edge); }
+.edge.rate-limiting:not(.inhibited):not(.activated) {
+  stroke: var(--rate);
+  stroke-width: 2.15;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--rate) 55%, transparent));
+}
 .edge.inhibited { stroke: var(--down); stroke-dasharray: 5 3; stroke-width: 2.5; }
 .edge.activated { stroke: var(--up); stroke-width: 2.5; }
 .edge.gluconeogenesis { stroke: var(--gluco); stroke-dasharray: 6 3; opacity: 0.85; }
@@ -366,6 +373,10 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
 .edge-label.inhibited { fill: var(--down); font-weight: 700; }
 .edge-label.activated { fill: var(--up); font-weight: 700; }
 .edge-label.gluconeogenesis { fill: var(--gluco); }
+.edge-label.rate-limiting:not(.inhibited):not(.activated) {
+  fill: var(--rate);
+  font-weight: 800;
+}
 
 .pathway-label {
   font-size: 14px;
@@ -385,6 +396,11 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
 .pathway-label.nucleo { fill: var(--lbl-nucleo); }
 .pathway-label.lipid { fill: var(--lbl-lipid); }
 .elabel-bg { fill: var(--chip); }
+.elabel-bg.rate-limiting {
+  fill: color-mix(in srgb, var(--rate) 15%, var(--chip));
+  stroke: color-mix(in srgb, var(--rate) 55%, transparent);
+  stroke-width: 0.8;
+}
 
 .metabolite-row {
   display: flex;
@@ -477,6 +493,30 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
 .detail-box .label-pair:first-of-type { border-top: none; }
 .detail-box .label-pair .k { color: var(--text-2); }
 .muted { color: var(--text-2); font-size: 11.5px; font-style: italic; }
+.key-enzyme-list {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 190px;
+}
+.key-enzyme {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-brd);
+  background: color-mix(in srgb, var(--glass-2) 75%, transparent);
+  color: var(--text);
+  font-size: 10.5px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.key-enzyme.rate {
+  color: var(--rate);
+  border-color: color-mix(in srgb, var(--rate) 55%, transparent);
+  background: color-mix(in srgb, var(--rate) 14%, transparent);
+}
 
 .driver-row {
   font-size: 11px;
@@ -1350,6 +1390,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <div class="legend-item"><div class="legend-box" style="background:var(--panel-2);border-color:var(--border)"></div>=</div>
       <div class="legend-item"><div class="legend-box" style="background:rgba(248,81,73,0.18);border-color:#f85149"></div>↓</div>
       <div class="legend-item"><div class="legend-box" style="background:rgba(218,54,51,0.30);border-color:#da3633"></div>↓↓</div>
+      <div class="legend-item"><div class="legend-box" style="background:color-mix(in srgb, var(--rate) 22%, transparent);border-color:var(--rate)"></div>rate-limiting</div>
     </div>
 
     <div class="sub-header" data-pw="glycolysis" style="--pw: var(--pw-glycolysis)">Glycolysis</div>
@@ -1819,7 +1860,7 @@ const E = [
   { e: 'AA→Gly', from: 'AA pool', to: 'Glycine', noLabel: true, cofactor: true, curved: true },
 
   // ==== PURINES ====
-  { e: 'de novo (~10 steps)', from: 'PRPP', to: 'IMP' },
+  { e: 'PRPP amidotransferase', from: 'PRPP', to: 'IMP', labelT: 0.44 },
   { e: '+Asp', from: 'IMP', to: 'AMP' },
   { e: '+Gln', from: 'IMP', to: 'GMP' },
   { e: 'catabolism', from: 'AMP', to: 'Hypoxanthine', curved: true },
@@ -1829,7 +1870,7 @@ const E = [
   { e: 'PRPP synthetase', from: 'Ribose-5-P', to: 'PRPP', cofactor: true, curved: true, noLabel: true },
 
   // ==== PYRIMIDINES ====
-  { e: 'CPS-II → orotate', from: 'Aspartate', to: 'Orotate', curved: true },
+  { e: 'CPS-II', from: 'Aspartate', to: 'Orotate', curved: true },
   { e: 'UMP synthase', from: 'Orotate', to: 'UMP' },
   { e: 'CTP synthase', from: 'UMP', to: 'CTP' },
   { e: 'Thymidylate synthase', from: 'UMP', to: 'dTMP' },
@@ -1891,6 +1932,32 @@ const E = [
   { e: 'Galactocerebrosidase', from: 'Galactocerebroside', to: 'Ceramide', curved: true },
   { e: 'Arylsulfatase A', from: 'Sulfatide', to: 'Galactocerebroside' },
 ];
+
+// Rate-limiting / committed control points shown as gold enzyme chips on the map.
+// These are intentionally explicit so visual emphasis stays auditable as pathways grow.
+const RATE_LIMITING = {
+  'Glycogen synthase': 'Rate-controlling glycogen synthesis; activated by insulin / dephosphorylation.',
+  'Glycogen phos.': 'Rate-controlling glycogenolysis; activated by glucagon/epinephrine and AMP in muscle.',
+  'G6PD': 'Rate-limiting oxidative PPP enzyme; controls NADPH supply for glutathione and biosynthesis.',
+  'PFK-1': 'Committed, rate-limiting glycolysis step; activated by AMP and F2,6-BP; inhibited by ATP and citrate.',
+  'PK': 'Irreversible glycolysis control point; inhibited by ATP/alanine and glucagon-mediated phosphorylation.',
+  'PDH': 'Gatekeeper from pyruvate into mitochondrial acetyl-CoA; inhibited by NADH/acetyl-CoA.',
+  'ACC': 'Committed, rate-limiting fatty-acid synthesis step; makes malonyl-CoA and blocks CPT1.',
+  'HMG-CoA syn.': 'Rate-controlling mitochondrial ketogenesis step in fasting liver.',
+  'IDH': 'Rate-limiting TCA cycle step; activated by ADP and inhibited by ATP/NADH.',
+  'CPS1': 'Rate-limiting urea-cycle enzyme; requires N-acetylglutamate activation.',
+  'HMG-CoA reductase': 'Committed, rate-limiting cholesterol synthesis step and statin target.',
+  'CYP7A1': 'Rate-limiting bile-acid synthesis enzyme.',
+  'ALA synthase': 'Rate-limiting heme synthesis enzyme; B6-dependent and feedback-inhibited by heme.',
+  'PRPP amidotransferase': 'Committed, rate-limiting de novo purine synthesis step; inhibited by 6-MP metabolites.',
+  'CPS-II': 'Rate-limiting de novo pyrimidine synthesis enzyme.',
+  'Fructokinase': 'High-capacity hepatic fructose entry point; bypasses PFK-1 regulation.',
+  'Aldose reductase': 'Rate-controlling polyol pathway entry; consumes NADPH under hyperglycemia.',
+  'Tyr hydroxylase': 'Rate-limiting catecholamine synthesis enzyme; BH4-dependent.',
+  'AGAT': 'Rate-limiting creatine synthesis enzyme.',
+  'Heme oxygenase': 'Rate-limiting heme degradation step; releases CO and Fe2+.',
+  'Sphingomyelinase': 'Clinically key lysosomal sphingomyelin degradation step.'
+};
 
 // ============================================
 // PERTURBATIONS
@@ -2157,6 +2224,7 @@ const P = [
 
   { id: '6mp', name: '6-Mercaptopurine / Azathioprine', cat: 'Drug',
     desc: 'Active form inhibits PRPP amidotransferase (committed step of de novo purines). ALL, IBD, transplant. Allopurinol blocks its breakdown → toxicity (lower the dose).',
+    inhibits: ['PRPP amidotransferase'],
     effects: { 'PRPP': 1, 'IMP': -3, 'AMP': -2, 'GMP': -2, 'Uric acid': -1 } },
 
   { id: 'hydroxyurea', name: 'Hydroxyurea (RNR)', cat: 'Drug',
@@ -2277,7 +2345,7 @@ const PATHWAY_INFO = {
     clinical: 'Fluoroacetate (aconitase, "lethal synthesis"), arsenite (PDH + α-KGDH), IDH1/2 mutations → 2-HG oncometabolite.' },
   'fa-ketones': { label: 'Lipids · β-Ox · Ketones', short: 'Fat storage, breakdown, and ketogenesis',
     desc: 'Triglyceride mobilization (lipase) → β-oxidation in mitochondria → acetyl-CoA → TCA or ketogenesis (HMG-CoA route). Cytosolic lipogenesis: acetyl-CoA → malonyl-CoA (ACC) → palmitate (FAS). Malonyl-CoA blocks CPT1 — no β-ox while building fat.',
-    keyEnzymes: ['Lipase', 'CPT1', 'β-ox spiral', 'ACC', 'FAS', 'HMGCS', 'HMG-CoA lyase'],
+    keyEnzymes: ['Lipase', 'CPT1', 'β-ox spiral', 'ACC', 'FAS', 'HMG-CoA syn.', 'HMG-CoA lyase'],
     clinical: 'DKA, fasting/starvation, MCAD deficiency, carnitine deficiency, statins (cyto HMG-CoA reductase), aspirin overdose.' },
   protein: { label: 'Amino Acids', short: 'AA catabolism + entry to TCA',
     desc: 'Transamination funnels amino groups to glutamate, then GDH releases NH₃ (urea cycle). Carbon skeletons enter TCA at 7 points (pyruvate, acetyl-CoA, α-KG, succinyl-CoA, fumarate, OAA, acetoacetate).',
@@ -2285,7 +2353,7 @@ const PATHWAY_INFO = {
     clinical: 'B6 deficiency, MSUD (branched-chain), PKU (catecholamines), hyperammonemia, high-protein diet.' },
   urea: { label: 'Urea Cycle', short: 'NH₃ disposal · 5 enzymes',
     desc: 'Hepatic disposal of toxic ammonia as urea (~30 g / day). Two nitrogens per molecule: one from NH₄⁺ (CPS-I, mitochondrial, rate-limiting) and one from aspartate (ASS). Fumarate output reconnects to TCA.',
-    keyEnzymes: ['CPS-I', 'OTC', 'ASS', 'ASL', 'Arginase'],
+    keyEnzymes: ['CPS1', 'OTC', 'ASS', 'ASL', 'Arginase'],
     clinical: 'OTC deficiency (X-linked; orotic aciduria + hyperammonemia), hepatic failure, sodium benzoate antidote.' },
   sterol: { label: 'Cholesterol / Steroids', short: 'Acetyl-CoA → cholesterol → bile acids + hormones',
     desc: 'HMG-CoA reductase is the committed, rate-limiting step (statin target). 30-C squalene cyclizes → lanosterol → cholesterol (27-C). Cholesterol is the precursor of bile acids (CYP7A1), all steroid hormones, and vitamin D.',
@@ -2297,7 +2365,7 @@ const PATHWAY_INFO = {
     clinical: 'Lead poisoning (ALA-D + ferrochelatase), acute intermittent porphyria (PBG deaminase), porphyria cutanea tarda (UROD), sideroblastic anemia (B6).' },
   nucleotide: { label: 'Purines · Pyrimidines', short: 'De novo + salvage nucleotide synthesis',
     desc: 'Purines build on PRPP (~10 ATP-costly steps → IMP → AMP/GMP). Pyrimidines build the ring first, then attach ribose (orotate → UMP → CTP/dTMP). Catabolism: purines → uric acid; salvage: HGPRT, APRT.',
-    keyEnzymes: ['PRPP synthetase', 'HGPRT', 'Thymidylate synthase', 'DHFR', 'Xanthine oxidase'],
+    keyEnzymes: ['PRPP amidotransferase', 'HGPRT', 'Thymidylate synthase', 'DHFR', 'Xanthine oxidase'],
     clinical: 'Methotrexate (DHFR), 5-FU (TS), 6-MP, hydroxyurea, allopurinol, Lesch-Nyhan, tumor lysis syndrome, gout.' },
   sugar: { label: 'Fructose · Galactose', short: 'Dietary sugar entry',
     desc: 'Fructose: hepatic fructokinase + aldolase B drop it onto the triose layer of glycolysis (bypasses PFK-1 — unregulated, drives lipogenesis + uric acid). Galactose: galactokinase + GALT funnel it to G1P → G6P via the UDP-sugar shuffle.',
@@ -2313,7 +2381,7 @@ const PATHWAY_INFO = {
     clinical: 'Folate / B12 deficiency (megaloblastic anemia; B12 also neuro), homocystinuria (CBS), methotrexate, trimethoprim.' },
   catechol: { label: 'Catecholamines', short: 'Phe → Tyr → DOPA → DA → NE → Epi',
     desc: 'PAH (BH₄-dependent) makes tyrosine; tyrosine hydroxylase (rate-limiting, BH₄) makes L-DOPA. DOPA decarboxylase needs B6; DBH needs vitamin C; PNMT uses SAM and is induced by cortisol (adrenal medulla).',
-    keyEnzymes: ['PAH (BH4)', 'Tyrosine hydroxylase', 'DOPA decarb.', 'DBH (vit C)', 'PNMT (SAM)'],
+    keyEnzymes: ['PAH (BH4)', 'Tyr hydroxylase', 'DOPA decarb.', 'DBH (vit C)', 'PNMT (SAM)'],
     clinical: 'PKU (PAH deficiency), levodopa + carbidopa for Parkinson’s, MAO inhibitors (tyramine "cheese" reaction), pheochromocytoma.' },
   creatine: { label: 'Creatine', short: 'Arg + Gly → creatine → phosphocreatine',
     desc: 'Synthesized in kidney (AGAT) + liver (GAMT — the body’s largest SAM methyl sink). Creatine kinase maintains ATP via a phosphocreatine buffer, critical in muscle and brain during burst activity.',
@@ -2423,6 +2491,10 @@ function getEdgeEnzymeStatus(enzymeName) {
   return '';
 }
 
+function getRateLimitingNote(enzymeName) {
+  return RATE_LIMITING[enzymeName] || '';
+}
+
 function intersectRect(cx, cy, w, h, tx, ty) {
   const dx = tx - cx, dy = ty - cy;
   if (dx === 0 && dy === 0) return { x: cx, y: cy };
@@ -2447,7 +2519,9 @@ function renderEdges() {
     const end = intersectRect(tgt.x, tgt.y, tgtW + 12, NODE_H + 12, src.x, src.y);
 
     const status = getEdgeEnzymeStatus(edge.e);
+    const rateNote = getRateLimitingNote(edge.e);
     let classes = ['edge'];
+    if (rateNote) classes.push('rate-limiting');
     if (edge.cofactor) classes.push('cofactor-edge');
     if (edge.gluconeogenesis) classes.push('gluconeogenesis');
     if (status) classes.push(status);
@@ -2473,7 +2547,8 @@ function renderEdges() {
       edgeParts.push(`<line class="${cls}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" marker-end="url(#${marker})" stroke-opacity="${edge.cofactor ? 0.45 : 1}"/>`);
     }
 
-    if (!edge.noLabel && !labelDrawn.has(edge.e)) {
+    const labelKey = edge.sharedLabel || null;
+    if (!edge.noLabel && (!labelKey || !labelDrawn.has(labelKey))) {
       const t = edge.labelT != null ? edge.labelT : 0.5;
       const lx = start.x + (end.x - start.x) * t;
       const ly = start.y + (end.y - start.y) * t;
@@ -2491,17 +2566,18 @@ function renderEdges() {
       if (edge.labelDY != null) oy = edge.labelDY;
       const labelText = edge.e;
       const textW = labelText.length * 5.8 + 8;
-      let labelCls = `edge-label ${status}`;
+      let labelCls = `edge-label ${rateNote ? 'rate-limiting ' : ''}${status}`;
       if (edge.gluconeogenesis && !status) labelCls = 'edge-label gluconeogenesis';
-      edgeParts.push(`<rect class="elabel-bg" x="${lx + ox - textW/2}" y="${ly + oy - 7}" width="${textW}" height="13" rx="3" opacity="0.92"/>`);
+      edgeParts.push(`<rect class="elabel-bg${rateNote ? ' rate-limiting' : ''}" x="${lx + ox - textW/2}" y="${ly + oy - 7}" width="${textW}" height="13" rx="3" opacity="0.92"/>`);
       edgeParts.push(`<text class="${labelCls}" x="${lx + ox}" y="${ly + oy + 0.5}" text-anchor="middle" dominant-baseline="middle">${escapeText(labelText)}</text>`);
-      labelDrawn.add(edge.e);
+      if (labelKey) labelDrawn.add(labelKey);
     }
 
     const fromPw = src.pathway, toPw = tgt.pathway;
     const pwActive = selectedPathway && (fromPw === selectedPathway || toPw === selectedPathway);
     const edgeId = `${edge.e}:${edge.from}->${edge.to}`;
-    items.push(`<g class="edge-group${pwActive ? ' pw-active' : ''}" data-from-pw="${fromPw}" data-to-pw="${toPw}" data-edge-id="${escapeAttr(edgeId)}">${edgeParts.join('')}</g>`);
+    const title = rateNote ? `<title>${escapeText(edge.e)} — rate-limiting: ${escapeText(rateNote)}</title>` : '';
+    items.push(`<g class="edge-group${pwActive ? ' pw-active' : ''}" data-from-pw="${fromPw}" data-to-pw="${toPw}" data-edge-id="${escapeAttr(edgeId)}">${title}${edgeParts.join('')}</g>`);
   }
   g.innerHTML = items.join('');
 }
@@ -2615,6 +2691,15 @@ function renderMetaboliteLists(state) {
   }
 }
 
+function renderKeyEnzymes(enzymeNames) {
+  return `<span class="key-enzyme-list">${enzymeNames.map(name => {
+    const note = getRateLimitingNote(name);
+    const cls = `key-enzyme${note ? ' rate' : ''}`;
+    const title = note ? ` title="${escapeAttr(note)}"` : '';
+    return `<span class="${cls}"${title}>${note ? '★ ' : ''}${escapeText(name)}</span>`;
+  }).join('')}</span>`;
+}
+
 function renderDetail(state) {
   const d = document.getElementById('detail');
   if (selectedPathway && PATHWAY_INFO[selectedPathway]) {
@@ -2642,7 +2727,7 @@ function renderDetail(state) {
       </div>
       <div style="font-size:10.5px;color:var(--text-2);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px">${escapeText(info.short)}</div>
       <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 10px">${escapeText(info.desc)}</p>
-      <div class="label-pair"><span class="k">Key enzymes</span><span style="text-align:right;color:var(--text);font-weight:600;font-size:11px">${info.keyEnzymes.map(escapeText).join(' · ')}</span></div>
+      <div class="label-pair"><span class="k">Key enzymes</span>${renderKeyEnzymes(info.keyEnzymes)}</div>
       <div class="label-pair"><span class="k">Clinical</span><span style="text-align:right;color:var(--text-2);font-size:11px">${escapeText(info.clinical)}</span></div>
       ${activeHere.length ? `
         <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--glass-brd)">
