@@ -1272,14 +1272,14 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     <button class="btn" id="cases-btn" title="Browse all clinical cases"><span class="ico">📋</span><span class="lbl">Cases</span></button>
     <button class="btn" id="help-btn" title="Help &amp; shortcuts  ( ? )"><span class="ico">?</span><span class="lbl">Help</span></button>
     <button class="btn" id="theme-btn" title="Toggle day / night mode  ( t )"><span class="ico">☀</span><span class="lbl">Day</span></button>
-    <button class="btn toggle-btn active" id="toggle-left" title="Show / hide perturbations panel  ( [ )"><span class="ico">◧</span><span class="lbl">Perturbations</span></button>
-    <button class="btn toggle-btn active" id="toggle-right" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Metabolites</span><span class="ico">◨</span></button>
+    <button class="btn toggle-btn" id="toggle-left" title="Show / hide perturbations panel  ( [ )"><span class="ico">◧</span><span class="lbl">Perturbations</span></button>
+    <button class="btn toggle-btn" id="toggle-right" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Metabolites</span><span class="ico">◨</span></button>
     <button class="btn" id="focus-btn" title="Focus mode — hide both panels  ( f )"><span class="ico">⤢</span><span class="lbl">Focus</span></button>
     <button class="btn" id="reset-btn">Reset <span class="count-badge zero" id="active-count">0</span></button>
   </div>
 </header>
 
-<div class="layout">
+<div class="layout hide-left hide-right">
   <aside id="perturbations-aside">
     <h2>Perturbations / Integrations</h2>
     <div id="pert-summary"></div>
@@ -2444,9 +2444,7 @@ function renderEdges() {
 }
 
 // Track which perturbation categories are currently collapsed (across re-renders).
-// Seeded with every category so the panel starts fully collapsed (compact list
-// of headers); the user expands the ones they want.
-const _pertCollapsed = new Set(P.map(p => p.cat));
+const _pertCollapsed = new Set();
 
 const QUICK_PERTS = [
   { id: 'insulin',    label: 'Insulin' },
@@ -2782,12 +2780,9 @@ document.querySelector('aside.right').addEventListener('click', (e) => {
   }
 });
 
-// Inject the collapse chevron into each metabolite sub-header on first load,
-// and start every group collapsed so the panel opens as a compact list of
-// pathway headers.
+// Inject the collapse chevron into each metabolite sub-header on first load.
 (function injectCollapseChevrons() {
   document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
-    h.classList.add('collapsed');
     if (h.querySelector('.collapse-chev')) return;
     const chev = document.createElement('span');
     chev.className = 'collapse-chev';
@@ -2919,6 +2914,8 @@ function syncToggleButtons() {
 
 tlBtn.addEventListener('click', () => { layoutEl.classList.toggle('hide-left'); syncToggleButtons(); });
 trBtn.addEventListener('click', () => { layoutEl.classList.toggle('hide-right'); syncToggleButtons(); });
+// Both panels start collapsed by default — reflect that on the header buttons.
+syncToggleButtons();
 focusBtn.addEventListener('click', () => {
   const anyShown = !layoutEl.classList.contains('hide-left') || !layoutEl.classList.contains('hide-right');
   layoutEl.classList.toggle('hide-left', anyShown);
