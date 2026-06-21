@@ -299,7 +299,7 @@ main {
   background: transparent;
 }
 
-#pathway-svg { display: block; min-width: 2460px; }
+#pathway-svg { display: block; min-width: 3120px; }
 
 .node { cursor: pointer; }
 .node rect {
@@ -1337,7 +1337,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   </aside>
 
   <main>
-    <svg id="pathway-svg" width="2460" height="1900" viewBox="0 0 2460 1900" xmlns="http://www.w3.org/2000/svg">
+    <svg id="pathway-svg" width="3120" height="2320" viewBox="0 0 3120 2320" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
           <polygon id="mk-arrow" points="0 0, 10 5, 0 10" fill="#4d5560" />
@@ -1742,6 +1742,18 @@ const M = {
   'Sulfatide':       { x: 1040, y: 1775, pathway: 'sphingo', info: 'Sulfated galactocerebroside. Degraded by arylsulfatase A. Deficiency = metachromatic leukodystrophy (central + peripheral demyelination, ataxia).' },
 };
 
+// Spread the layout: scale node POSITIONS only (box + text sizes stay the
+// same), so the gaps between nodes/labels grow and the diagram breathes.
+// The SVG section labels and the canvas viewBox are scaled to match below.
+const LAYOUT_SCALE = 1.26;
+for (const _k in M) { M[_k].x = Math.round(M[_k].x * LAYOUT_SCALE); M[_k].y = Math.round(M[_k].y * LAYOUT_SCALE); }
+// Scale the static SVG section labels to the same layout (font-size stays).
+document.querySelectorAll('#pathway-svg .pathway-label').forEach(t => {
+  const x = parseFloat(t.getAttribute('x')), y = parseFloat(t.getAttribute('y'));
+  if (!isNaN(x)) t.setAttribute('x', Math.round(x * LAYOUT_SCALE));
+  if (!isNaN(y)) t.setAttribute('y', Math.round(y * LAYOUT_SCALE));
+});
+
 // ============================================
 // EDGES — enzyme reactions
 // ============================================
@@ -1872,7 +1884,7 @@ const E = [
   { e: 'PRPP synthetase', from: 'Ribose-5-P', to: 'PRPP', cofactor: true, curved: true, noLabel: true },
 
   // ==== PYRIMIDINES ====
-  { e: 'CPS-II', from: 'Aspartate', to: 'Orotate', curved: true },
+  { e: 'CPS-II', from: 'Aspartate', to: 'Orotate', curved: true, labelT: 0.72 },
   { e: 'UMP synthase', from: 'Orotate', to: 'UMP' },
   { e: 'CTP synthase', from: 'UMP', to: 'CTP' },
   { e: 'Thymidylate synthase', from: 'UMP', to: 'dTMP' },
