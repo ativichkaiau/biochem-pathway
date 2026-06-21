@@ -1,0 +1,83 @@
+{
+  "id": "sphingo-tay-sachs",
+  "pathway": "sphingo",
+  "title": "The 8-month-old who startles at every sound",
+  "blurb": "A previously bright infant who has begun to lose milestones, with an exaggerated startle and a cherry-red spot — and a notably soft, normal-sized belly.",
+  "patient": {
+    "age": "8 months",
+    "sex": "M",
+    "complaint": "Losing skills he'd already gained; jumps violently at sudden noises."
+  },
+  "opening": "8-month-old boy of Ashkenazi Jewish descent. Parents say he was smiling, rolling, and reaching by 5 months but over the last two months he's gone floppy, stopped tracking, and no longer sits. He has a dramatic startle to sound. Fundoscopy shows a bilateral cherry-red macula. The abdomen is soft with NO hepatosplenomegaly. What do you want to ask, examine, or order next?",
+  "history": "Term, normal birth, normal newborn screen (this disorder isn't on every panel). Met early milestones, then regressed from ~6 months. Parents are healthy first cousins-once-removed; both of Ashkenazi Jewish ancestry. A maternal great-aunt's baby reportedly died young of a 'brain disease.'",
+  "exam": "Vitals normal. Hypotonic with poor head control, no longer sits unsupported. Exaggerated startle (hyperacusis) to a hand-clap. Fundoscopy: bilateral cherry-red macula. Increasing head circumference (macrocephaly). Abdomen soft, liver and spleen NOT enlarged. No coarse facies.",
+  "labs": [
+    { "name": "Hexosaminidase A activity (serum)", "value": "Absent", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "Hexosaminidase B activity", "value": "Normal / elevated", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Liver span", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Spleen", "value": "Not palpable", "unit": "", "ref": "Not palpable", "flag": "normal" },
+    { "name": "Fundoscopy", "value": "Bilateral cherry-red macula", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Peripheral smear (vacuolated lymphocytes)", "value": "Absent", "unit": "", "ref": "Absent", "flag": "normal" },
+    { "name": "HEXA gene sequencing", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" },
+    { "name": "Brain MRI", "value": "White-matter signal change, cerebral atrophy", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "What enzyme is deficient, and what substrate accumulates?",
+      "mechanism": "Briefly: why is the spleen/liver NORMAL here (unlike most other sphingolipidoses)?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["tay-sachs", "tay sachs", "gm2 gangliosidosis"] },
+      "cause": { "weight": 1.0, "accepts": ["hexosaminidase a", "hex a", "hexosaminidase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["gm2", "ganglioside", "neuron"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the sphingolipid-degradation step that fails in Tay-Sachs.",
+    "target": { "type": "edge", "edgeId": "Hexosaminidase A:GM2 ganglioside->Ceramide" },
+    "correctMsg": "Yes — hexosaminidase A. Without it, GM2 ganglioside can't be degraded and accumulates in neuronal lysosomes (gangliosides are concentrated in the CNS), producing the neurodegeneration and the cherry-red macula. No peripheral organ storage → no hepatosplenomegaly.",
+    "wrongMsg": "Not quite. The accumulating substrate is GM2 ganglioside — which lysosomal hydrolase normally clears it?",
+    "revealMsg": "Target: Hexosaminidase A (GM2 ganglioside → Ceramide). Tay-Sachs = Hex A deficiency; Sandhoff = Hex A AND B (β-subunit) with added organomegaly."
+  },
+  "mcqs": [
+    {
+      "stem": "Why does Tay-Sachs spare the liver and spleen while Niemann-Pick and Gaucher cause hepatosplenomegaly?",
+      "choices": [
+        "GM2 ganglioside is concentrated in neurons/CNS, so storage is mostly neuronal; sphingomyelin and glucocerebroside accumulate in reticuloendothelial (Kupffer/spleen) macrophages",
+        "Tay-Sachs patients have protective splenic enzymes",
+        "GM2 is water-soluble and excreted by the liver",
+        "The liver compensates with hexosaminidase B"
+      ],
+      "correct": 0,
+      "explanation": "Substrate distribution drives the phenotype. Gangliosides are enriched in neuronal membranes, so GM2 storage is CNS-predominant (cherry-red macula, neurodegeneration, NO organomegaly). Sphingomyelin (Niemann-Pick) and glucocerebroside (Gaucher) load reticuloendothelial macrophages → hepatosplenomegaly."
+    },
+    {
+      "stem": "The cherry-red macula in Tay-Sachs is produced by:",
+      "choices": [
+        "Ganglioside-laden ganglion cells whiten the perifoveal retina, leaving the thin, well-perfused fovea to stand out red",
+        "Retinal hemorrhage",
+        "Macular edema from hypertension",
+        "Optic nerve drusen"
+      ],
+      "correct": 0,
+      "explanation": "The retinal ganglion-cell layer is thick around the fovea and stores lipid, turning it pale/white. The fovea itself lacks ganglion cells, so the underlying choroidal red shows through as a 'cherry-red spot.' Also seen in Niemann-Pick and central retinal artery occlusion."
+    },
+    {
+      "stem": "How is Sandhoff disease distinguished from classic Tay-Sachs?",
+      "choices": [
+        "Sandhoff lacks BOTH hexosaminidase A and B (β-subunit / HEXB defect) and adds hepatosplenomegaly",
+        "Sandhoff has normal hexosaminidase levels",
+        "Sandhoff is X-linked",
+        "Sandhoff presents only in adulthood"
+      ],
+      "correct": 0,
+      "explanation": "Tay-Sachs = HEXA (α-subunit) → only Hex A lost. Sandhoff = HEXB (β-subunit, shared by Hex A and Hex B) → both lost, giving a similar CNS picture PLUS visceral involvement (hepatosplenomegaly). Both show the cherry-red macula."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

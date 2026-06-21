@@ -60,6 +60,7 @@
   --pw-bilirubin: #e8c14a;
   --pw-sphingo: #67c9a8;
   --pw-gag: #b39ddb;
+  --elabel: #c9d2dc;
 }
 body.light {
   --bg: #f6f8fa;
@@ -114,6 +115,7 @@ body.light {
   --pw-bilirubin: #9a7d00;
   --pw-sphingo: #0f766e;
   --pw-gag: #6d4ca8;
+  --elabel: #3d444d;
 }
 html, body { height: 100%; }
 body {
@@ -289,8 +291,8 @@ aside h2 {
   font-weight: 700;
 }
 .perturbation .info { flex: 1; min-width: 0; }
-.perturbation .name { font-size: 12.5px; font-weight: 500; line-height: 1.3; }
-.perturbation .desc { font-size: 10.5px; color: var(--text-2); margin-top: 2px; line-height: 1.35; }
+.perturbation .name { font-size: 12.5px; font-weight: 600; line-height: 1.3; }
+.perturbation .desc { font-size: 11px; color: var(--text-2); margin-top: 3px; line-height: 1.45; }
 
 main {
   overflow: auto;
@@ -309,10 +311,10 @@ main {
 }
 .node text.label {
   fill: var(--text);
-  font-size: 11px;
+  font-size: 11.5px;
   font-family: inherit;
   pointer-events: none;
-  font-weight: 500;
+  font-weight: 600;
   dominant-baseline: middle;
 }
 .node text.delta {
@@ -364,11 +366,11 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
 .edge.gluconeogenesis.activated { stroke: var(--up); }
 
 .edge-label {
-  font-size: 9.5px;
-  fill: var(--text-2);
+  font-size: 10px;
+  fill: var(--elabel);
   font-family: inherit;
   pointer-events: none;
-  font-weight: 500;
+  font-weight: 600;
 }
 .edge-label.inhibited { fill: var(--down); font-weight: 700; }
 .edge-label.activated { fill: var(--up); font-weight: 700; }
@@ -406,10 +408,10 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 10px;
-  font-size: 12px;
+  padding: 5px 10px;
+  font-size: 12.5px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: background 0.1s;
 }
 .metabolite-row:hover { background: var(--panel-2); }
@@ -1817,7 +1819,7 @@ const E = [
 
   // ==== PROTEIN / AMINO ACID METABOLISM ====
   { e: 'ALT', from: 'Alanine', to: 'Pyruvate', curved: true },
-  { e: 'Glutaminase', from: 'Glutamine', to: 'Glutamate' },
+  { e: 'Glutaminase', from: 'Glutamine', to: 'Glutamate', labelDX: 0, labelDY: -21 },
   { e: 'GDH', from: 'Glutamate', to: 'α-KG', curved: true },
   { e: 'GDH', from: 'Glutamate', to: 'NH4+', noLabel: true, cofactor: true, curved: true },
   { e: 'AA catabolism', from: 'AA pool', to: 'Glutamate' },
@@ -2565,10 +2567,10 @@ function renderEdges() {
       if (edge.labelDX != null) ox = edge.labelDX; // absolute nudge (for degenerate short edges)
       if (edge.labelDY != null) oy = edge.labelDY;
       const labelText = edge.e;
-      const textW = labelText.length * 5.8 + 8;
+      const textW = labelText.length * 6.0 + 10;
       let labelCls = `edge-label ${rateNote ? 'rate-limiting ' : ''}${status}`;
       if (edge.gluconeogenesis && !status) labelCls = 'edge-label gluconeogenesis';
-      edgeParts.push(`<rect class="elabel-bg${rateNote ? ' rate-limiting' : ''}" x="${lx + ox - textW/2}" y="${ly + oy - 7}" width="${textW}" height="13" rx="3" opacity="0.92"/>`);
+      edgeParts.push(`<rect class="elabel-bg${rateNote ? ' rate-limiting' : ''}" x="${lx + ox - textW/2}" y="${ly + oy - 7.5}" width="${textW}" height="15" rx="4" opacity="0.97"/>`);
       edgeParts.push(`<text class="${labelCls}" x="${lx + ox}" y="${ly + oy + 0.5}" text-anchor="middle" dominant-baseline="middle">${escapeText(labelText)}</text>`);
       if (labelKey) labelDrawn.add(labelKey);
     }
@@ -3108,7 +3110,7 @@ document.addEventListener('keydown', (e) => {
 
 // Which pathways have a case JSON shipped today. Add to this list
 // when a new /cases/<pathway>.json drops.
-const AVAILABLE_CASES = ['glycolysis', 'sugar', 'tca', 'etc', 'heme', 'urea', 'onecarbon', 'fa-ketones', 'nucleotide', 'catechol', 'sterol', 'protein', 'ethanol', 'glycogen-ppp', 'creatine'];
+const AVAILABLE_CASES = ['glycolysis', 'sugar', 'tca', 'etc', 'heme', 'urea', 'onecarbon', 'fa-ketones', 'nucleotide', 'catechol', 'sterol', 'protein', 'ethanol', 'glycogen-ppp', 'creatine', 'sphingo', 'bilirubin', 'polyol'];
 
 // Mode flag read by the pathway-svg click handler. null | 'pinpoint'.
 let caseMode = null;
@@ -3914,7 +3916,10 @@ const CASES_INDEX = [
   { pathway: 'onecarbon',     title: "The pale vegan with paresthesias she didn't tell anyone about", blurb: 'A macrocytic anemia with hypersegmented neutrophils — and a posterior column that is slowly going dark. The one lab that pins it: methylmalonic acid.' },
   { pathway: 'catechol',      title: 'The skipped newborn screen and the fair-haired baby',    blurb: 'An untreated home-birth infant presenting at 8 months with developmental delay, a musty odor, and a pale phenotype her parents never expected.' },
   { pathway: 'creatine',      title: 'The toddler with intellectual disability and an empty brain creatine peak', blurb: 'A rare but treatable cerebral creatine deficiency. The MRS lights it up before anyone else does.' },
-  { pathway: 'etc',           title: 'The fire victim with a lethal lactate',                  blurb: 'Pulled from a smoldering polyurethane fire. Full arterial oxygen, lactate 16, and a venous SO₂ that should not exist. Mitochondria starving in a sea of oxygen.' }
+  { pathway: 'etc',           title: 'The fire victim with a lethal lactate',                  blurb: 'Pulled from a smoldering polyurethane fire. Full arterial oxygen, lactate 16, and a venous SO₂ that should not exist. Mitochondria starving in a sea of oxygen.' },
+  { pathway: 'sphingo',       title: 'The 8-month-old who startles at every sound',            blurb: 'A bright infant losing milestones, with an exaggerated startle, a cherry-red macula — and a notably soft, normal-sized belly.' },
+  { pathway: 'bilirubin',     title: "The newborn whose jaundice won't quit",                  blurb: 'Unconjugated bilirubin climbing toward the danger zone in a well-appearing term newborn, with phototherapy barely holding the line.' },
+  { pathway: 'polyol',        title: 'The poorly-controlled diabetic with new cataracts and numb feet', blurb: 'A sugar trapped where it should not be — osmotic and oxidative damage in the lens, nerve, retina, and kidney of a chronically hyperglycemic patient.' }
 ];
 
 function renderCasesGrid() {

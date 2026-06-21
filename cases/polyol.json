@@ -1,0 +1,83 @@
+{
+  "id": "polyol-diabetic",
+  "pathway": "polyol",
+  "title": "The poorly-controlled diabetic with new cataracts and numb feet",
+  "blurb": "A sugar that gets trapped where it shouldn't — driving osmotic and oxidative damage in the lens, nerve, retina, and kidney of a chronically hyperglycemic patient.",
+  "patient": {
+    "age": "19 years",
+    "sex": "M",
+    "complaint": "Blurry vision and 'pins and needles' in both feet over the past few months."
+  },
+  "opening": "19-year-old with type 1 diabetes since age 8, admittedly poor adherence (frequent missed insulin, A1c 12.4%). Over a few months: progressive blurry vision and bilateral foot numbness/tingling. Slit-lamp shows early bilateral posterior subcapsular cataracts; monofilament testing shows reduced sensation in a stocking distribution. Fasting glucose 280. What do you want to ask, examine, or order next?",
+  "history": "T1DM x 11 years, on basal-bolus insulin but frequently skips doses. No alcohol. No other meds. No family history of early cataracts. Reports nocturia and polydipsia (chronic hyperglycemia). No prior eye exam in 3 years.",
+  "exam": "Vitals normal, BMI 22. Slit-lamp: bilateral posterior subcapsular lens opacities. Visual acuity 20/40 OU. Feet: warm, pulses intact, but reduced vibration and 10-g monofilament sensation to mid-shin bilaterally; ankle reflexes diminished. No ulcers. Fundus: scattered microaneurysms (early retinopathy).",
+  "labs": [
+    { "name": "Fasting glucose", "value": 280, "unit": "mg/dL", "ref": "70-100", "flag": "high" },
+    { "name": "HbA1c", "value": 12.4, "unit": "%", "ref": "<5.7", "flag": "high" },
+    { "name": "Lens exam", "value": "Bilateral posterior subcapsular cataracts", "unit": "", "ref": "Clear", "flag": "high" },
+    { "name": "10-g monofilament", "value": "Reduced to mid-shin", "unit": "", "ref": "Intact", "flag": "high" },
+    { "name": "Vibration (128 Hz)", "value": "Reduced bilaterally", "unit": "", "ref": "Intact", "flag": "high" },
+    { "name": "Urine albumin/creatinine", "value": 48, "unit": "mg/g", "ref": "<30", "flag": "high" },
+    { "name": "Serum creatinine", "value": 0.9, "unit": "mg/dL", "ref": "0.7-1.3", "flag": "normal" },
+    { "name": "Fundoscopy", "value": "Microaneurysms (mild NPDR)", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What unifying biochemical mechanism links the cataracts, neuropathy, retinopathy, and early nephropathy?",
+      "cause": "Which enzyme initiates this pathway, and what does it produce?",
+      "mechanism": "Briefly: why do the lens and nerve accumulate so much of this product while other tissues are spared?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["polyol", "sorbitol", "aldose reductase", "polyol pathway"] },
+      "cause": { "weight": 1.0, "accepts": ["aldose reductase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["sorbitol", "osmotic", "trap"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the enzyme that initiates the damaging pathway in chronic hyperglycemia.",
+    "target": { "type": "edge", "edgeId": "Aldose reductase:Glucose->Sorbitol" },
+    "correctMsg": "Yes — aldose reductase. Under hyperglycemia it converts excess glucose to sorbitol (consuming NADPH). Tissues rich in aldose reductase but poor in sorbitol dehydrogenase (lens, retina, Schwann cells, kidney) trap sorbitol → osmotic swelling, plus NADPH depletion → less glutathione → oxidative injury.",
+    "wrongMsg": "Not quite. The first, committed step converts glucose into the trapped sugar alcohol that drives osmotic damage.",
+    "revealMsg": "Target: Aldose reductase (Glucose → Sorbitol). It's also the enzyme that makes galactitol from galactose in galactosemia — the same osmotic-cataract mechanism."
+  },
+  "mcqs": [
+    {
+      "stem": "Why do the lens, Schwann cells, retina, and renal tissue accumulate sorbitol while, say, hepatocytes do not?",
+      "choices": [
+        "These tissues express aldose reductase but have little sorbitol dehydrogenase, so sorbitol is made but not cleared — and being polar, it's trapped intracellularly",
+        "These tissues lack glucose transporters",
+        "Sorbitol is actively imported into these tissues",
+        "Hepatocytes destroy sorbitol with catalase"
+      ],
+      "correct": 0,
+      "explanation": "Aldose reductase makes sorbitol; sorbitol dehydrogenase converts it onward to fructose. Tissues high in the former and low in the latter trap sorbitol. Sorbitol is membrane-impermeant, so it accumulates osmotically — swelling the lens (cataract) and Schwann cells (neuropathy)."
+    },
+    {
+      "stem": "Beyond osmotic swelling, how does the polyol pathway add OXIDATIVE stress?",
+      "choices": [
+        "Aldose reductase consumes NADPH, depleting the glutathione system and leaving cells vulnerable to reactive oxygen species",
+        "Sorbitol is itself a free radical",
+        "The pathway generates hydrogen peroxide directly",
+        "Fructose inhibits superoxide dismutase"
+      ],
+      "correct": 0,
+      "explanation": "Aldose reductase uses NADPH. Diverting NADPH starves glutathione reductase (which needs NADPH to regenerate reduced glutathione), lowering antioxidant capacity. So the polyol pathway is a double hit: osmotic (sorbitol trapping) plus oxidative (NADPH/glutathione depletion)."
+    },
+    {
+      "stem": "Which sugar uses this SAME aldose reductase step to cause infantile cataracts in a different inborn error?",
+      "choices": [
+        "Galactose → galactitol in galactosemia / galactokinase deficiency",
+        "Fructose → fructitol in hereditary fructose intolerance",
+        "Mannose → mannitol",
+        "Xylulose → xylitol in essential pentosuria"
+      ],
+      "correct": 0,
+      "explanation": "Aldose reductase also reduces galactose to galactitol. In classic galactosemia and galactokinase deficiency, galactitol accumulates in the lens and causes infantile cataracts by the identical osmotic mechanism — the conceptual bridge to the dietary-sugars case."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "id": "bilirubin-crigler-najjar",
+  "pathway": "bilirubin",
+  "title": "The newborn whose jaundice won't quit",
+  "blurb": "Unconjugated bilirubin climbing toward the danger zone in a well-appearing term newborn — with phototherapy barely holding the line.",
+  "patient": {
+    "age": "5 days",
+    "sex": "F",
+    "complaint": "Deep yellow since day 2; total bilirubin keeps rising despite intensive phototherapy."
+  },
+  "opening": "5-day-old term girl, exclusively breastfed, vigorous and feeding well. Jaundice appeared on day 2 and has deepened. Total bilirubin is 28 mg/dL — almost entirely unconjugated — and it keeps climbing despite intensive phototherapy. She is now slightly lethargic with a subtle high-pitched cry. Blood type, Coombs, CBC, retic, and smear are all unremarkable. What do you want to ask, examine, or order next?",
+  "history": "Term, uncomplicated delivery, Apgars 9/9. Mother O+, baby O+, direct Coombs negative. No bruising or cephalohematoma. Feeding and voiding well. Parents are consanguineous. An older sibling needed exchange transfusion as a neonate and is now on nightly phototherapy at home.",
+  "exam": "Vitals normal, afebrile. Deeply jaundiced to the soles (cephalocaudal progression complete). Well-hydrated, good tone earlier but now mildly lethargic with an intermittent high-pitched cry. No hepatosplenomegaly. Setting-sun sign not yet present. Neuro otherwise non-focal.",
+  "labs": [
+    { "name": "Total bilirubin", "value": 28, "unit": "mg/dL", "ref": "<12 (day 5)", "flag": "high" },
+    { "name": "Direct (conjugated) bilirubin", "value": 0.4, "unit": "mg/dL", "ref": "<0.3", "flag": "normal" },
+    { "name": "Indirect (unconjugated) bilirubin", "value": 27.6, "unit": "mg/dL", "ref": "<11", "flag": "high" },
+    { "name": "Hemoglobin", "value": 16.8, "unit": "g/dL", "ref": "14-20", "flag": "normal" },
+    { "name": "Reticulocyte count", "value": 2.1, "unit": "%", "ref": "<6 (neonate)", "flag": "normal" },
+    { "name": "Direct Coombs", "value": "Negative", "unit": "", "ref": "Negative", "flag": "normal" },
+    { "name": "Blood type (mom / baby)", "value": "O+ / O+", "unit": "", "ref": "—", "flag": "normal" },
+    { "name": "Peripheral smear", "value": "No hemolysis", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "UGT1A1 activity", "value": "Undetectable", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "Response to phenobarbital trial", "value": "None", "unit": "", "ref": "—", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the most likely diagnosis (and which type)?",
+      "cause": "What enzyme is deficient?",
+      "mechanism": "Briefly: why is the bilirubin UNCONJUGATED, and why is phenobarbital useless here (unlike in the milder variant)?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["crigler-najjar", "crigler najjar", "crigler-najjar type 1", "crigler-najjar type i"] },
+      "cause": { "weight": 1.0, "accepts": ["ugt1a1", "ugt", "udp-glucuronosyltransferase", "glucuronosyltransferase", "glucuronyl transferase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["conjugat", "glucuron", "phenobarbital"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the bilirubin-handling step that fails in this disorder.",
+    "target": { "type": "edge", "edgeId": "UGT1A1:Bilirubin (UCB)->Conj. bilirubin" },
+    "correctMsg": "Yes — UGT1A1 (bilirubin UDP-glucuronosyltransferase). With it absent, unconjugated bilirubin can't be made water-soluble for biliary excretion, so lipophilic UCB accumulates and crosses into the basal ganglia → kernicterus. Type I = no enzyme (no phenobarbital response); type II = reduced enzyme (responds to phenobarbital).",
+    "wrongMsg": "Not quite. The bilirubin is UNCONJUGATED — which step normally conjugates it to make it water-soluble?",
+    "revealMsg": "Target: UGT1A1 (Bilirubin (UCB) → Conj. bilirubin). Same enzyme is mildly reduced in Gilbert syndrome and absent in Crigler-Najjar type I."
+  },
+  "mcqs": [
+    {
+      "stem": "Why is phenobarbital effective in Crigler-Najjar type II and Gilbert syndrome but NOT type I?",
+      "choices": [
+        "Phenobarbital induces residual UGT1A1; type I has essentially no enzyme to induce, while type II/Gilbert retain partial activity",
+        "Phenobarbital chelates bilirubin directly",
+        "Type I has a transporter defect, not an enzyme defect",
+        "Phenobarbital only works on conjugated bilirubin"
+      ],
+      "correct": 0,
+      "explanation": "Phenobarbital up-regulates UGT1A1 transcription. That helps when SOME functional enzyme exists (type II, Gilbert) but does nothing in type I where the enzyme is absent. Type I requires aggressive phototherapy, exchange transfusion, and ultimately liver transplant."
+    },
+    {
+      "stem": "Why does unconjugated (not conjugated) hyperbilirubinemia threaten the brain?",
+      "choices": [
+        "Unconjugated bilirubin is lipid-soluble and crosses the blood-brain barrier, depositing in the basal ganglia (kernicterus)",
+        "Conjugated bilirubin is the neurotoxic form",
+        "Unconjugated bilirubin precipitates in cerebral vessels",
+        "Only direct bilirubin crosses the placenta"
+      ],
+      "correct": 0,
+      "explanation": "Unconjugated bilirubin is lipophilic and albumin-bound; when it exceeds albumin binding (or albumin is displaced), free UCB crosses the BBB and is toxic to the basal ganglia and brainstem nuclei → acute bilirubin encephalopathy and chronic kernicterus. Conjugation makes it water-soluble and non-neurotoxic."
+    },
+    {
+      "stem": "How does this differ mechanistically from Dubin-Johnson syndrome?",
+      "choices": [
+        "Dubin-Johnson is a defect in MRP2-mediated secretion of CONJUGATED bilirubin into bile (conjugated hyperbilirubinemia, black liver), not a conjugation defect",
+        "Dubin-Johnson is also a UGT1A1 defect",
+        "Dubin-Johnson causes unconjugated hyperbilirubinemia",
+        "Dubin-Johnson is a hemolytic disorder"
+      ],
+      "correct": 0,
+      "explanation": "Dubin-Johnson = defective MRP2 canalicular transporter → conjugated bilirubin can be made but not excreted → CONJUGATED (direct) hyperbilirubinemia with a characteristic black liver. Crigler-Najjar/Gilbert are upstream, at conjugation, giving UNCONJUGATED hyperbilirubinemia."
+    }
+  ],
+  "scoring": {
+    "chatMaxTurns": 20,
+    "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 },
+    "passingScore": 0.6
+  }
+}
