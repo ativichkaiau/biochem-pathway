@@ -484,7 +484,8 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
   margin-bottom: 8px;
   font-weight: 600;
 }
-.detail-box .label-pair {
+.detail-box .label-pair,
+#node-popover .label-pair {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -492,9 +493,31 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
   border-top: 1px solid var(--border);
   font-size: 11.5px;
 }
-.detail-box .label-pair:first-of-type { border-top: none; }
-.detail-box .label-pair .k { color: var(--text-2); }
+.detail-box .label-pair:first-of-type,
+#node-popover .label-pair:first-of-type { border-top: none; }
+.detail-box .label-pair .k,
+#node-popover .label-pair .k { color: var(--text-2); }
 .muted { color: var(--text-2); font-size: 11.5px; font-style: italic; }
+
+/* ===== Node detail popover (lights up at the clicked metabolite) ===== */
+#node-popover {
+  position: fixed; z-index: 40;
+  width: 290px; max-width: calc(100vw - 24px);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--glass-brd); border-radius: 14px;
+  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 24px 60px -18px var(--shadow), 0 0 0 1px color-mix(in srgb, var(--pw, var(--accent)) 35%, transparent);
+  padding: 13px 15px 14px; font-size: 12px; color: var(--text);
+  display: none; animation: popIn 0.16s ease both;
+}
+#node-popover.open { display: block; }
+@keyframes popIn { from { opacity: 0; transform: translateY(6px) scale(0.97); } to { opacity: 1; transform: none; } }
+.pop-head { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+.pop-bar { width: 4px; height: 19px; border-radius: 2px; background: var(--pw, var(--accent)); box-shadow: 0 0 12px var(--pw, var(--accent)); flex-shrink: 0; }
+.pop-title { margin: 0; font-size: 14.5px; font-weight: 700; letter-spacing: -0.2px; flex: 1; line-height: 1.2; }
+.pop-close { background: transparent; border: none; color: var(--text-2); cursor: pointer; font-size: 14px; line-height: 1; padding: 3px 5px; border-radius: 7px; flex-shrink: 0; }
+.pop-close:hover { color: var(--text); background: var(--glass-2); }
+@media (prefers-reduced-motion: reduce) { #node-popover { animation: none; } }
 .key-enzyme-list {
   display: flex;
   justify-content: flex-end;
@@ -1481,6 +1504,8 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     </div>
   </div>
 </div>
+
+<div id="node-popover" role="dialog" aria-label="Metabolite detail"></div>
 
 <div id="cases-browser" aria-hidden="true">
   <div class="cases-shell">
@@ -2783,53 +2808,66 @@ function renderDetail(state) {
   if (selectedMetabolite) {
     const m = M[selectedMetabolite];
     if (m) {
-      const val = state[selectedMetabolite] || 0;
-      const drivers = [];
-      for (const pid of activePerturbations) {
-        const p = P.find(x => x.id === pid);
-        if (!p || !p.effects) continue;
-        if (p.effects[selectedMetabolite] !== undefined && p.effects[selectedMetabolite] !== 0) {
-          drivers.push({ name: p.name, delta: p.effects[selectedMetabolite] });
-        }
-      }
-      const pathwayLabels = {
-        glycolysis: 'Glycolysis',
-        'glycogen-ppp': 'Glycogen / PPP',
-        tca: 'TCA Cycle',
-        'fa-ketones': 'Lipids · β-Ox · Ketones',
-        protein: 'Amino Acids / Protein',
-        urea: 'Urea Cycle',
-        sterol: 'Cholesterol / Steroids',
-        heme: 'Heme Synthesis',
-        nucleotide: 'Purines / Pyrimidines',
-        sugar: 'Fructose / Galactose',
-        ethanol: 'Ethanol Metabolism',
-        onecarbon: 'Folate / Methionine',
-        catechol: 'Catecholamines',
-        creatine: 'Creatine',
-        polyol: 'Polyol (Sorbitol)',
-        bilirubin: 'Bilirubin / Heme degradation',
-        sphingo: 'Sphingolipids',
-        etc: 'ETC / OxPhos'
-      };
-      d.innerHTML = `
-        <h4>${escapeText(selectedMetabolite)}</h4>
-        <div class="label-pair"><span class="k">State</span><span class="change ${deltaClass(val)}">${deltaArrow(val)} &nbsp; ${deltaLabel(val)}</span></div>
-        <div class="label-pair"><span class="k">Pathway</span><span>${pathwayLabels[m.pathway] || m.pathway}</span></div>
-        <p style="margin-top:8px;font-size:11.5px;color:var(--text-2);line-height:1.5">${escapeText(m.info || '')}</p>
-        ${drivers.length ? `
-          <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
-            <div style="font-size:10.5px;color:var(--text-2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Affected by</div>
-            ${drivers.map(dr => `<div class="driver-row">
-              <span>${escapeText(dr.name)}</span><span class="change ${deltaClass(dr.delta)}">${dr.delta > 0 ? '+' : ''}${dr.delta}</span>
-            </div>`).join('')}
-          </div>` : ''}
-      `;
+      d.innerHTML = `<h4>${escapeText(selectedMetabolite)}</h4>` + metaboliteBodyHTML(selectedMetabolite, state);
       return;
     }
   }
   d.innerHTML = `<p class="muted">Click a metabolite in the pathway or list, or any perturbation, for details.</p>`;
 }
+
+// Shared detail body for a metabolite — used by both the right-panel detail
+// box and the floating node popover.
+function metaboliteBodyHTML(name, state) {
+  const m = M[name];
+  if (!m) return '';
+  const val = state[name] || 0;
+  const drivers = [];
+  for (const pid of activePerturbations) {
+    const p = P.find(x => x.id === pid);
+    if (!p || !p.effects) continue;
+    if (p.effects[name] !== undefined && p.effects[name] !== 0) drivers.push({ name: p.name, delta: p.effects[name] });
+  }
+  const pwLabel = (PATHWAY_INFO[m.pathway] && PATHWAY_INFO[m.pathway].label) || m.pathway;
+  return `
+    <div class="label-pair"><span class="k">State</span><span class="change ${deltaClass(val)}">${deltaArrow(val)} &nbsp; ${deltaLabel(val)}</span></div>
+    <div class="label-pair"><span class="k">Pathway</span><span style="color:var(--pw-${m.pathway});font-weight:600">${escapeText(pwLabel)}</span></div>
+    <p style="margin-top:8px;font-size:11.5px;color:var(--text-2);line-height:1.5">${escapeText(m.info || '')}</p>
+    ${drivers.length ? `
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--glass-brd)">
+        <div style="font-size:10.5px;color:var(--text-2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Affected by</div>
+        ${drivers.map(dr => `<div class="driver-row"><span>${escapeText(dr.name)}</span><span class="change ${deltaClass(dr.delta)}">${dr.delta > 0 ? '+' : ''}${dr.delta}</span></div>`).join('')}
+      </div>` : ''}
+  `;
+}
+
+// Floating popover that lights up next to the clicked metabolite node.
+const _popEl = document.getElementById('node-popover');
+function showNodePopover(name, anchorRect) {
+  const m = M[name];
+  if (!m) return;
+  const state = computeState();
+  _popEl.style.setProperty('--pw', `var(--pw-${m.pathway})`);
+  _popEl.innerHTML =
+    `<div class="pop-head"><span class="pop-bar"></span><h4 class="pop-title">${escapeText(name)}</h4>` +
+    `<button class="pop-close" id="pop-close" aria-label="Close">✕</button></div>` +
+    metaboliteBodyHTML(name, state);
+  _popEl.classList.add('open');
+  // Position: prefer to the right of the node, else left; clamp to viewport.
+  const pad = 12, pw = _popEl.offsetWidth || 290, ph = _popEl.offsetHeight || 180;
+  let left = anchorRect.right + 10;
+  if (left + pw > window.innerWidth - pad) left = anchorRect.left - pw - 10;
+  if (left < pad) left = pad;
+  let top = anchorRect.top + anchorRect.height / 2 - ph / 2;
+  top = Math.max(pad, Math.min(top, window.innerHeight - ph - pad));
+  _popEl.style.left = left + 'px';
+  _popEl.style.top = top + 'px';
+  document.getElementById('pop-close').addEventListener('click', (ev) => { ev.stopPropagation(); hideNodePopover(); });
+}
+function hideNodePopover() {
+  _popEl.classList.remove('open');
+  if (selectedMetabolite) { selectedMetabolite = null; renderAll(); }
+}
+function popoverOpen() { return _popEl.classList.contains('open'); }
 
 function renderAll() {
   const state = computeState();
@@ -2922,16 +2960,29 @@ document.getElementById('pathway-svg').addEventListener('click', (e) => {
   }
   const node = e.target.closest('.node');
   if (node) {
-    selectedMetabolite = node.dataset.name;
+    const rect = node.getBoundingClientRect(); // capture before renderAll detaches the node
+    const nodeName = node.dataset.name;
+    selectedMetabolite = nodeName;
     selectedPerturbation = null;
     renderAll();
+    showNodePopover(nodeName, rect);
     return;
   }
+  hideNodePopover();
   const lbl = e.target.closest('.pathway-label[data-pw]');
   if (lbl) {
     openPathway(lbl.dataset.pw, { shift: e.shiftKey });
   }
 });
+
+// Dismiss the popover on outside-click, Escape, or scrolling the map.
+document.addEventListener('click', (e) => {
+  if (!popoverOpen()) return;
+  if (e.target.closest('#node-popover') || e.target.closest('#pathway-svg .node')) return;
+  hideNodePopover();
+}, true);
+document.querySelector('main').addEventListener('scroll', () => { if (popoverOpen()) hideNodePopover(); }, { passive: true });
+window.addEventListener('resize', () => { if (popoverOpen()) hideNodePopover(); });
 
 document.querySelector('aside.right').addEventListener('click', (e) => {
   // The chevron toggles collapse only — it preempts pathway-focus click
@@ -3100,6 +3151,7 @@ document.addEventListener('keydown', (e) => {
   if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable || e.metaKey || e.ctrlKey || e.altKey) return;
   // Don't let single-key shortcuts leak through any open overlay.
   if (introOpen() || casesBrowserOpen() || helpOpen() || cmdPaletteOpen() || CaseRunner.state) return;
+  if (e.key === 'Escape' && popoverOpen()) { hideNodePopover(); return; }
   if (e.key === 'Escape' && selectedPathway) { exitDive(); return; }
   if (e.key === '[') { layoutEl.classList.toggle('hide-left'); syncToggleButtons(); }
   else if (e.key === ']') { layoutEl.classList.toggle('hide-right'); syncToggleButtons(); }
