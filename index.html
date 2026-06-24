@@ -380,6 +380,24 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
   font-weight: 800;
 }
 
+/* Organelle compartment boxes drawn behind the map */
+#compartments { pointer-events: none; }
+.compartment {
+  fill: color-mix(in srgb, var(--cc) 6%, transparent);
+  stroke: var(--cc); stroke-width: 1.6; stroke-dasharray: 8 6; stroke-opacity: 0.5;
+}
+.compartment.solid { stroke-dasharray: none; stroke-opacity: 0.42; }
+.compartment-tab rect {
+  fill: color-mix(in srgb, var(--cc) 20%, var(--panel));
+  stroke: var(--cc); stroke-opacity: 0.55; stroke-width: 1;
+}
+.compartment-tab text {
+  fill: var(--cc); font-size: 12.5px; font-weight: 800; letter-spacing: 1.4px;
+  font-family: "SF Mono", "Menlo", monospace;
+}
+body.case-pinpoint #compartments,
+body[data-dive] #compartments { opacity: 0.35; transition: opacity 0.28s; }
+
 .pathway-label {
   font-size: 14px;
   font-weight: 700;
@@ -1397,6 +1415,8 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
           <polygon points="0 0, 10 5, 0 10" fill="#d29922" />
         </marker>
       </defs>
+
+      <g id="compartments"></g>
 
       <text x="20" y="42" class="pathway-label" data-pw="glycogen-ppp" style="--pw: var(--pw-glycogen-ppp)">GLYCOGEN</text>
       <text x="170" y="42" class="pathway-label" style="font-size:10px;opacity:0.5;--pw: var(--pw-glycogen-ppp)" data-pw="glycogen-ppp">// synthesis</text>
@@ -2934,10 +2954,51 @@ function escapeAttr(s) {
   return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// ---- Organelle compartment boxes (drawn once behind the map) ----
+// Each box is auto-sized to the bounding box of its member nodes (so it
+// tracks LAYOUT_SCALE), with a labelled tab in a chosen corner.
+const COMPARTMENTS = [
+  { label: 'MITOCHONDRION · matrix', cc: 'var(--pw-tca)', pad: 30, tab: 'tr',
+    nodes: ['Acetyl-CoA','Citrate','Isocitrate','α-KG','Succinyl-CoA','Succinate','Fumarate','Malate','OAA','GTP','CO2'] },
+  { label: 'MITOCHONDRION · inner membrane (ETC)', cc: 'var(--pw-tca)', pad: 26, tab: 'tl',
+    nodes: ['NADH','NAD+','FADH2','FAD','CoQH2','CoQ','Cyt c (red)','O2','H2O','H⁺ gradient','ADP','ATP'] },
+  { label: 'ENDOPLASMIC RETICULUM · sterols', cc: 'var(--pw-sterol)', pad: 26, tab: 'tr',
+    nodes: ['Mevalonate','Squalene','Cholesterol','Bile acids','Vitamin D','Steroid hormones'] },
+  { label: 'LYSOSOME · sphingolipid degradation', cc: 'var(--pw-sphingo)', pad: 26, tab: 'bl',
+    nodes: ['Ceramide','Sphingomyelin','Glucocerebroside','GM2 ganglioside','Galactocerebroside','Sulfatide'] }
+];
+
+function renderCompartments() {
+  const g = document.getElementById('compartments');
+  if (!g) return;
+  const parts = [];
+  for (const c of COMPARTMENTS) {
+    let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+    for (const n of c.nodes) {
+      const m = M[n]; if (!m) continue;
+      const hw = nodeWidth(n) / 2;
+      minX = Math.min(minX, m.x - hw); maxX = Math.max(maxX, m.x + hw);
+      minY = Math.min(minY, m.y - NODE_H / 2); maxY = Math.max(maxY, m.y + NODE_H / 2);
+    }
+    if (maxX < minX) continue;
+    const x = minX - c.pad, y = minY - c.pad, w = (maxX - minX) + c.pad * 2, h = (maxY - minY) + c.pad * 2;
+    parts.push(`<rect class="compartment" x="${x}" y="${y}" width="${w}" height="${h}" rx="22" style="--cc:${c.cc}"/>`);
+    // label tab
+    const tw = c.label.length * 6.6 + 22, th = 21;
+    let tx, ty;
+    if (c.tab === 'tr') { tx = x + w - tw - 10; ty = y + 8; }
+    else if (c.tab === 'bl') { tx = x + 10; ty = y + h - th - 8; }
+    else { tx = x + 10; ty = y + 8; } // tl default
+    parts.push(`<g class="compartment-tab" style="--cc:${c.cc}"><rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="7"/><text x="${tx + tw/2}" y="${ty + th/2 + 0.5}" text-anchor="middle" dominant-baseline="middle">${escapeText(c.label)}</text></g>`);
+  }
+  g.innerHTML = parts.join('');
+}
+
 // ============================================
 // EVENTS
 // ============================================
 
+renderCompartments();
 renderPerturbationList();
 renderAll();
 
