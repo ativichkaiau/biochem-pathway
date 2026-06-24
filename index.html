@@ -432,7 +432,7 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
 .sub-header {
   font-size: 11px;
   color: var(--text-2);
-  margin: 14px 0 5px;
+  margin: 8px 0 4px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -440,9 +440,31 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 3px 6px 3px 0;
+  padding: 3px 6px 3px 10px;
   border-radius: 6px;
   transition: color 0.15s, background 0.15s;
+}
+
+/* Organelle super-headers — group pathways by subcellular compartment */
+.organelle-header {
+  display: flex; align-items: center; gap: 9px;
+  margin: 20px 0 4px; padding: 8px 8px 8px 2px;
+  font-size: 11.5px; font-weight: 800; letter-spacing: 1.5px;
+  color: var(--text); text-transform: uppercase;
+  border-top: 1px solid var(--glass-brd);
+}
+.organelle-header:first-of-type { margin-top: 4px; border-top: none; }
+.organelle-header .org-ico {
+  width: 22px; height: 22px; flex-shrink: 0;
+  display: grid; place-items: center; border-radius: 7px;
+  font-size: 13px; line-height: 1;
+  background: color-mix(in srgb, var(--org, var(--accent)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--org, var(--accent)) 45%, transparent);
+  color: var(--org, var(--accent));
+}
+.organelle-header .org-note {
+  margin-left: auto; font-size: 9px; font-weight: 600; letter-spacing: 0.5px;
+  color: var(--text-2); text-transform: none; opacity: 0.85; text-align: right;
 }
 .sub-header::before {
   content: ""; display: inline-block;
@@ -1418,42 +1440,51 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <div class="legend-item"><div class="legend-box" style="background:color-mix(in srgb, var(--rate) 22%, transparent);border-color:var(--rate)"></div>rate-limiting</div>
     </div>
 
+    <div class="organelle-header" data-org="cytosol" style="--org:#6aa8e0"><span class="org-ico">◍</span>Cytosol<span class="org-note">soluble metabolism</span></div>
     <div class="sub-header" data-pw="glycolysis" style="--pw: var(--pw-glycolysis)">Glycolysis</div>
     <div id="list-glycolysis"></div>
     <div class="sub-header" data-pw="glycogen-ppp" style="--pw: var(--pw-glycogen-ppp)">Glycogen · PPP</div>
     <div id="list-glycogen-ppp"></div>
-    <div class="sub-header" data-pw="tca" style="--pw: var(--pw-tca)">TCA · Acetyl-CoA hub</div>
-    <div id="list-tca"></div>
-    <div class="sub-header" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones)">Lipids · β-Ox · Ketones</div>
-    <div id="list-fa-ketones"></div>
-    <div class="sub-header" data-pw="protein" style="--pw: var(--pw-protein)">Amino acids · Protein</div>
-    <div id="list-protein"></div>
-    <div class="sub-header" data-pw="urea" style="--pw: var(--pw-urea)">Urea cycle</div>
-    <div id="list-urea"></div>
-    <div class="sub-header" data-pw="sterol" style="--pw: var(--pw-sterol)">Cholesterol · Steroids</div>
-    <div id="list-sterol"></div>
-    <div class="sub-header" data-pw="heme" style="--pw: var(--pw-heme)">Heme synthesis</div>
-    <div id="list-heme"></div>
-    <div class="sub-header" data-pw="nucleotide" style="--pw: var(--pw-nucleotide)">Purines · Pyrimidines</div>
-    <div id="list-nucleotide"></div>
     <div class="sub-header" data-pw="sugar" style="--pw: var(--pw-sugar)">Fructose · Galactose</div>
     <div id="list-sugar"></div>
-    <div class="sub-header" data-pw="ethanol" style="--pw: var(--pw-ethanol)">Ethanol</div>
-    <div id="list-ethanol"></div>
+    <div class="sub-header" data-pw="polyol" style="--pw: var(--pw-polyol)">Polyol (sorbitol)</div>
+    <div id="list-polyol"></div>
+    <div class="sub-header" data-pw="nucleotide" style="--pw: var(--pw-nucleotide)">Purines · Pyrimidines</div>
+    <div id="list-nucleotide"></div>
     <div class="sub-header" data-pw="onecarbon" style="--pw: var(--pw-onecarbon)">Folate · Methionine</div>
     <div id="list-onecarbon"></div>
     <div class="sub-header" data-pw="catechol" style="--pw: var(--pw-catechol)">Catecholamines</div>
     <div id="list-catechol"></div>
-    <div class="sub-header" data-pw="creatine" style="--pw: var(--pw-creatine)">Creatine</div>
-    <div id="list-creatine"></div>
-    <div class="sub-header" data-pw="polyol" style="--pw: var(--pw-polyol)">Polyol (sorbitol)</div>
-    <div id="list-polyol"></div>
-    <div class="sub-header" data-pw="bilirubin" style="--pw: var(--pw-bilirubin)">Bilirubin · heme degradation</div>
-    <div id="list-bilirubin"></div>
-    <div class="sub-header" data-pw="sphingo" style="--pw: var(--pw-sphingo)">Sphingolipids</div>
-    <div id="list-sphingo"></div>
+
+    <div class="organelle-header" data-org="mito" style="--org:#3fc587"><span class="org-ico">◉</span>Mitochondrion<span class="org-note">oxidation · ATP</span></div>
+    <div class="sub-header" data-pw="tca" style="--pw: var(--pw-tca)">TCA · Acetyl-CoA hub</div>
+    <div id="list-tca"></div>
+    <div class="sub-header" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones)">Lipids · β-Ox · Ketones</div>
+    <div id="list-fa-ketones"></div>
     <div class="sub-header" data-pw="etc" style="--pw: var(--pw-etc)">ETC / Cofactors</div>
     <div id="list-etc"></div>
+
+    <div class="organelle-header" data-org="mitocyto" style="--org:#e6a86c"><span class="org-ico">⇄</span>Cytosol ⇄ Mitochondrion<span class="org-note">shuttled pathways</span></div>
+    <div class="sub-header" data-pw="protein" style="--pw: var(--pw-protein)">Amino acids · Protein</div>
+    <div id="list-protein"></div>
+    <div class="sub-header" data-pw="urea" style="--pw: var(--pw-urea)">Urea cycle</div>
+    <div id="list-urea"></div>
+    <div class="sub-header" data-pw="heme" style="--pw: var(--pw-heme)">Heme synthesis</div>
+    <div id="list-heme"></div>
+    <div class="sub-header" data-pw="creatine" style="--pw: var(--pw-creatine)">Creatine</div>
+    <div id="list-creatine"></div>
+    <div class="sub-header" data-pw="ethanol" style="--pw: var(--pw-ethanol)">Ethanol</div>
+    <div id="list-ethanol"></div>
+
+    <div class="organelle-header" data-org="er" style="--org:#bc8cff"><span class="org-ico">∿</span>Endoplasmic reticulum<span class="org-note">lipids · conjugation</span></div>
+    <div class="sub-header" data-pw="sterol" style="--pw: var(--pw-sterol)">Cholesterol · Steroids</div>
+    <div id="list-sterol"></div>
+    <div class="sub-header" data-pw="bilirubin" style="--pw: var(--pw-bilirubin)">Bilirubin · heme degradation</div>
+    <div id="list-bilirubin"></div>
+
+    <div class="organelle-header" data-org="lysosome" style="--org:#e0526b"><span class="org-ico">○</span>Lysosome<span class="org-note">acid hydrolases</span></div>
+    <div class="sub-header" data-pw="sphingo" style="--pw: var(--pw-sphingo)">Sphingolipids</div>
+    <div id="list-sphingo"></div>
 
     <div class="sub-header" style="margin-top:18px">Detail</div>
     <div id="detail" class="detail-box">
@@ -2429,7 +2460,7 @@ const PATHWAY_INFO = {
   etc: { label: 'ETC / OxPhos', short: 'NADH/FADH₂ → O₂; H⁺ gradient → ATP',
     desc: 'Five complexes drive the electron cascade. Complexes I, III, IV pump H⁺ across the inner mitochondrial membrane; ATP synthase uses the proton motive force to make ~28-30 ATP per glucose under aerobic conditions.',
     keyEnzymes: ['Complex I', 'Complex II', 'Complex III', 'Complex IV', 'ATP Synthase'],
-    clinical: 'Rotenone (CI), antimycin A (CIII), cyanide / CO / azide (CIV), oligomycin (V), DNP (uncoupler), hypoxia, metformin.' },
+    clinical: 'Rotenone (CI), antimycin A (CIII), cyanide / CO / azide (CIV), oligomycin (V), DNP (uncoupler), hypoxia, metformin.', org: 'Mitochondrion (inner membrane)' },
   polyol: { label: 'Polyol (Sorbitol)', short: 'Glucose → Sorbitol → Fructose',
     desc: 'Aldose reductase reduces glucose to sorbitol (using NADPH); sorbitol dehydrogenase oxidizes it to fructose. Tissues with aldose reductase but little sorbitol DH (lens, retina, nerve, kidney) trap sorbitol — osmotic and oxidative injury under hyperglycemia.',
     keyEnzymes: ['Aldose reductase', 'Sorbitol DH'],
@@ -2442,6 +2473,18 @@ const PATHWAY_INFO = {
     desc: 'Ceramide is the metabolic hub: built de novo from serine + palmitoyl-CoA, and the convergence point for degradation of sphingomyelin, cerebrosides, gangliosides, and sulfatides. Each lysosomal hydrolase maps to a storage disease when deficient.',
     keyEnzymes: ['Sphingomyelinase', 'β-Glucocerebrosidase', 'Hexosaminidase A', 'Galactocerebrosidase', 'Arylsulfatase A'],
     clinical: 'Niemann-Pick (sphingomyelinase), Gaucher (glucocerebrosidase), Tay-Sachs (hexosaminidase A), Krabbe (galactocerebrosidase), metachromatic leukodystrophy (arylsulfatase A), Fabry (α-galactosidase A).' }
+};
+
+// Primary subcellular compartment of each pathway (teaching simplification;
+// spanning pathways are noted as "Cytosol ⇄ Mitochondrion").
+const ORGANELLE_OF = {
+  glycolysis: 'Cytosol', 'glycogen-ppp': 'Cytosol', sugar: 'Cytosol', polyol: 'Cytosol',
+  nucleotide: 'Cytosol', onecarbon: 'Cytosol', catechol: 'Cytosol',
+  tca: 'Mitochondrion', 'fa-ketones': 'Mitochondrion', etc: 'Mitochondrion (inner membrane)',
+  protein: 'Cytosol ⇄ Mitochondrion', urea: 'Cytosol ⇄ Mitochondrion', heme: 'Cytosol ⇄ Mitochondrion',
+  creatine: 'Cytosol ⇄ Mitochondrion', ethanol: 'Cytosol ⇄ Mitochondrion',
+  sterol: 'Endoplasmic reticulum', bilirubin: 'Endoplasmic reticulum',
+  sphingo: 'Lysosome'
 };
 
 // ============================================
@@ -2766,6 +2809,7 @@ function renderDetail(state) {
       </div>
       <div style="font-size:10.5px;color:var(--text-2);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px">${escapeText(info.short)}</div>
       <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 10px">${escapeText(info.desc)}</p>
+      ${ORGANELLE_OF[selectedPathway] ? `<div class="label-pair"><span class="k">Compartment</span><span style="font-weight:600">${escapeText(ORGANELLE_OF[selectedPathway])}</span></div>` : ''}
       <div class="label-pair"><span class="k">Key enzymes</span>${renderKeyEnzymes(info.keyEnzymes)}</div>
       <div class="label-pair"><span class="k">Clinical</span><span style="text-align:right;color:var(--text-2);font-size:11px">${escapeText(info.clinical)}</span></div>
       ${activeHere.length ? `
@@ -2828,9 +2872,11 @@ function metaboliteBodyHTML(name, state) {
     if (p.effects[name] !== undefined && p.effects[name] !== 0) drivers.push({ name: p.name, delta: p.effects[name] });
   }
   const pwLabel = (PATHWAY_INFO[m.pathway] && PATHWAY_INFO[m.pathway].label) || m.pathway;
+  const organelle = ORGANELLE_OF[m.pathway] || '';
   return `
     <div class="label-pair"><span class="k">State</span><span class="change ${deltaClass(val)}">${deltaArrow(val)} &nbsp; ${deltaLabel(val)}</span></div>
     <div class="label-pair"><span class="k">Pathway</span><span style="color:var(--pw-${m.pathway});font-weight:600">${escapeText(pwLabel)}</span></div>
+    ${organelle ? `<div class="label-pair"><span class="k">Compartment</span><span>${escapeText(organelle)}</span></div>` : ''}
     <p style="margin-top:8px;font-size:11.5px;color:var(--text-2);line-height:1.5">${escapeText(m.info || '')}</p>
     ${drivers.length ? `
       <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--glass-brd)">
