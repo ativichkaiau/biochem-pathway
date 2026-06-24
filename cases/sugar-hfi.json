@@ -1,0 +1,45 @@
+{
+  "id": "sugar-hfi",
+  "pathway": "sugar",
+  "title": "The baby who got sick the week fruit was introduced",
+  "blurb": "Vomiting, hypoglycemia, and liver failure that began precisely when fruit and table sugar entered the diet — a fructose-handling defect that traps phosphate.",
+  "patient": { "age": "7 months", "sex": "F", "complaint": "Vomiting, sweating, and lethargy after meals since starting solids and juice." },
+  "opening": "7-month-old girl, thriving on breast milk, who became ill the week purees, fruit juice, and sweetened cereal were introduced. She vomits and turns sweaty and shaky ~20 minutes after fructose-containing meals; today she is jaundiced and lethargic. Glucose drops to 38 after juice; labs show lactic acidosis, hypophosphatemia, hyperuricemia, and elevated transaminases. She already grimaces at and refuses sweet foods. What do you want to ask, examine, or order next?",
+  "history": "Completely well while exclusively breastfed. Symptoms began with weaning onto fruit/sucrose. Strong aversion to sweets (protective). No symptoms after pure glucose. Parents non-consanguineous (autosomal recessive). No infection.",
+  "exam": "Lethargic, jaundiced, sweaty. Hepatomegaly 3 cm with tenderness. After a fructose-containing feed: tremulous, tachycardic (hypoglycemia). No dysmorphism. No cataracts.",
+  "labs": [
+    { "name": "Glucose (after fructose meal)", "value": 38, "unit": "mg/dL", "ref": "70-110", "flag": "low" },
+    { "name": "Lactate", "value": 5.6, "unit": "mmol/L", "ref": "0.5-2.2", "flag": "high" },
+    { "name": "Phosphate", "value": 1.9, "unit": "mg/dL", "ref": "4-7 (infant)", "flag": "low" },
+    { "name": "Uric acid", "value": 9.8, "unit": "mg/dL", "ref": "2-5.5", "flag": "high" },
+    { "name": "AST / ALT", "value": "Elevated", "unit": "U/L", "ref": "<40", "flag": "high" },
+    { "name": "Urine reducing substances (after fructose)", "value": "Positive", "unit": "", "ref": "Negative", "flag": "high" },
+    { "name": "Coagulation (PT/INR)", "value": "Prolonged", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "ALDOB gene", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme is deficient?",
+      "mechanism": "Briefly: why does fructose-1-phosphate accumulation cause hypoglycemia, lactic acidosis, AND hyperuricemia?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["hereditary fructose intolerance", "hfi", "fructose intolerance", "aldolase b deficiency"] },
+      "cause": { "weight": 1.0, "accepts": ["aldolase b", "aldolase", "aldob", "fructose-1-phosphate aldolase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["fructose-1-phosphate", "phosphate", "glycogenolysis"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the fructose-metabolism step that fails in HFI.",
+    "target": { "type": "edge", "edgeId": "Aldolase B:Fructose-1-P->DHAP" },
+    "correctMsg": "Yes — aldolase B. Fructose is trapped as fructose-1-phosphate, which can't be cleaved. F1P sequesters inorganic phosphate (hypophosphatemia) and depletes ATP; low phosphate/ATP cripples glycogen phosphorylase and gluconeogenesis → hypoglycemia + lactic acidosis, and ATP breakdown to AMP drives purine catabolism → hyperuricemia.",
+    "wrongMsg": "Not quite. The block is the cleavage of fructose-1-phosphate (the aldolase B step), not fructokinase.",
+    "revealMsg": "Target: Aldolase B (Fructose-1-P → DHAP). Trapped F1P drives the whole syndrome; treatment is strict lifelong avoidance of fructose, sucrose, and sorbitol."
+  },
+  "mcqs": [
+    { "stem": "Why does fructose-1-phosphate accumulation cause hypoglycemia?", "choices": ["F1P sequesters phosphate and depletes ATP, inhibiting glycogenolysis (phosphorylase) and gluconeogenesis", "Fructose directly stimulates insulin to dangerous levels", "F1P is converted to insulin", "Fructose blocks glucose absorption in the gut"], "correct": 0, "explanation": "Trapping phosphate as F1P lowers free Pi and ATP. Glycogen phosphorylase needs Pi, and gluconeogenesis needs ATP — both stall, so the liver can neither release stored glucose nor make new glucose → fasting/post-fructose hypoglycemia." },
+    { "stem": "Why is the serum uric acid elevated?", "choices": ["ATP consumed trapping fructose is degraded to AMP → IMP → hypoxanthine → uric acid (purine catabolism)", "Fructose is a purine", "Renal failure", "Increased dietary purines"], "correct": 0, "explanation": "Rapid ATP depletion (phosphate trapped in F1P) raises AMP, which is deaminated and catabolized down the purine pathway to uric acid. The same mechanism causes the transient hyperuricemia after large fructose loads even in healthy people." },
+    { "stem": "How does HFI differ from benign essential fructosuria?", "choices": ["HFI (aldolase B) causes hypoglycemia, liver/kidney injury, and is dangerous; essential fructosuria (fructokinase) is asymptomatic with fructose merely spilling in urine", "Both are dangerous", "Essential fructosuria causes liver failure", "HFI is asymptomatic"], "correct": 0, "explanation": "Fructokinase deficiency (essential fructosuria) means fructose is simply not phosphorylated — harmless, found incidentally as a urinary reducing substance. HFI traps F1P and is toxic. The level of the block determines severity." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "glycolysis-pdh",
+  "pathway": "glycolysis",
+  "title": "The floppy infant with lactate that won't come down",
+  "blurb": "Pyruvate piles up at the gate of the mitochondrion, spilling to lactate and alanine — and a ketogenic diet, paradoxically, helps.",
+  "patient": { "age": "4 months", "sex": "M", "complaint": "Poor feeding, hypotonia, and episodes of rapid breathing." },
+  "opening": "4-month-old boy with hypotonia since birth, poor head control, and intermittent tachypnea. Bedside glucose is normal but venous lactate is 7.8 and persists despite hydration. Plasma alanine is high; MRI shows thin corpus callosum and basal ganglia changes. The lactate does NOT fall with glucose — it rises. What do you want to ask, examine, or order next?",
+  "history": "Born at term; hypotonia and feeding difficulty from the first weeks. Mild dysmorphism noted. No fever or sepsis. Parents non-consanguineous (the common form is X-linked, PDHA1). Older female cousin with developmental delay.",
+  "exam": "Hypotonic with poor head control, brisk-ish reflexes, intermittent tachypnea (compensating for acidosis). Narrow forehead, mild dysmorphism. Liver not enlarged. No organomegaly.",
+  "labs": [
+    { "name": "Venous lactate", "value": 7.8, "unit": "mmol/L", "ref": "0.5-2.2", "flag": "high" },
+    { "name": "Pyruvate", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Lactate : pyruvate ratio", "value": 14, "unit": "", "ref": "<20 (normal/low here)", "flag": "normal" },
+    { "name": "Plasma alanine", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Glucose", "value": 76, "unit": "mg/dL", "ref": "45-90", "flag": "normal" },
+    { "name": "Response to glucose load", "value": "Lactate rises", "unit": "", "ref": "—", "flag": "high" },
+    { "name": "Brain MRI", "value": "Thin corpus callosum, basal ganglia signal", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "PDHA1 sequencing", "value": "Pathogenic variant", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "What enzyme complex is deficient?",
+      "mechanism": "Briefly: why does a glucose load make it WORSE, and why does a ketogenic diet help?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["pdh deficiency", "pyruvate dehydrogenase deficiency", "pdh", "pyruvate dehydrogenase"] },
+      "cause": { "weight": 1.0, "accepts": ["pdh", "pyruvate dehydrogenase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["pyruvate", "acetyl-coa", "ketogenic"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the step that connects glycolysis to the TCA cycle and fails here.",
+    "target": { "type": "edge", "edgeId": "PDH:Pyruvate->Acetyl-CoA" },
+    "correctMsg": "Yes — pyruvate dehydrogenase. Pyruvate can't be converted to acetyl-CoA, so it backs up to lactate (acidosis) and alanine. Glucose feeds more pyruvate into the jam (worsens lactate); a KETOGENIC diet supplies acetyl-CoA directly from fat, bypassing the block.",
+    "wrongMsg": "Not quite. The block is at the bridge from pyruvate into the mitochondrial TCA cycle.",
+    "revealMsg": "Target: PDH (Pyruvate → Acetyl-CoA). It is a thiamine/lipoate/FAD/NAD/CoA complex — the same family as α-KGDH and BCKDH."
+  },
+  "mcqs": [
+    { "stem": "Why does a glucose load worsen the lactate in PDH deficiency?", "choices": ["More glucose → more pyruvate, which cannot proceed to acetyl-CoA and is shunted to lactate", "Glucose inhibits the kidney's lactate clearance", "Glucose directly activates LDH transcription", "Glucose causes osmotic diuresis"], "correct": 0, "explanation": "With the PDH gate shut, extra carbohydrate just feeds more pyruvate into a dead end → more lactate and alanine. This is why carbohydrate loading worsens PDH deficiency, opposite to glycogen storage disease." },
+    { "stem": "Why is a ketogenic diet the cornerstone of treatment?", "choices": ["Fat-derived acetyl-CoA (via β-oxidation and ketones) enters the TCA cycle downstream of the block", "Ketones inhibit lactate production directly", "Ketogenic diets raise thiamine levels", "Fat suppresses glycolysis entirely"], "correct": 0, "explanation": "Ketone bodies and β-oxidation generate acetyl-CoA distal to PDH, fueling the TCA cycle without needing pyruvate to cross the broken bridge. Thiamine (a PDH cofactor) is also trialed." },
+    { "stem": "A normal-to-low lactate:pyruvate ratio (rather than a high ratio) points away from which alternative?", "choices": ["A respiratory-chain (ETC) defect, where impaired NADH reoxidation drives a HIGH lactate:pyruvate ratio", "Diabetic ketoacidosis", "Sepsis", "Salicylate toxicity"], "correct": 0, "explanation": "ETC defects raise NADH, pushing pyruvate→lactate and giving a HIGH L:P ratio (>20-25). PDH deficiency blocks pyruvate use directly, so pyruvate AND lactate both rise with a relatively normal ratio — a useful discriminator." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

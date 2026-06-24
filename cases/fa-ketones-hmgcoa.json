@@ -1,0 +1,45 @@
+{
+  "id": "fa-ketones-hmgcoa",
+  "pathway": "fa-ketones",
+  "title": "The fasting toddler with hypoglycemia but no ketones",
+  "blurb": "A block at the last shared step of ketogenesis and leucine breakdown — hypoketotic hypoglycemia with a metabolic acidosis and a Reye-like picture.",
+  "patient": { "age": "14 months", "sex": "M", "complaint": "Vomiting, lethargy, and a seizure during a gastroenteritis with poor intake." },
+  "opening": "14-month-old boy with a viral illness and 18 hours of poor intake who became lethargic, then had a generalized seizure. Glucose is 30, but urine ketones are negative/trace despite the hypoglycemia. He has a metabolic acidosis, hyperammonemia, and elevated transaminases. Urine organic acids show 3-hydroxy-3-methylglutaric acid and related metabolites. What do you want to ask, examine, or order next?",
+  "history": "Previous episodes of 'low blood sugar' with illness. No hepatomegaly between episodes. Parents consanguineous (autosomal recessive). Decompensations triggered by fasting/intercurrent illness, not by specific foods.",
+  "exam": "Lethargic, hypotonic, post-ictal. Hepatomegaly during the acute illness. Tachypneic (acidosis). No dysmorphism. No cardiomyopathy noted.",
+  "labs": [
+    { "name": "Glucose", "value": 30, "unit": "mg/dL", "ref": "70-110", "flag": "low" },
+    { "name": "Urine ketones", "value": "Negative / trace", "unit": "", "ref": "Present in fasting", "flag": "low" },
+    { "name": "Serum β-hydroxybutyrate", "value": "Inappropriately low", "unit": "", "ref": "High in hypoglycemia", "flag": "low" },
+    { "name": "pH / anion gap", "value": "7.22 / 20", "unit": "", "ref": "7.35-7.45 / 8-12", "flag": "high" },
+    { "name": "Ammonia", "value": 180, "unit": "μmol/L", "ref": "<50", "flag": "high" },
+    { "name": "Urine organic acids", "value": "3-hydroxy-3-methylglutarate, 3-methylglutaconate", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "AST / ALT", "value": "Elevated", "unit": "U/L", "ref": "<40", "flag": "high" },
+    { "name": "HMGCL gene", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme is deficient?",
+      "mechanism": "Briefly: why hypoglycemia WITHOUT ketones, and why does this also disrupt leucine catabolism?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["hmg-coa lyase deficiency", "hmg coa lyase deficiency", "3-hydroxy-3-methylglutaryl-coa lyase deficiency", "hmgcl deficiency"] },
+      "cause": { "weight": 1.0, "accepts": ["hmg-coa lyase", "hmg coa lyase", "hydroxymethylglutaryl-coa lyase", "hmgcl"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["ketone", "acetoacetate", "leucine"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the ketogenesis step that fails in this disorder.",
+    "target": { "type": "edge", "edgeId": "HMG-CoA lyase:HMG-CoA->Acetoacetate" },
+    "correctMsg": "Yes — HMG-CoA lyase. It cleaves HMG-CoA to acetoacetate (the final ketogenesis step). Without it, fasting can't generate ketone bodies (hypoketotic hypoglycemia), and because HMG-CoA is also the last step of leucine degradation, leucine-derived metabolites (3-HMG, 3-methylglutaconate) accumulate, giving the diagnostic organic-acid pattern.",
+    "wrongMsg": "Not quite. The block is the FINAL ketogenesis step — cleaving HMG-CoA to acetoacetate.",
+    "revealMsg": "Target: HMG-CoA lyase (HMG-CoA → Acetoacetate). It sits at the junction of ketogenesis and leucine catabolism, explaining the combined picture."
+  },
+  "mcqs": [
+    { "stem": "Why are ketones inappropriately LOW during hypoglycemia here?", "choices": ["HMG-CoA lyase is the final step of ketone-body synthesis; without it, acetoacetate/β-hydroxybutyrate cannot be made from acetyl-CoA", "Insulin remains high", "Ketones are rapidly excreted", "The liver is too small"], "correct": 0, "explanation": "Fasting normally drives fat → acetyl-CoA → HMG-CoA → acetoacetate (ketones), the brain's backup fuel. Blocking the last step (HMG-CoA lyase) yields hypoketotic hypoglycemia — like MCAD, but the block is in ketone synthesis rather than β-oxidation upstream." },
+    { "stem": "Why does this disorder ALSO show abnormal leucine-derived organic acids?", "choices": ["HMG-CoA is the final intermediate of leucine catabolism too, so its breakdown products (3-HMG, 3-methylglutaconate) accumulate", "Leucine inhibits the kidney", "Leucine is converted to glucose", "Leucine is a ketone body"], "correct": 0, "explanation": "Leucine degradation converges on HMG-CoA. With HMG-CoA lyase deficient, both ketogenesis and the terminal leucine pathway are blocked, so leucine metabolites (3-hydroxy-3-methylglutaric and 3-methylglutaconic acids) spill into urine — the diagnostic fingerprint." },
+    { "stem": "What is the cornerstone of long-term management?", "choices": ["Avoid fasting (frequent feeds, emergency glucose during illness) and moderate protein/fat restriction", "High-fat ketogenic diet", "Allopurinol", "Phlebotomy"], "correct": 0, "explanation": "Because the child cannot make ketones to survive fasting, the priority is preventing catabolism: avoid fasting, give carbohydrate during illness, and modestly restrict leucine (protein) and fat. A ketogenic diet would be harmful here." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

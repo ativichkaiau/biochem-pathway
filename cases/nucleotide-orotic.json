@@ -1,0 +1,45 @@
+{
+  "id": "nucleotide-orotic",
+  "pathway": "nucleotide",
+  "title": "The infant with a megaloblastic anemia that ignores B12 and folate",
+  "blurb": "A pyrimidine-synthesis defect: megaloblastic anemia plus orotic crystals in the urine — but here the ammonia is normal, unlike the urea-cycle mimic.",
+  "patient": { "age": "7 months", "sex": "M", "complaint": "Failure to thrive, pallor, and gritty orange urine crystals." },
+  "opening": "7-month-old boy with poor growth, pallor, and developmental delay. CBC shows a macrocytic anemia with hypersegmented neutrophils; it did NOT respond to B12 or folate. Urine has orange crystals; urinary orotic acid is very high — but plasma ammonia is NORMAL. What do you want to ask, examine, or order next?",
+  "history": "Failure to thrive from a few months of age, recurrent infections (leukopenia). No vomiting or encephalopathy. Trials of B12 and folate failed. Parents consanguineous (autosomal recessive). No hyperammonemic crises.",
+  "exam": "Pale, small for age, mild hypotonia and developmental delay. No hepatosplenomegaly. No jaundice. Cardiopulmonary normal.",
+  "labs": [
+    { "name": "Hemoglobin", "value": 7.0, "unit": "g/dL", "ref": "10.5-13.5", "flag": "low" },
+    { "name": "MCV", "value": 104, "unit": "fL", "ref": "70-86", "flag": "high" },
+    { "name": "Smear", "value": "Megaloblastic; hypersegmented neutrophils", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Response to B12 / folate", "value": "None", "unit": "", "ref": "—", "flag": "high" },
+    { "name": "Urine orotic acid", "value": "Markedly elevated", "unit": "", "ref": "<2", "flag": "high" },
+    { "name": "Plasma ammonia", "value": 42, "unit": "μmol/L", "ref": "<50", "flag": "normal" },
+    { "name": "WBC", "value": 2.8, "unit": "x10^9/L", "ref": "5-15", "flag": "low" },
+    { "name": "UMPS gene", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme is deficient?",
+      "mechanism": "Briefly: why a megaloblastic anemia unresponsive to B12/folate, and how do you tell this from OTC deficiency (both raise orotic acid)?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["hereditary orotic aciduria", "orotic aciduria", "ump synthase deficiency"] },
+      "cause": { "weight": 1.0, "accepts": ["ump synthase", "uridine monophosphate synthase", "orotate phosphoribosyltransferase", "omp decarboxylase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["pyrimidine", "ump", "dna"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the pyrimidine-synthesis step that fails in hereditary orotic aciduria.",
+    "target": { "type": "edge", "edgeId": "UMP synthase:Orotate->UMP" },
+    "correctMsg": "Yes — UMP synthase. Orotate can't be converted to UMP, so pyrimidine nucleotides run short (impairing DNA synthesis → megaloblastic anemia, leukopenia, failure to thrive) while orotic acid spills into the urine. Because the block is in synthesis (not the urea cycle), ammonia is normal — and treatment is oral URIDINE, which bypasses the block.",
+    "wrongMsg": "Not quite. The block converts orotate into the first pyrimidine nucleotide (UMP).",
+    "revealMsg": "Target: UMP synthase (Orotate → UMP). Oral uridine replenishes pyrimidines downstream of the block and suppresses orotate overproduction."
+  },
+  "mcqs": [
+    { "stem": "Why doesn't the megaloblastic anemia respond to B12 or folate?", "choices": ["The defect is in pyrimidine nucleotide synthesis itself, so cells lack the UMP-derived nucleotides needed for DNA regardless of folate/B12 status", "The patient is also iron deficient", "B12 and folate are not absorbed", "The marrow is fibrotic"], "correct": 0, "explanation": "Folate/B12 deficiencies cause megaloblastic anemia by impairing thymidylate/purine synthesis. Here the problem is a primary inability to make UMP (pyrimidines), upstream of any folate role — so supplementing folate/B12 does nothing. Uridine is the fix." },
+    { "stem": "Both hereditary orotic aciduria and OTC deficiency raise urinary orotic acid. What distinguishes them?", "choices": ["Hereditary orotic aciduria has NORMAL ammonia + megaloblastic anemia; OTC deficiency has HYPERAMMONEMIA without anemia", "Only OTC raises orotic acid", "Only orotic aciduria causes hyperammonemia", "They are indistinguishable"], "correct": 0, "explanation": "In OTC deficiency, carbamoyl phosphate overflows into pyrimidine synthesis → orotic acid PLUS hyperammonemia (a urea-cycle defect). In hereditary orotic aciduria the urea cycle is intact (normal ammonia), but pyrimidine synthesis fails → megaloblastic anemia. Ammonia is the discriminator." },
+    { "stem": "What is the treatment?", "choices": ["Oral uridine (or uridine triacetate), which supplies pyrimidines downstream of the block and feedback-suppresses orotate overproduction", "Allopurinol", "Low-protein diet", "Exchange transfusion"], "correct": 0, "explanation": "Uridine bypasses UMP synthase, restoring the pyrimidine pool (correcting the anemia and growth) and reducing orotate excretion via feedback. It is a rare 'treatable' inborn error with a clean dietary-style fix." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

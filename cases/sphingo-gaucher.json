@@ -1,0 +1,45 @@
+{
+  "id": "sphingo-gaucher",
+  "pathway": "sphingo",
+  "title": "The adult with a huge spleen and unexplained bruising",
+  "blurb": "The most common lysosomal storage disease — massive hepatosplenomegaly, low counts, and bone crises from lipid-laden macrophages; notably treatable.",
+  "patient": { "age": "27 years", "sex": "F", "complaint": "Easy bruising, fatigue, abdominal fullness, and deep bone pain." },
+  "opening": "27-year-old woman of Ashkenazi Jewish descent with months of easy bruising, fatigue, early satiety, and episodes of deep femoral bone pain. Exam shows massive splenomegaly and hepatomegaly. CBC: Hgb 9.5, platelets 70k. Marrow shows lipid-laden macrophages with a 'crumpled tissue paper' cytoplasm. There is NO neurological involvement. What do you want to ask, examine, or order next?",
+  "history": "Insidious onset over a year. Two prior 'bone crises' misdiagnosed as osteomyelitis. No cherry-red spot, normal cognition and development (this is the non-neuronopathic, type 1 form). Family of Ashkenazi descent (high carrier frequency).",
+  "exam": "Pallor, scattered bruises. Massive splenomegaly (to the pelvis) and hepatomegaly. Point tenderness over the distal femur. No cherry-red macula, normal neuro exam. No lymphadenopathy.",
+  "labs": [
+    { "name": "Hemoglobin", "value": 9.5, "unit": "g/dL", "ref": "12-15", "flag": "low" },
+    { "name": "Platelets", "value": 70, "unit": "x10^9/L", "ref": "150-400", "flag": "low" },
+    { "name": "Spleen", "value": "Massive (to pelvis)", "unit": "", "ref": "Not palpable", "flag": "high" },
+    { "name": "Marrow", "value": "Gaucher cells (crumpled-paper macrophages)", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Serum ACE / ferritin", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Femur MRI", "value": "Erlenmeyer-flask deformity, infarct", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Leukocyte β-glucocerebrosidase activity", "value": "Markedly reduced", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "GBA gene", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme is deficient, and what substrate accumulates?",
+      "mechanism": "Briefly: why hepatosplenomegaly and cytopenias (and why is type 1 NON-neuronopathic, unlike Tay-Sachs)?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["gaucher", "gaucher disease"] },
+      "cause": { "weight": 1.0, "accepts": ["glucocerebrosidase", "beta-glucocerebrosidase", "β-glucocerebrosidase", "glucosylceramidase", "acid beta-glucosidase", "gba"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["glucocerebroside", "macrophage", "spleen"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the sphingolipid-degradation step that fails in Gaucher disease.",
+    "target": { "type": "edge", "edgeId": "β-Glucocerebrosidase:Glucocerebroside->Ceramide" },
+    "correctMsg": "Yes — β-glucocerebrosidase. Glucocerebroside accumulates in the lysosomes of reticuloendothelial macrophages (the spleen, liver, and marrow), forming Gaucher cells → hepatosplenomegaly, cytopenias (hypersplenism), and bone disease. Because storage is in macrophages (not neurons), the common type 1 form spares the CNS — and it is treatable with enzyme replacement.",
+    "wrongMsg": "Not quite. The accumulating substrate is glucocerebroside — which lysosomal hydrolase normally clears it to ceramide?",
+    "revealMsg": "Target: β-Glucocerebrosidase (Glucocerebroside → Ceramide). Gaucher is the commonest lysosomal storage disease; type 1 is non-neuronopathic and treatable (ERT, substrate-reduction therapy)."
+  },
+  "mcqs": [
+    { "stem": "Why does Gaucher cause hepatosplenomegaly and cytopenias, while Tay-Sachs does not?", "choices": ["Glucocerebroside accumulates in reticuloendothelial macrophages (spleen/liver/marrow), causing organomegaly and hypersplenism; GM2 in Tay-Sachs accumulates in neurons", "Gaucher spares macrophages", "Tay-Sachs also enlarges the spleen", "Gaucher is a neuronal disease"], "correct": 0, "explanation": "Substrate distribution dictates phenotype. Glucocerebroside loads macrophages → big spleen/liver, low counts, bone disease (Gaucher cells). GM2 ganglioside is neuron-enriched, so Tay-Sachs is CNS-predominant with NO organomegaly. The pathway is shared; the storage site differs." },
+    { "stem": "What is the 'crumpled tissue paper' cell, and why does it matter?", "choices": ["The lipid-laden Gaucher macrophage, whose marrow presence helps confirm the diagnosis (definitive test is enzyme assay/genetics)", "A nucleated red cell", "A reactive lymphocyte", "A plasma cell"], "correct": 0, "explanation": "Gaucher cells are engorged macrophages with a striated, crumpled-paper cytoplasm. They support the diagnosis, but the gold standard is reduced leukocyte β-glucocerebrosidase activity confirmed by GBA genetics." },
+    { "stem": "What disease-specific treatments exist for type 1 Gaucher?", "choices": ["Enzyme replacement therapy (recombinant glucocerebrosidase) and substrate-reduction therapy (e.g., miglustat/eliglustat)", "Phlebotomy", "Chelation", "Sodium benzoate"], "correct": 0, "explanation": "Type 1 Gaucher is one of the treatable lysosomal storage diseases: IV enzyme replacement reverses organomegaly and cytopenias, and oral substrate-reduction therapy lowers glucocerebroside production. Note GBA variants also raise Parkinson disease risk." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

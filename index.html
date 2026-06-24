@@ -1513,7 +1513,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <div>
         <div class="cases-head-eyebrow">📋 CLINICAL CASES</div>
         <h2 class="cases-head-title">Pick a <span>case</span></h2>
-        <p class="cases-head-sub">15 teaching cases, one per pathway. Click any card to start the 5-phase loop.</p>
+        <p class="cases-head-sub">34 teaching cases across 18 pathways. Click any card to start the 5-phase loop.</p>
       </div>
       <button class="btn cases-close" id="cases-close" title="Close (Esc)">Close ✕</button>
     </div>
@@ -3301,16 +3301,18 @@ const CaseRunner = {
     });
   },
 
-  async open(pathway) {
+  // `file` is the case JSON slug (without .json). For a pathway's primary
+  // case the slug equals the pathway key; secondary cases use their own slug.
+  async open(file) {
     this.cacheEls();
     if (selectedPathway) exitDive();
     let caseData;
     try {
-      const res = await fetch(`/cases/${pathway}.json`);
+      const res = await fetch(`/cases/${file}.json`);
       if (!res.ok) throw new Error('case not found');
       caseData = await res.json();
     } catch (e) {
-      alert(`No case available for ${pathway}.\n(Tried /cases/${pathway}.json)`);
+      alert(`No case available.\n(Tried /cases/${file}.json)`);
       return;
     }
     this.init(caseData);
@@ -3795,12 +3797,13 @@ function buildCmdIndex() {
   const items = [];
   for (const c of CASES_INDEX) {
     const info = PATHWAY_INFO[c.pathway];
+    const file = c.file;
     items.push({
       type: 'case', pw: c.pathway,
       label: c.title,
       sub: `Case · ${info?.label || c.pathway}`,
       keywords: (c.title + ' ' + c.blurb + ' ' + (info?.label || c.pathway) + ' case').toLowerCase(),
-      action: () => CaseRunner.open(c.pathway)
+      action: () => CaseRunner.open(file)
     });
   }
   for (const [key, info] of Object.entries(PATHWAY_INFO)) {
@@ -3965,25 +3968,43 @@ document.getElementById('help-browse-cases').addEventListener('click', () => {
 // Lightweight in-memory manifest. When the user opens the browser we render
 // these cards; clicking a card delegates to CaseRunner.open(pathway), which
 // fetches /cases/<pathway>.json under the hood.
+// Each entry: { file, pathway, title, blurb }. `file` is the JSON filename
+// (without .json). A pathway may have multiple cases (multiple entries).
 const CASES_INDEX = [
-  { pathway: 'glycolysis',    title: 'The 5-month-old with hepatomegaly and morning seizures', blurb: 'Inborn error of carbohydrate metabolism with a deceptive triad: hypoglycemia, lactic acidosis, and hepatomegaly.' },
-  { pathway: 'glycogen-ppp',  title: 'The soldier on primaquine and a cola-colored urine',     blurb: 'The most common enzyme deficiency in the world — silent until an oxidative trigger arrives. Bite cells and Heinz bodies on the smear.' },
-  { pathway: 'tca',           title: "The farmer's son who tasted from the tin",              blurb: "A textbook 'lethal synthesis': an innocuous molecule that the cell's own enzymes convert into a tight-binding TCA poison." },
-  { pathway: 'fa-ketones',    title: "The toddler who didn't wake up from her nap",            blurb: 'The most common defect of fatty-acid oxidation — a stunningly normal baby until fasting tips her into hypoketotic hypoglycemia.' },
-  { pathway: 'protein',       title: 'The 10-day-old who smells like maple syrup',             blurb: 'A neonatal acidotic crisis with a distinctive sweet odor and a deficient enzyme in the same family as PDH and α-KGDH.' },
-  { pathway: 'urea',          title: 'The day-3 male newborn who stopped feeding',             blurb: 'A previously well newborn who decompensates 48 hours after the first feed. The discriminating lab: orotic acid in the urine.' },
-  { pathway: 'sterol',        title: 'The teenager with tendon xanthomas and an LDL of 386',   blurb: 'Premature coronary disease running through a family. A receptor problem treated, paradoxically, with an enzyme inhibitor.' },
-  { pathway: 'heme',          title: 'The cranky toddler with a microcytic anemia',            blurb: 'A toddler in a peeling pre-1978 rowhouse with abdominal pain, mouthing the windowsill, and basophilic stippling on smear.' },
-  { pathway: 'nucleotide',    title: 'The toddler who bites his own lips',                     blurb: 'An X-linked disorder of purine salvage. Self-mutilation, dystonia, and a uric acid level that does not belong in a 2-year-old.' },
-  { pathway: 'sugar',         title: 'The newborn vomiting after every feed',                  blurb: 'Inborn error of carbohydrate metabolism that presents in the first week of life — vomiting, jaundice, hepatomegaly, and E. coli sepsis.' },
-  { pathway: 'ethanol',       title: "Three roommates and the gallon jug labeled 'antifreeze'", blurb: 'A toxic alcohol with a deceptive latent period. Lethal not because of the parent molecule, but because of what ADH makes from it.' },
-  { pathway: 'onecarbon',     title: "The pale vegan with paresthesias she didn't tell anyone about", blurb: 'A macrocytic anemia with hypersegmented neutrophils — and a posterior column that is slowly going dark. The one lab that pins it: methylmalonic acid.' },
-  { pathway: 'catechol',      title: 'The skipped newborn screen and the fair-haired baby',    blurb: 'An untreated home-birth infant presenting at 8 months with developmental delay, a musty odor, and a pale phenotype her parents never expected.' },
-  { pathway: 'creatine',      title: 'The toddler with intellectual disability and an empty brain creatine peak', blurb: 'A rare but treatable cerebral creatine deficiency. The MRS lights it up before anyone else does.' },
-  { pathway: 'etc',           title: 'The fire victim with a lethal lactate',                  blurb: 'Pulled from a smoldering polyurethane fire. Full arterial oxygen, lactate 16, and a venous SO₂ that should not exist. Mitochondria starving in a sea of oxygen.' },
-  { pathway: 'sphingo',       title: 'The 8-month-old who startles at every sound',            blurb: 'A bright infant losing milestones, with an exaggerated startle, a cherry-red macula — and a notably soft, normal-sized belly.' },
-  { pathway: 'bilirubin',     title: "The newborn whose jaundice won't quit",                  blurb: 'Unconjugated bilirubin climbing toward the danger zone in a well-appearing term newborn, with phototherapy barely holding the line.' },
-  { pathway: 'polyol',        title: 'The poorly-controlled diabetic with new cataracts and numb feet', blurb: 'A sugar trapped where it should not be — osmotic and oxidative damage in the lens, nerve, retina, and kidney of a chronically hyperglycemic patient.' }
+  { file: 'glycolysis',     pathway: 'glycolysis',    title: 'The 5-month-old with hepatomegaly and morning seizures', blurb: 'Inborn error of carbohydrate metabolism with a deceptive triad: hypoglycemia, lactic acidosis, and hepatomegaly.' },
+  { file: 'glycolysis-pk',  pathway: 'glycolysis',    title: 'The jaundiced child whose red cells run out of ATP', blurb: 'A chronic hemolytic anemia from a glycolytic enzyme defect — the red cell simply can’t make enough ATP.' },
+  { file: 'glycolysis-pdh', pathway: 'glycolysis',    title: "The floppy infant with lactate that won't come down", blurb: 'Pyruvate piles up at the gate of the mitochondrion, spilling to lactate and alanine — and a ketogenic diet, paradoxically, helps.' },
+  { file: 'glycogen-ppp',   pathway: 'glycogen-ppp',  title: 'The soldier on primaquine and a cola-colored urine',     blurb: 'The most common enzyme deficiency in the world — silent until an oxidative trigger arrives. Bite cells and Heinz bodies on the smear.' },
+  { file: 'glycogen-ppp-mcardle', pathway: 'glycogen-ppp', title: "The young weightlifter with a 'second wind'", blurb: 'Cramps and dark urine minutes into hard exercise, then relief if he pushes through — muscle that can’t tap its own glycogen.' },
+  { file: 'tca',            pathway: 'tca',           title: "The farmer's son who tasted from the tin",              blurb: "A textbook 'lethal synthesis': an innocuous molecule that the cell's own enzymes convert into a tight-binding TCA poison." },
+  { file: 'tca-sdh',        pathway: 'tca',           title: 'The young woman with pounding headaches and a neck mass', blurb: 'A TCA enzyme that doubles as a tumor suppressor — when it fails, succinate becomes an oncometabolite and a paraganglioma grows.' },
+  { file: 'fa-ketones',     pathway: 'fa-ketones',    title: "The toddler who didn't wake up from her nap",            blurb: 'The most common defect of fatty-acid oxidation — a stunningly normal baby until fasting tips her into hypoketotic hypoglycemia.' },
+  { file: 'fa-ketones-hmgcoa', pathway: 'fa-ketones', title: 'The fasting toddler with hypoglycemia but no ketones', blurb: 'A block at the last shared step of ketogenesis and leucine breakdown — hypoketotic hypoglycemia with acidosis.' },
+  { file: 'protein',        pathway: 'protein',       title: 'The 10-day-old who smells like maple syrup',             blurb: 'A neonatal acidotic crisis with a distinctive sweet odor and a deficient enzyme in the same family as PDH and α-KGDH.' },
+  { file: 'urea',           pathway: 'urea',          title: 'The day-3 male newborn who stopped feeding',             blurb: 'A previously well newborn who decompensates 48 hours after the first feed. The discriminating lab: orotic acid in the urine.' },
+  { file: 'urea-asl',       pathway: 'urea',          title: 'The infant with brittle hair and rising ammonia',        blurb: 'A urea-cycle defect one step from the finish, flagged by a sky-high citrulline — with fragile, breakable hair as a clue.' },
+  { file: 'sterol',         pathway: 'sterol',        title: 'The teenager with tendon xanthomas and an LDL of 386',   blurb: 'Premature coronary disease running through a family. A receptor problem treated, paradoxically, with an enzyme inhibitor.' },
+  { file: 'sterol-slos',    pathway: 'sterol',        title: 'The dysmorphic newborn with a low cholesterol',          blurb: 'A malformation syndrome from a block in the LAST step of cholesterol synthesis — the rare disease where cholesterol is too LOW.' },
+  { file: 'heme',           pathway: 'heme',          title: 'The cranky toddler with a microcytic anemia',            blurb: 'A toddler in a peeling pre-1978 rowhouse with abdominal pain, mouthing the windowsill, and basophilic stippling on smear.' },
+  { file: 'heme-aip',       pathway: 'heme',          title: 'The woman with agonizing belly pain and wine-dark urine', blurb: 'Recurrent severe abdominal pain with no surgical findings, neuropsychiatric features, and normal skin.' },
+  { file: 'heme-pct',       pathway: 'heme',          title: 'The man with blistering hands and tea-colored urine',    blurb: 'The most common porphyria: fragile, blistering sun-exposed skin, often unmasked by alcohol, HCV, iron, or estrogen.' },
+  { file: 'nucleotide',     pathway: 'nucleotide',    title: 'The toddler who bites his own lips',                     blurb: 'An X-linked disorder of purine salvage. Self-mutilation, dystonia, and a uric acid level that does not belong in a 2-year-old.' },
+  { file: 'nucleotide-orotic', pathway: 'nucleotide', title: 'The infant with anemia that ignores B12 and folate',    blurb: 'A pyrimidine-synthesis defect: megaloblastic anemia plus orotic crystals — but here the ammonia is normal.' },
+  { file: 'sugar',          pathway: 'sugar',         title: 'The newborn vomiting after every feed',                  blurb: 'Inborn error of carbohydrate metabolism that presents in the first week of life — vomiting, jaundice, hepatomegaly, and E. coli sepsis.' },
+  { file: 'sugar-hfi',      pathway: 'sugar',         title: 'The baby who got sick the week fruit was introduced',    blurb: 'Vomiting, hypoglycemia, and liver failure that began exactly when fruit and table sugar entered the diet.' },
+  { file: 'sugar-fructosuria', pathway: 'sugar',      title: "The healthy child whose urine tests 'positive for sugar'", blurb: 'An incidental, completely benign finding — a reducing substance in the urine that is fructose, not glucose.' },
+  { file: 'ethanol',        pathway: 'ethanol',       title: "Three roommates and the gallon jug labeled 'antifreeze'", blurb: 'A toxic alcohol with a deceptive latent period. Lethal not because of the parent molecule, but because of what ADH makes from it.' },
+  { file: 'ethanol-aldh2',  pathway: 'ethanol',       title: 'The flushing drinker and the deterrent pill',            blurb: 'Flushing, nausea, and palpitations after a single drink — acetaldehyde building up because the clearing enzyme is blocked.' },
+  { file: 'onecarbon',      pathway: 'onecarbon',     title: "The pale vegan with paresthesias she didn't tell anyone about", blurb: 'A macrocytic anemia with hypersegmented neutrophils — and a posterior column that is slowly going dark. The lab that pins it: methylmalonic acid.' },
+  { file: 'onecarbon-cbs',  pathway: 'onecarbon',     title: 'The tall teenager with dislocated lenses and a clot',    blurb: 'Marfan-like habitus but with intellectual disability, downward lens dislocation, and thrombosis — homocysteine floods the blood.' },
+  { file: 'catechol',       pathway: 'catechol',      title: 'The skipped newborn screen and the fair-haired baby',    blurb: 'An untreated home-birth infant at 8 months with developmental delay, a musty odor, and a pale phenotype.' },
+  { file: 'creatine',       pathway: 'creatine',      title: 'The toddler with intellectual disability and an empty brain creatine peak', blurb: 'A rare but treatable cerebral creatine deficiency. The MRS lights it up before anyone else does.' },
+  { file: 'etc',            pathway: 'etc',           title: 'The fire victim with a lethal lactate',                  blurb: 'Pulled from a smoldering polyurethane fire. Full arterial oxygen, lactate 16, and a venous SO₂ that should not exist.' },
+  { file: 'etc-melas',      pathway: 'etc',           title: 'The teenager with stroke-like episodes that cross no artery', blurb: 'Maternally inherited episodes of cortical dysfunction with lactic acidosis — a respiratory-chain disorder.' },
+  { file: 'sphingo',        pathway: 'sphingo',       title: 'The 8-month-old who startles at every sound',            blurb: 'A bright infant losing milestones, with an exaggerated startle, a cherry-red macula — and a notably soft, normal-sized belly.' },
+  { file: 'sphingo-gaucher', pathway: 'sphingo',      title: 'The adult with a huge spleen and unexplained bruising',  blurb: 'The most common lysosomal storage disease — massive hepatosplenomegaly, low counts, and bone crises. Notably treatable.' },
+  { file: 'bilirubin',      pathway: 'bilirubin',     title: "The newborn whose jaundice won't quit",                  blurb: 'Unconjugated bilirubin climbing toward the danger zone in a well-appearing term newborn, with phototherapy barely holding the line.' },
+  { file: 'polyol',         pathway: 'polyol',        title: 'The diabetic with new cataracts and numb feet',          blurb: 'A sugar trapped where it should not be — osmotic and oxidative damage in the lens, nerve, retina, and kidney.' }
 ];
 
 function renderCasesGrid() {
@@ -3991,7 +4012,7 @@ function renderCasesGrid() {
   grid.innerHTML = CASES_INDEX.map(c => {
     const info = PATHWAY_INFO[c.pathway];
     const label = (info && info.label) ? info.label : c.pathway;
-    return `<div class="case-card" data-pathway="${escapeAttr(c.pathway)}" style="--pw: var(--pw-${c.pathway})">
+    return `<div class="case-card" data-file="${escapeAttr(c.file)}" data-pathway="${escapeAttr(c.pathway)}" style="--pw: var(--pw-${c.pathway})">
       <div class="case-card-pw">${escapeText(label)}</div>
       <h3 class="case-card-title">${escapeText(c.title)}</h3>
       <p class="case-card-blurb">${escapeText(c.blurb)}</p>
@@ -4016,7 +4037,7 @@ document.getElementById('cases-browser').addEventListener('click', (e) => {
   const card = e.target.closest('.case-card');
   if (card) {
     closeCasesBrowser();
-    CaseRunner.open(card.dataset.pathway);
+    CaseRunner.open(card.dataset.file);
   }
 });
 

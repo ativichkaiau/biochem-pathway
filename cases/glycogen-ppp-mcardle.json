@@ -1,0 +1,45 @@
+{
+  "id": "glycogen-ppp-mcardle",
+  "pathway": "glycogen-ppp",
+  "title": "The young weightlifter with a 'second wind'",
+  "blurb": "Cramps and dark urine minutes into hard exercise, then relief if he pushes through — muscle that can't tap its own glycogen.",
+  "patient": { "age": "22 years", "sex": "M", "complaint": "Severe muscle cramps and cola-colored urine after intense exercise." },
+  "opening": "22-year-old man reports that within minutes of intense exertion his muscles cramp painfully and he has to stop — but if he rests briefly and resumes gently, it eases (a 'second wind'). Twice he has passed cola-colored urine after lifting weights, once with a CK of 25,000. At rest he is completely well. The forearm ischemic exercise test shows a FLAT lactate but a normal ammonia rise. What do you want to ask, examine, or order next?",
+  "history": "Lifelong exercise intolerance with cramps on sprinting/lifting; better with sustained mild activity after a 'second wind.' Two episodes of myoglobinuria. No weakness at rest. No family history known (autosomal recessive).",
+  "exam": "Well-built, normal strength and tone at rest. No fixed weakness, no fasciculations. Cardiac and respiratory exams normal. No hepatomegaly (this is a MUSCLE glycogenosis).",
+  "labs": [
+    { "name": "Creatine kinase (baseline)", "value": 780, "unit": "U/L", "ref": "<200", "flag": "high" },
+    { "name": "CK during episode", "value": 25000, "unit": "U/L", "ref": "<200", "flag": "high" },
+    { "name": "Urine myoglobin", "value": "Positive", "unit": "", "ref": "Negative", "flag": "high" },
+    { "name": "Forearm ischemic exercise — lactate rise", "value": "Absent (flat)", "unit": "", "ref": "Rises 3-5x", "flag": "high" },
+    { "name": "Forearm ischemic exercise — ammonia rise", "value": "Normal", "unit": "", "ref": "Rises", "flag": "normal" },
+    { "name": "Fasting glucose", "value": 88, "unit": "mg/dL", "ref": "70-100", "flag": "normal" },
+    { "name": "Muscle biopsy", "value": "Subsarcolemmal glycogen, absent myophosphorylase stain", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "PYGM gene", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis (name + GSD number)?",
+      "cause": "Which enzyme is deficient?",
+      "mechanism": "Briefly: why the flat lactate on ischemic exercise, and why the 'second wind'?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["mcardle", "mc ardle", "gsd v", "gsd 5", "glycogen storage disease v", "myophosphorylase deficiency"] },
+      "cause": { "weight": 1.0, "accepts": ["myophosphorylase", "muscle glycogen phosphorylase", "glycogen phosphorylase", "pygm"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["glycogen", "lactate", "fatty"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the first step of glycogen breakdown that fails in muscle here.",
+    "target": { "type": "edge", "edgeId": "Glycogen phos.:Glycogen->G1P" },
+    "correctMsg": "Yes — glycogen phosphorylase (the muscle isoform, myophosphorylase). Muscle can't liberate glucose-1-P from its glycogen during burst exercise, so anaerobic glycolysis can't ramp up → flat lactate, energy crisis, cramps, rhabdomyolysis. The 'second wind' comes when blood glucose and fatty acids take over as fuel.",
+    "wrongMsg": "Not quite. The block is at the FIRST step of glycogen breakdown (glycogen → glucose-1-phosphate).",
+    "revealMsg": "Target: Glycogen phos. (Glycogen → G1P). McArdle = the MUSCLE isoform (PYGM); the liver isoform is spared, so fasting glucose is normal."
+  },
+  "mcqs": [
+    { "stem": "Why is the lactate rise absent on ischemic forearm exercise?", "choices": ["Muscle can't mobilize its glycogen to feed glycolysis, so no anaerobic lactate is produced", "Lactate is rapidly cleared by the liver", "Ammonia replaces lactate", "The tourniquet prevents lactate detection"], "correct": 0, "explanation": "The test stresses anaerobic glycolysis. Without myophosphorylase, glycogen can't enter glycolysis, so lactate stays flat while ammonia (from the purine nucleotide cycle, AMP deaminase) still rises normally — confirming effort was made." },
+    { "stem": "What is the 'second wind' phenomenon?", "choices": ["After a few minutes of rest/lower effort, blood-borne glucose and free fatty acids fuel the muscle, relieving the early cramping", "The heart compensates", "Lactic acid finally accumulates", "Glycogen stores are replenished mid-exercise"], "correct": 0, "explanation": "Early exercise relies on muscle glycogen (unavailable here). After ~7-10 minutes, hepatic glucose and mobilized fatty acids reach the muscle and sustain activity — the hallmark second wind of McArdle disease." },
+    { "stem": "How does McArdle differ from von Gierke (GSD I)?", "choices": ["McArdle is a MUSCLE glycogenosis with normal fasting glucose; von Gierke is a LIVER glycogenosis (G6Pase) with fasting hypoglycemia", "Both cause fasting hypoglycemia", "McArdle causes hepatomegaly", "Von Gierke causes exercise-induced myoglobinuria"], "correct": 0, "explanation": "McArdle = PYGM (muscle), so glucose homeostasis is intact and the picture is exercise intolerance/rhabdo. Von Gierke = G6Pase (liver), so fasting hypoglycemia, lactic acidosis, and hepatomegaly dominate." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

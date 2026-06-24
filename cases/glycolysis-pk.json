@@ -1,0 +1,46 @@
+{
+  "id": "glycolysis-pk",
+  "pathway": "glycolysis",
+  "title": "The jaundiced child whose red cells run out of ATP",
+  "blurb": "A chronic non-spherocytic hemolytic anemia from the second-commonest glycolytic enzyme defect — the red cell simply can't make enough ATP.",
+  "patient": { "age": "4 years", "sex": "M", "complaint": "Long-standing pallor and jaundice, gallstones found on ultrasound." },
+  "opening": "4-year-old boy of Northern European descent with lifelong pallor, intermittent scleral icterus, and splenomegaly. An ultrasound for vague abdominal pain shows pigment gallstones. Hgb 8.2, reticulocytes 9%, indirect bilirubin high, haptoglobin low; the smear shows echinocytes ('burr cells') but NO spherocytes and a negative Coombs. What do you want to ask, examine, or order next?",
+  "history": "Neonatal jaundice requiring phototherapy. Chronic anemia since infancy, transfused twice during viral illnesses. Parents are unaffected (autosomal recessive). No drug exposures. Splenomegaly noted for years.",
+  "exam": "Pallor, mild scleral icterus, spleen tip 4 cm below costal margin. Frontal bossing (chronic marrow expansion). No lymphadenopathy. Growth at 25th centile.",
+  "labs": [
+    { "name": "Hemoglobin", "value": 8.2, "unit": "g/dL", "ref": "11.5-13.5", "flag": "low" },
+    { "name": "Reticulocytes", "value": 9, "unit": "%", "ref": "0.5-1.5", "flag": "high" },
+    { "name": "Indirect bilirubin", "value": 4.1, "unit": "mg/dL", "ref": "<1.0", "flag": "high" },
+    { "name": "Haptoglobin", "value": "<10", "unit": "mg/dL", "ref": "30-200", "flag": "low" },
+    { "name": "Direct Coombs", "value": "Negative", "unit": "", "ref": "Negative", "flag": "normal" },
+    { "name": "Osmotic fragility", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Peripheral smear", "value": "Echinocytes, no spherocytes", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "RBC 2,3-BPG", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "RBC pyruvate kinase activity", "value": "Markedly reduced", "unit": "", "ref": "Normal", "flag": "low" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "What enzyme is deficient?",
+      "mechanism": "Briefly: why are RED CELLS uniquely affected, and why is exercise tolerance paradoxically preserved by the high 2,3-BPG?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["pyruvate kinase deficiency", "pk deficiency", "pyruvate kinase"] },
+      "cause": { "weight": 1.0, "accepts": ["pyruvate kinase", "pk"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["atp", "mitochondria", "2,3-bpg"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the glycolytic step that fails in this hemolytic anemia.",
+    "target": { "type": "edge", "edgeId": "PK:PEP->Pyruvate" },
+    "correctMsg": "Yes — pyruvate kinase. It catalyzes the second ATP-generating (substrate-level) step. Red cells have no mitochondria, so glycolysis is their ONLY ATP source; without PK they can't maintain membrane ion pumps and lyse. Upstream intermediates back up, raising 2,3-BPG (which right-shifts O₂ delivery, partly offsetting the anemia).",
+    "wrongMsg": "Not quite. Look for the final, ATP-generating step of glycolysis (PEP → pyruvate).",
+    "revealMsg": "Target: PK (PEP → Pyruvate). RBCs depend entirely on glycolytic ATP; PK is the second of the two ATP-yielding steps."
+  },
+  "mcqs": [
+    { "stem": "Why does PK deficiency right-shift the oxygen-hemoglobin dissociation curve, easing symptoms?", "choices": ["Upstream glycolytic intermediates accumulate, raising 2,3-BPG, which lowers Hb O₂ affinity and improves tissue delivery", "PK deficiency raises fetal hemoglobin", "Reticulocytosis dilutes affinity", "Bilirubin binds hemoglobin"], "correct": 0, "explanation": "The block at PK backs up 1,3-BPG / 3-PG, feeding 2,3-BPG production. High 2,3-BPG right-shifts the curve, so a given hemoglobin delivers more O₂ — patients tolerate anemia better than the Hb number suggests." },
+    { "stem": "Why are mature red cells, but not most other tissues, crippled by this defect?", "choices": ["RBCs lack mitochondria and depend solely on glycolysis for ATP", "RBCs lack pyruvate kinase only in disease", "Other tissues excrete pyruvate", "RBCs cannot use the pentose phosphate pathway"], "correct": 0, "explanation": "Anucleate mature RBCs have no mitochondria and no oxidative phosphorylation — glycolysis is their entire ATP economy. Lose a glycolytic ATP step and the Na⁺/K⁺-ATPase fails, the membrane stiffens, and the spleen culls the cells." },
+    { "stem": "What is definitive management for severe transfusion-dependent PK deficiency?", "choices": ["Splenectomy reduces hemolysis; the PK activator mitapivat can raise hemoglobin", "Iron supplementation", "Corticosteroids", "Plasma exchange"], "correct": 0, "explanation": "Splenectomy lessens extravascular hemolysis (the spleen removes the rigid cells). The allosteric PK activator mitapivat is a newer disease-specific option. Watch for iron overload from chronic transfusion." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

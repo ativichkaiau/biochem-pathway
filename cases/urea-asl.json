@@ -1,0 +1,45 @@
+{
+  "id": "urea-asl",
+  "pathway": "urea",
+  "title": "The infant with brittle hair and rising ammonia",
+  "blurb": "A urea-cycle defect one step from the finish, flagged on the newborn screen by a sky-high citrulline — with fragile, breakable hair as a clue.",
+  "patient": { "age": "12 days", "sex": "F", "complaint": "Lethargy and poor feeding; newborn screen flagged elevated citrulline." },
+  "opening": "12-day-old girl, breastfed, brought in for poor feeding and lethargy. The state newborn screen flagged markedly elevated citrulline. Ammonia is 480, with a respiratory alkalosis and low BUN. Plasma argininosuccinate is detectable (abnormal). On exam her hair is unusually dry and brittle and breaks easily. What do you want to ask, examine, or order next?",
+  "history": "Term, uneventful birth, well until day 7 then progressive feeding difficulty and somnolence. Parents consanguineous (autosomal recessive). Newborn screen: citrullinemia pattern. No fever.",
+  "exam": "Lethargic, hypotonic, tachypneic. Anterior fontanelle full. Hepatomegaly 2 cm. Hair dry, brittle, and fragile (trichorrhexis nodosa). No dysmorphism otherwise.",
+  "labs": [
+    { "name": "Plasma ammonia", "value": 480, "unit": "μmol/L", "ref": "<100 (newborn)", "flag": "high" },
+    { "name": "Plasma citrulline", "value": "Markedly elevated", "unit": "", "ref": "10-45 μmol/L", "flag": "high" },
+    { "name": "Plasma argininosuccinate", "value": "Present (abnormal)", "unit": "", "ref": "Absent", "flag": "high" },
+    { "name": "Plasma arginine", "value": "Low", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "BUN", "value": 2, "unit": "mg/dL", "ref": "5-18", "flag": "low" },
+    { "name": "pH / PaCO2", "value": "7.49 / 27", "unit": "", "ref": "7.35-7.45 / 35-45", "flag": "high" },
+    { "name": "Urine orotic acid", "value": "Mildly elevated", "unit": "", "ref": "<2", "flag": "high" },
+    { "name": "Hair microscopy", "value": "Trichorrhexis nodosa", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which urea-cycle enzyme is deficient?",
+      "mechanism": "Briefly: why is citrulline AND argininosuccinate high while arginine is low, and what causes the brittle hair?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["argininosuccinic aciduria", "asl deficiency", "argininosuccinate lyase deficiency", "argininosuccinic acidemia"] },
+      "cause": { "weight": 1.0, "accepts": ["argininosuccinate lyase", "asl"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["argininosuccinate", "arginine", "ammonia"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the urea-cycle step that fails in this disorder.",
+    "target": { "type": "edge", "edgeId": "ASL:Argininosuccinate->Arginine" },
+    "correctMsg": "Yes — argininosuccinate lyase (ASL). The cycle stalls one step from arginine: argininosuccinate (and upstream citrulline) accumulate while arginine falls and ammonia rises. Low arginine impairs collagen/structural protein and creatine synthesis — contributing to the fragile, breakable hair (trichorrhexis nodosa).",
+    "wrongMsg": "Not quite. The block is the step that splits argininosuccinate into arginine (and fumarate).",
+    "revealMsg": "Target: ASL (Argininosuccinate → Arginine). The diagnostic clue is detectable argininosuccinate; arginine becomes conditionally essential and must be supplemented."
+  },
+  "mcqs": [
+    { "stem": "Why is arginine supplementation part of treatment in ASL (and most distal urea-cycle defects)?", "choices": ["Arginine becomes conditionally essential when the cycle can't make it, and it also helps drive residual ureagenesis/ornithine regeneration", "Arginine directly binds ammonia", "Arginine inhibits ALA synthase", "Arginine is a phosphate binder"], "correct": 0, "explanation": "Below the arginine-producing steps, the cycle can't supply arginine, so it must be given. Arginine also replenishes ornithine to keep the cycle turning and supports nitrogen scavenging. (In ASL it additionally allows excretion of argininosuccinate as a nitrogen sink.)" },
+    { "stem": "Why is the blood gas a respiratory ALKALOSIS rather than a metabolic acidosis?", "choices": ["Ammonia-driven central hyperventilation lowers CO₂; urea-cycle defects do not generate organic acids", "Renal bicarbonate wasting", "Lactic acidosis with compensation", "Vomiting"], "correct": 0, "explanation": "Hyperammonemia stimulates central respiration → respiratory alkalosis. Unlike the organic acidemias (which cause a high-anion-gap metabolic acidosis), urea-cycle defects present with alkalosis plus hyperammonemia — a key discriminator in the sick neonate." },
+    { "stem": "How does the citrulline level help localize the urea-cycle block?", "choices": ["Citrulline is HIGH in citrullinemia (ASS) and argininosuccinic aciduria (ASL), but LOW in CPS1/OTC deficiency (proximal blocks)", "Citrulline is always low in urea-cycle defects", "Citrulline distinguishes organic acidemias", "Citrulline reflects renal function"], "correct": 0, "explanation": "Citrulline is made by OTC and consumed by ASS. Proximal blocks (CPS1, OTC) → LOW citrulline (with high orotic acid in OTC). Distal blocks (ASS = citrullinemia, ASL = argininosuccinic aciduria) → HIGH citrulline; ASL additionally shows argininosuccinate." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

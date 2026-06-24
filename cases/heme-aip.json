@@ -1,0 +1,45 @@
+{
+  "id": "heme-aip",
+  "pathway": "heme",
+  "title": "The woman with agonizing belly pain and wine-dark urine",
+  "blurb": "Recurrent severe abdominal pain with no surgical findings, neuropsychiatric features, and urine that darkens on standing — a defect late in heme synthesis with normal skin.",
+  "patient": { "age": "31 years", "sex": "F", "complaint": "Recurrent severe diffuse abdominal pain, anxiety, and tingling weakness." },
+  "opening": "31-year-old woman, third ED visit this year for severe diffuse abdominal pain with no peritoneal signs, soft abdomen, and a normal CT. This time she also has tachycardia, hyponatremia (Na 122), confusion, and new proximal arm weakness. The nurse notes her urine darkened to a port-wine color after sitting at the bedside. Symptoms began days after she started a new 'diet pill' and crash dieting. What do you want to ask, examine, or order next?",
+  "history": "Episodic attacks over 2 years, often premenstrual or after fasting, alcohol, or new medications. No skin rash or photosensitivity. Started a P450-inducing weight-loss drug and a low-calorie diet this week. Family: a sister had a 'mystery abdominal illness.'",
+  "exam": "Tachycardic, hypertensive, diaphoretic. Abdomen soft, diffusely tender, no guarding or rebound, bowel sounds present. Proximal upper-limb weakness, diminished reflexes. Anxious, intermittently confused. SKIN NORMAL — no blistering, no photosensitivity.",
+  "labs": [
+    { "name": "Urine porphobilinogen (PBG)", "value": "Markedly elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Urine δ-ALA", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Urine color on standing", "value": "Darkens to port-wine", "unit": "", "ref": "Pale yellow", "flag": "high" },
+    { "name": "Sodium", "value": 122, "unit": "mmol/L", "ref": "135-145", "flag": "low" },
+    { "name": "Abdominal CT", "value": "Unremarkable", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Lipase", "value": 40, "unit": "U/L", "ref": "<60", "flag": "normal" },
+    { "name": "Skin exam", "value": "No photosensitivity / blistering", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "HMBS (PBG deaminase) gene", "value": "Pathogenic variant", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "What enzyme is deficient?",
+      "mechanism": "Briefly: why do attacks flare with fasting, alcohol, and P450-inducing drugs, and why is there NO photosensitivity (unlike PCT)?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["acute intermittent porphyria", "aip", "intermittent porphyria"] },
+      "cause": { "weight": 1.0, "accepts": ["pbg deaminase", "porphobilinogen deaminase", "hydroxymethylbilane synthase", "hmbs", "pbg deaminase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["ala synthase", "ala", "heme"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the heme-synthesis step that is deficient in this neurovisceral porphyria.",
+    "target": { "type": "edge", "edgeId": "PBG deaminase:PBG->Uropor III" },
+    "correctMsg": "Yes — PBG deaminase (HMBS). The block makes ALA and PBG pile up (neurotoxic, hence the pain, neuropathy, and psych features). Because the deficiency is BEFORE the porphyrinogens, no photosensitizing porphyrins reach the skin — so the skin is normal (unlike PCT). Triggers (fasting, alcohol, P450 inducers) up-regulate ALA synthase, worsening the buildup.",
+    "wrongMsg": "Not quite. The defect is the step that polymerizes porphobilinogen — before any photosensitizing porphyrins form.",
+    "revealMsg": "Target: PBG deaminase (PBG → Uropor III). ALA/PBG accumulate (neurovisceral attacks) but downstream porphyrins do not, so there is no skin photosensitivity."
+  },
+  "mcqs": [
+    { "stem": "Why do enzyme-inducing drugs, alcohol, and fasting precipitate attacks?", "choices": ["They up-regulate ALA synthase (the rate-limiting first step), increasing flux into a partially blocked pathway and accumulating neurotoxic ALA/PBG", "They inhibit renal excretion of porphyrins", "They cause direct hepatocyte necrosis", "They deplete vitamin B6"], "correct": 0, "explanation": "Anything that demands more heme or induces hepatic P450 (which consumes heme) de-represses ALA synthase. With PBG deaminase deficient, ramping up ALA synthase floods the pathway with ALA and PBG. Fasting (low glucose/heme) does the same — hence IV glucose and hemin are treatments." },
+    { "stem": "What is the acute treatment that switches off ALA synthase?", "choices": ["IV hemin (and IV glucose) provide negative feedback on ALA synthase", "High-dose corticosteroids", "Plasmapheresis", "Phlebotomy"], "correct": 0, "explanation": "Hemin replenishes the regulatory heme pool, feedback-inhibiting ALA synthase and shutting down ALA/PBG overproduction. IV dextrose helps milder attacks. Phlebotomy is for PCT, not AIP." },
+    { "stem": "Why is AIP NOT photosensitive whereas porphyria cutanea tarda IS?", "choices": ["AIP's block is upstream of the photosensitizing porphyrinogens; PCT (UROD deficiency) accumulates uroporphyrinogen that oxidizes to skin-damaging porphyrins", "AIP patients avoid the sun", "AIP porphyrins are water-soluble and excreted", "PCT lacks PBG"], "correct": 0, "explanation": "Skin photosensitivity requires accumulation of cyclic porphyrins that absorb light and generate ROS. AIP accumulates ALA/PBG (no skin disease); PCT accumulates uroporphyrinogen → blistering photosensitivity. The level of the block determines the phenotype." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "tca-sdh",
+  "pathway": "tca",
+  "title": "The young woman with episodic pounding headaches and a neck mass",
+  "blurb": "A TCA enzyme that doubles as a tumor suppressor — when it fails, a catecholamine-secreting paraganglioma grows and succinate becomes an oncometabolite.",
+  "patient": { "age": "29 years", "sex": "F", "complaint": "Episodes of pounding headache, palpitations, and drenching sweats; a painless lump in the neck." },
+  "opening": "29-year-old woman with months of paroxysmal pounding headaches, palpitations, sweating, and pallor, plus blood pressures spiking to 190/110 during episodes. She has a firm, pulsatile painless mass at the carotid bifurcation. Plasma free metanephrines are elevated and CT shows an avidly enhancing skull-base/neck lesion. Her father died of a 'neck tumor.' What do you want to ask, examine, or order next?",
+  "history": "Paroxysmal adrenergic spells for ~1 year. Family history: father and paternal aunt had head-and-neck paragangliomas (autosomal dominant, parent-of-origin pattern). No diabetes. No medication triggers.",
+  "exam": "During a spell: HR 124, BP 188/108, diaphoretic, pale. Firm pulsatile mass at the left carotid bifurcation (carotid body), non-tender, mobile side-to-side but not vertically. No thyromegaly. No abdominal mass.",
+  "labs": [
+    { "name": "Plasma free metanephrines", "value": "Elevated (normetanephrine predominant)", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "24h urine catecholamines", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Blood pressure (spell)", "value": "188/108", "unit": "mmHg", "ref": "<120/80", "flag": "high" },
+    { "name": "CT neck/skull base", "value": "Avidly enhancing paraganglioma", "unit": "", "ref": "—", "flag": "high" },
+    { "name": "Tumor immunohistochemistry (SDHB)", "value": "Loss of SDHB staining", "unit": "", "ref": "Retained", "flag": "high" },
+    { "name": "Germline panel", "value": "Pathogenic SDHB variant", "unit": "", "ref": "Wild-type", "flag": "high" },
+    { "name": "Tumor succinate / fumarate ratio", "value": "Markedly elevated", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis (tumor + the gene family)?",
+      "cause": "Which TCA enzyme/complex is lost?",
+      "mechanism": "Briefly: how does losing a TCA enzyme cause a TUMOR (the oncometabolite link)?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["paraganglioma", "sdh", "sdhb", "hereditary paraganglioma", "pheochromocytoma-paraganglioma"] },
+      "cause": { "weight": 1.0, "accepts": ["succinate dehydrogenase", "sdh", "complex ii", "sdhb"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["succinate", "hif", "oncometabolite"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the TCA enzyme that is lost in this tumor (it is also ETC Complex II).",
+    "target": { "type": "edge", "edgeId": "SDH (CII):Succinate->Fumarate" },
+    "correctMsg": "Yes — succinate dehydrogenase (Complex II). Loss of SDH blocks succinate → fumarate, so succinate accumulates. Succinate is an ONCOMETABOLITE: it inhibits α-KG-dependent prolyl hydroxylases, stabilizing HIF-1α → a pseudohypoxic, pro-angiogenic state that drives paraganglioma/pheochromocytoma.",
+    "wrongMsg": "Not quite. The enzyme is the only one embedded in the inner mitochondrial membrane — it's both a TCA enzyme AND ETC Complex II.",
+    "revealMsg": "Target: SDH (CII) (Succinate → Fumarate). SDHx mutations (SDHB/C/D) cause hereditary paraganglioma-pheochromocytoma; SDHB carries the highest malignant/metastatic risk."
+  },
+  "mcqs": [
+    { "stem": "How does accumulated succinate promote tumorigenesis?", "choices": ["It inhibits α-ketoglutarate-dependent dioxygenases (prolyl hydroxylases, TET/histone demethylases), stabilizing HIF-1α and altering the epigenome", "It directly mutates DNA", "It activates the EGFR receptor", "It depletes glutathione"], "correct": 0, "explanation": "Succinate (like fumarate and 2-HG) competitively inhibits α-KG-dependent enzymes. Blocking prolyl hydroxylases stabilizes HIF-1α (pseudohypoxia → VEGF, angiogenesis); blocking TET/JmjC demethylases produces a hypermethylator phenotype. Hence 'oncometabolite.'" },
+    { "stem": "Before any surgery or biopsy of a catecholamine-secreting paraganglioma, what is essential?", "choices": ["Alpha-blockade first (e.g., phenoxybenzamine), then beta-blockade, to prevent hypertensive crisis", "Beta-blockade first", "Immediate resection", "Start an ACE inhibitor"], "correct": 0, "explanation": "Unopposed alpha stimulation can precipitate a hypertensive crisis. Always alpha-block FIRST (phenoxybenzamine/doxazosin) with volume expansion, then add beta-blockade for tachycardia. Never beta-block first." },
+    { "stem": "Which other TCA-linked oncometabolite syndrome parallels this mechanism?", "choices": ["Fumarate hydratase (FH) loss → hereditary leiomyomatosis and renal cell cancer; and IDH1/2 mutations → 2-hydroxyglutarate in glioma/AML", "G6PD deficiency", "Lesch-Nyhan", "Wilson disease"], "correct": 0, "explanation": "FH loss accumulates fumarate (HLRCC), and mutant IDH produces 2-HG (gliomas, AML). All three — succinate, fumarate, 2-HG — are α-KG-mimicking oncometabolites that dysregulate the same dioxygenases." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "sterol-slos",
+  "pathway": "sterol",
+  "title": "The dysmorphic newborn with fused toes and a low cholesterol",
+  "blurb": "A malformation syndrome from a block in the LAST step of cholesterol synthesis — the rare disease where cholesterol is too LOW.",
+  "patient": { "age": "Newborn", "sex": "M", "complaint": "Multiple congenital anomalies noted at birth; ambiguous genitalia." },
+  "opening": "Term newborn with microcephaly, ptosis, a small upturned nose, micrognathia, 2-3 toe syndactyly, postaxial polydactyly, and ambiguous genitalia (46,XY undervirilization). He feeds poorly with a weak cry. Total cholesterol is strikingly LOW for a neonate, and plasma 7-dehydrocholesterol is markedly elevated. What do you want to ask, examine, or order next?",
+  "history": "First child of non-consanguineous parents (autosomal recessive). Intrauterine growth restriction. Prenatal ultrasound suggested anomalies. No maternal statin use. Family history unremarkable.",
+  "exam": "Microcephaly, bitemporal narrowing, ptosis, anteverted nares, cleft palate, micrognathia. 2-3 toe cutaneous syndactyly, postaxial polydactyly. Hypospadias with undervirilized genitalia. Hypotonia.",
+  "labs": [
+    { "name": "Total cholesterol", "value": 38, "unit": "mg/dL", "ref": "45-170 (neonate)", "flag": "low" },
+    { "name": "Plasma 7-dehydrocholesterol (7-DHC)", "value": "Markedly elevated", "unit": "", "ref": "Very low", "flag": "high" },
+    { "name": "7-DHC : cholesterol ratio", "value": "High", "unit": "", "ref": "Low", "flag": "high" },
+    { "name": "Karyotype", "value": "46,XY", "unit": "", "ref": "—", "flag": "normal" },
+    { "name": "DHCR7 gene", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" },
+    { "name": "Maternal serum estriol (prenatal)", "value": "Low", "unit": "", "ref": "Normal", "flag": "low" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme (final cholesterol-synthesis step) is deficient?",
+      "mechanism": "Briefly: why do malformations occur (think Sonic hedgehog), and why is cholesterol LOW here when most sterol cases are about excess?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["smith-lemli-opitz", "smith lemli opitz", "slos", "slo syndrome"] },
+      "cause": { "weight": 1.0, "accepts": ["7-dehydrocholesterol reductase", "dhcr7", "7 dehydrocholesterol reductase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["cholesterol", "hedgehog", "7-dehydrocholesterol"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the cholesterol-synthesis span whose final step (7-DHC reductase) is deficient here.",
+    "target": { "type": "edge", "edgeId": "cyclization:Squalene->Cholesterol" },
+    "correctMsg": "Yes — the late cholesterol-synthesis pathway (squalene → … → cholesterol). DHCR7 normally performs the final reduction of 7-dehydrocholesterol to cholesterol; its loss leaves cholesterol LOW and 7-DHC HIGH. Cholesterol is required to covalently modify and activate Sonic hedgehog signaling, so deficiency causes the multi-organ malformations.",
+    "wrongMsg": "Not quite. The defect is at the very END of cholesterol synthesis (converting the immediate precursor to cholesterol).",
+    "revealMsg": "Target: the squalene → cholesterol span (DHCR7 is the final step). 7-dehydrocholesterol accumulates; cholesterol is low — the opposite of familial hypercholesterolemia."
+  },
+  "mcqs": [
+    { "stem": "Why does cholesterol deficiency cause congenital malformations?", "choices": ["Cholesterol is required for covalent modification and activity of Sonic hedgehog, a key developmental morphogen", "Cholesterol is needed for neural crest migration only", "Low cholesterol causes apoptosis of all dividing cells", "Cholesterol stabilizes the karyotype"], "correct": 0, "explanation": "Sonic hedgehog is cholesterol-modified to signal properly. Without cholesterol, hedgehog patterning fails — producing the holoprosencephaly-spectrum facial features, limb anomalies (syndactyly/polydactyly), and genital undervirilization of SLOS." },
+    { "stem": "How is SLOS conceptually opposite to familial hypercholesterolemia despite both being 'sterol' disorders?", "choices": ["SLOS is a cholesterol SYNTHESIS deficiency (low cholesterol); FH is an LDL-receptor clearance defect (high LDL cholesterol)", "Both have high cholesterol", "Both are LDL-receptor defects", "SLOS is acquired"], "correct": 0, "explanation": "SLOS fails to MAKE cholesterol (DHCR7) → low cholesterol, high 7-DHC. FH fails to CLEAR LDL (LDLR) → high plasma LDL. Same pathway map, opposite ends — a nice teaching pair." },
+    { "stem": "What is the rationale for dietary cholesterol supplementation in SLOS?", "choices": ["To raise tissue cholesterol and reduce toxic 7-DHC accumulation, improving growth and some symptoms", "To lower LDL", "To induce DHCR7", "To bind bile acids"], "correct": 0, "explanation": "Cholesterol supplementation (often with egg yolk or purified cholesterol) aims to replenish the deficient sterol and suppress 7-DHC; benefits are partial. Avoid drugs that further inhibit cholesterol synthesis. Statins are used cautiously/experimentally to lower 7-DHC in milder cases." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

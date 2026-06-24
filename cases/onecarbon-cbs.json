@@ -1,0 +1,45 @@
+{
+  "id": "onecarbon-cbs",
+  "pathway": "onecarbon",
+  "title": "The tall teenager with dislocated lenses and a clot",
+  "blurb": "Marfan-like habitus but with intellectual disability, downward lens dislocation, and thrombosis — a transsulfuration defect that floods the blood with homocysteine.",
+  "patient": { "age": "16 years", "sex": "M", "complaint": "Blurred vision from a dislocated lens; presented with a leg DVT." },
+  "opening": "16-year-old, tall and thin with long limbs, presents with a deep vein thrombosis of the leg — and on exam has downward-and-inward lens dislocation in both eyes. He has mild intellectual disability and a fair, flushed complexion. Plasma homocysteine is very high and methionine is elevated; the urine nitroprusside test is positive. What do you want to ask, examine, or order next?",
+  "history": "Learning difficulties since childhood. Progressive myopia, then diagnosed lens dislocation. No prior thrombosis until now. Diet normal. Parents non-consanguineous (autosomal recessive). A maternal cousin had early stroke.",
+  "exam": "Tall, arachnodactyly, pectus, joint laxity (marfanoid). Downward lens subluxation (ectopia lentis) bilaterally. Malar flush, fair skin. Mild cognitive impairment. Right calf swollen/tender (DVT). No aortic murmur today.",
+  "labs": [
+    { "name": "Plasma total homocysteine", "value": "Markedly elevated", "unit": "", "ref": "<15 μmol/L", "flag": "high" },
+    { "name": "Plasma methionine", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Plasma cysteine", "value": "Low", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "Urine homocystine (nitroprusside)", "value": "Positive", "unit": "", "ref": "Negative", "flag": "high" },
+    { "name": "Methylmalonic acid", "value": "Normal", "unit": "", "ref": "<0.4 μmol/L", "flag": "normal" },
+    { "name": "Lens exam", "value": "Bilateral downward ectopia lentis", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Lower-limb Doppler", "value": "Acute DVT", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "CBS gene", "value": "Biallelic pathogenic variants", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme is deficient?",
+      "mechanism": "Briefly: why high methionine AND high homocysteine (vs B12 deficiency), and why the thrombosis + downward lens dislocation?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["homocystinuria", "classic homocystinuria", "cbs deficiency", "cystathionine beta synthase deficiency", "cystathionine β-synthase deficiency"] },
+      "cause": { "weight": 1.0, "accepts": ["cystathionine beta-synthase", "cystathionine β-synthase", "cbs", "cystathionine synthase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["homocysteine", "cysteine", "methionine"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the transsulfuration step that fails in classic homocystinuria.",
+    "target": { "type": "edge", "edgeId": "CBS (B6):Homocysteine->Cysteine" },
+    "correctMsg": "Yes — cystathionine β-synthase (CBS, the B6-dependent transsulfuration step). Homocysteine can't be funneled to cysteine, so homocysteine accumulates (and is remethylated back to methionine, raising it too). Excess homocysteine damages endothelium/collagen → thrombosis and lens zonule weakness (downward dislocation). Some patients respond to high-dose B6.",
+    "wrongMsg": "Not quite. The block is the B6-dependent step that commits homocysteine to cysteine (transsulfuration).",
+    "revealMsg": "Target: CBS (B6) (Homocysteine → Cysteine). High methionine + high homocysteine + low cysteine = CBS deficiency; pyridoxine (B6) helps responsive forms."
+  },
+  "mcqs": [
+    { "stem": "How does CBS-deficiency homocystinuria differ biochemically from B12-deficiency hyperhomocysteinemia?", "choices": ["CBS deficiency: HIGH methionine, normal MMA. B12 deficiency: LOW/normal methionine and HIGH methylmalonic acid", "Both raise methylmalonic acid", "Both lower methionine", "They are biochemically identical"], "correct": 0, "explanation": "CBS blocks homocysteine's exit to cysteine, so it's remethylated to methionine → methionine HIGH, MMA normal. B12 deficiency blocks methionine synthase (and methylmalonyl-CoA mutase) → methionine low/normal and MMA elevated. Methionine and MMA separate the two." },
+    { "stem": "Why is the lens dislocation DOWNWARD in homocystinuria (vs upward in Marfan)?", "choices": ["Homocysteine disrupts the zonular fibers differently; classically downward/inward in homocystinuria, upward/outward in Marfan", "Gravity differs", "Homocystinuria affects only one eye", "The lens is heavier"], "correct": 0, "explanation": "Both cause ectopia lentis, but the classic teaching is DOWNWARD (and inward) in homocystinuria versus UPWARD (and outward) in Marfan syndrome — a high-yield discriminator alongside the thrombosis and intellectual disability seen in homocystinuria." },
+    { "stem": "What is first-line treatment, and what is trialed first?", "choices": ["Trial high-dose pyridoxine (B6); for non-responders, a methionine-restricted diet with cysteine, plus betaine and folate/B12", "Lifelong warfarin only", "Methionine supplementation", "Copper chelation"], "correct": 0, "explanation": "About half of CBS patients are B6 (pyridoxine)-responsive — always trial it. Otherwise restrict methionine, supplement cysteine, and add betaine (remethylates homocysteine to methionine via an alternate route) plus folate/B12 to lower homocysteine and reduce thrombotic risk." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

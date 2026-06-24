@@ -1,0 +1,45 @@
+{
+  "id": "heme-pct",
+  "pathway": "heme",
+  "title": "The man with blistering hands and tea-colored urine",
+  "blurb": "The most common porphyria: fragile, blistering sun-exposed skin and dark urine, often unmasked by alcohol, hepatitis C, iron, or estrogen.",
+  "patient": { "age": "48 years", "sex": "M", "complaint": "Blisters and skin fragility on the backs of the hands, plus darkening urine." },
+  "opening": "48-year-old man with months of tense blisters, erosions, and skin fragility on the dorsal hands and forearms, healing with scars and milia, worse in summer. He also has increased facial hair and tea-colored urine. He drinks heavily and was treated for hepatitis C. Urine fluoresces coral-pink under a Wood's lamp. Ferritin is high. What do you want to ask, examine, or order next?",
+  "history": "Heavy alcohol use, chronic hepatitis C, and recent iron supplements. No family history necessarily (most PCT is acquired/sporadic). Photosensitivity with blistering on sun-exposed skin. Smoker.",
+  "exam": "Tense bullae, erosions, and atrophic scars with milia on the dorsal hands; hypertrichosis of the temples/cheeks; mild hyperpigmentation. Hepatomegaly, stigmata of chronic liver disease. No abdominal pain or neuropathy.",
+  "labs": [
+    { "name": "Urine uroporphyrin", "value": "Markedly elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Urine Wood's-lamp fluorescence", "value": "Coral-pink", "unit": "", "ref": "None", "flag": "high" },
+    { "name": "Plasma porphyrin fluorescence peak", "value": "~620 nm", "unit": "", "ref": "—", "flag": "high" },
+    { "name": "Ferritin", "value": 920, "unit": "ng/mL", "ref": "30-300", "flag": "high" },
+    { "name": "Hepatitis C antibody/RNA", "value": "Positive", "unit": "", "ref": "Negative", "flag": "high" },
+    { "name": "Urine PBG", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "AST / ALT", "value": "Elevated", "unit": "U/L", "ref": "<40", "flag": "high" },
+    { "name": "UROD activity (erythrocyte)", "value": "Reduced (hepatic inhibition)", "unit": "", "ref": "Normal", "flag": "low" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which heme-synthesis enzyme is deficient/inhibited?",
+      "mechanism": "Briefly: why blistering photosensitive skin (vs the painless abdominal attacks of AIP), and how do alcohol/HCV/iron unmask it?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["porphyria cutanea tarda", "pct"] },
+      "cause": { "weight": 1.0, "accepts": ["urod", "uroporphyrinogen decarboxylase", "uroporphyrinogen iii decarboxylase"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["uroporphyrin", "skin", "iron"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the heme-synthesis step that is deficient in PCT (uroporphyrinogen → coproporphyrinogen, drawn here as the multi-step span to protoporphyrin).",
+    "target": { "type": "edge", "edgeId": "multi-step:Uropor III->Protopor IX" },
+    "correctMsg": "Yes — uroporphyrinogen decarboxylase (UROD), the enzyme just downstream of uroporphyrinogen III. Its hepatic inhibition (worsened by iron, alcohol, HCV, estrogen) accumulates uroporphyrinogen, which oxidizes to uroporphyrin — a photosensitizer that generates ROS in sun-exposed skin, causing the blistering.",
+    "wrongMsg": "Not quite. The block is just AFTER uroporphyrinogen III (UROD), so uroporphyrins build up and reach the skin.",
+    "revealMsg": "Target: the UROD span (Uropor III → Protopor IX). Accumulated uroporphyrins are photosensitizing — hence the blistering, fragile, sun-exposed skin."
+  },
+  "mcqs": [
+    { "stem": "Why is the skin blistering in PCT but normal in AIP?", "choices": ["PCT accumulates photosensitizing uroporphyrins that absorb light and generate ROS in the skin; AIP accumulates non-photosensitizing ALA/PBG", "PCT patients have thinner skin", "AIP porphyrins are excreted in bile", "PCT is purely allergic"], "correct": 0, "explanation": "Cyclic porphyrins (uroporphyrin) absorb ~400-410 nm light and produce reactive oxygen species in the dermis → subepidermal blisters. AIP's accumulated ALA/PBG are not photosensitizers, so AIP has neurovisceral attacks without skin disease." },
+    { "stem": "Which factors classically precipitate/worsen PCT?", "choices": ["Alcohol, hepatitis C, iron overload (incl. HFE mutations), and estrogen", "Fasting and rifampin", "Lead exposure", "High-protein diet"], "correct": 0, "explanation": "Iron and these hepatotoxic/oxidative stressors inhibit hepatic UROD. PCT is strongly associated with HCV, alcohol, iron overload/hemochromatosis, and estrogen use — a constellation worth screening for." },
+    { "stem": "What are the mainstays of treatment?", "choices": ["Remove triggers, sun protection, repeated phlebotomy to reduce iron, and low-dose hydroxychloroquine", "IV hemin and glucose", "Heme arginate only", "Splenectomy"], "correct": 0, "explanation": "Lower the iron burden (phlebotomy), eliminate alcohol/estrogen, treat HCV, protect skin from light, and use low-dose hydroxychloroquine to mobilize hepatic porphyrins. (Hemin/glucose are for the acute neurovisceral porphyrias like AIP.)" }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

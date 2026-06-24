@@ -1,0 +1,44 @@
+{
+  "id": "ethanol-aldh2",
+  "pathway": "ethanol",
+  "title": "The flushing drinker and the deterrent pill",
+  "blurb": "Facial flushing, nausea, and palpitations after a single drink — acetaldehyde building up because the enzyme that clears it is blocked or genetically slow.",
+  "patient": { "age": "45 years", "sex": "M", "complaint": "Intense flushing, throbbing headache, vomiting, and palpitations minutes after a small amount of alcohol." },
+  "opening": "45-year-old man in an alcohol-use-disorder program presents to urgent care after drinking 'just one beer.' Within 15 minutes he developed dramatic facial flushing, throbbing headache, nausea/vomiting, palpitations, and BP 92/56 with tachycardia. He recently started a medication to support sobriety. He recalls always flushing badly with alcohol even before the new pill. What do you want to ask, examine, or order next?",
+  "history": "Alcohol-use disorder, enrolled in a deterrent program; started a new oral medication a week ago. Of East Asian descent and has 'always' flushed with alcohol (a known genetic variant). No coronary disease. Took a sip of beer not realizing the interaction.",
+  "exam": "Flushed face and trunk, diaphoretic, HR 118, BP 92/56. No chest pain, ECG sinus tachycardia. Mild wheeze. Vomiting. Mentating normally. No focal neuro deficit.",
+  "labs": [
+    { "name": "Blood acetaldehyde", "value": "Elevated", "unit": "", "ref": "Low", "flag": "high" },
+    { "name": "Blood ethanol", "value": "Low-moderate", "unit": "", "ref": "0", "flag": "high" },
+    { "name": "Heart rate", "value": 118, "unit": "bpm", "ref": "60-100", "flag": "high" },
+    { "name": "Blood pressure", "value": "92/56", "unit": "mmHg", "ref": "<120/80", "flag": "low" },
+    { "name": "ECG", "value": "Sinus tachycardia", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Medication history", "value": "Recently started aldehyde-dehydrogenase inhibitor", "unit": "", "ref": "—", "flag": "high" },
+    { "name": "ALDH2 genotype", "value": "ALDH2*2 variant (reduced activity)", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is happening (the reaction and the metabolite)?",
+      "cause": "Which enzyme is blocked/slow, and what drug class reproduces this?",
+      "mechanism": "Briefly: why does acetaldehyde accumulation cause flushing, nausea, and hypotension?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["disulfiram reaction", "disulfiram-ethanol reaction", "acetaldehyde", "aldh2 deficiency", "alcohol flush reaction"] },
+      "cause": { "weight": 1.0, "accepts": ["aldehyde dehydrogenase", "aldh", "aldh2", "disulfiram"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["acetaldehyde", "vasodilation", "ethanol"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the ethanol-metabolism step that is blocked, causing the toxin to accumulate.",
+    "target": { "type": "edge", "edgeId": "ALDH:Acetaldehyde->Acetate" },
+    "correctMsg": "Yes — aldehyde dehydrogenase (ALDH). With ALDH inhibited (disulfiram) or genetically slow (ALDH2*2, common in East Asian populations), acetaldehyde from ethanol can't be oxidized to acetate and accumulates — causing vasodilatory flushing, throbbing headache, nausea/vomiting, tachycardia, and hypotension.",
+    "wrongMsg": "Not quite. The block is the SECOND oxidation (acetaldehyde → acetate), not alcohol dehydrogenase.",
+    "revealMsg": "Target: ALDH (Acetaldehyde → Acetate). Disulfiram inhibits it as a deterrent; the ALDH2*2 allele does the same genetically (the 'Asian flush')."
+  },
+  "mcqs": [
+    { "stem": "Why does acetaldehyde accumulation produce flushing and hypotension?", "choices": ["Acetaldehyde triggers catecholamine and histamine release / vasodilation, causing flushing, headache, tachycardia, and a drop in blood pressure", "Acetaldehyde is a direct cardiac stimulant only", "It causes acute renal failure", "It precipitates in capillaries"], "correct": 0, "explanation": "Acetaldehyde provokes vasodilation (via catecholamine/histamine effects), producing the intense flush, throbbing headache, nausea, palpitations, and hypotension of the disulfiram-ethanol reaction. The reaction is unpleasant by design (deterrent) and can be dangerous." },
+    { "stem": "Which other drugs can cause a 'disulfiram-like' reaction with alcohol?", "choices": ["Metronidazole, certain cephalosporins (e.g., cefotetan), griseofulvin, and some sulfonylureas", "Acetaminophen", "Amoxicillin", "Loratadine"], "correct": 0, "explanation": "Metronidazole is the classic offender; certain cephalosporins (cefotetan, cefamandole), griseofulvin, and first-gen sulfonylureas can also inhibit ALDH. Patients must avoid alcohol on these — a common counseling point." },
+    { "stem": "Why is the ALDH2*2 variant relevant beyond flushing?", "choices": ["Chronic acetaldehyde exposure in drinkers with ALDH2*2 raises the risk of esophageal and head/neck cancers", "It protects against all cancers", "It causes hemolysis", "It improves alcohol clearance"], "correct": 0, "explanation": "ALDH2*2 carriers who drink accumulate acetaldehyde, a carcinogen, markedly increasing esophageal squamous cell and head-and-neck cancer risk. The flush reaction also tends to discourage heavy drinking — a protective behavioral effect." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

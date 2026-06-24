@@ -1,0 +1,44 @@
+{
+  "id": "etc-melas",
+  "pathway": "etc",
+  "title": "The teenager with stroke-like episodes that cross no artery",
+  "blurb": "Maternally inherited episodes of cortical dysfunction with lactic acidosis — a respiratory-chain disorder where tissues full of oxygen still can't make ATP.",
+  "patient": { "age": "15 years", "sex": "M", "complaint": "Sudden vision loss and confusion, recurrent migraines, short stature." },
+  "opening": "15-year-old boy, short for his family, with recurrent severe migraines and now an acute episode of right-sided vision loss, confusion, and a focal seizure. MRI shows a parieto-occipital lesion that does NOT respect a vascular territory. Serum and CSF lactate are elevated. He is hearing-impaired and has had myoclonus. His mother and maternal uncle have diabetes and deafness. What do you want to ask, examine, or order next?",
+  "history": "Maternal-line history: mother and maternal relatives with diabetes, deafness, and 'migraines' (maternal/mitochondrial inheritance). Short stature, exercise intolerance, sensorineural hearing loss. Several prior stroke-like episodes with partial recovery.",
+  "exam": "Short stature, sensorineural hearing loss. Acutely: homonymous visual field deficit, confusion, post-ictal. Mild proximal myopathy. No carotid bruit. Fundi with pigmentary changes.",
+  "labs": [
+    { "name": "Serum lactate", "value": 6.4, "unit": "mmol/L", "ref": "0.5-2.2", "flag": "high" },
+    { "name": "CSF lactate", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "MRI lesion", "value": "Non-vascular-territory cortical lesion", "unit": "", "ref": "—", "flag": "high" },
+    { "name": "Muscle biopsy", "value": "Ragged-red fibers (Gomori trichrome)", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "COX/SDH stain", "value": "COX-negative, SDH-positive fibers", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "mtDNA testing", "value": "m.3243A>G (MT-TL1)", "unit": "", "ref": "Wild-type", "flag": "high" },
+    { "name": "Echocardiogram", "value": "Mild hypertrophic cardiomyopathy", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis (the acronym)?",
+      "cause": "What part of the electron transport chain is most impaired, and what's the inheritance?",
+      "mechanism": "Briefly: why are brain and muscle hit hardest, and why the lactic acidosis despite normal oxygenation?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["melas", "mitochondrial encephalomyopathy", "mitochondrial myopathy"] },
+      "cause": { "weight": 1.0, "accepts": ["complex i", "respiratory chain", "electron transport", "mtdna", "oxidative phosphorylation"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["atp", "lactate", "nadh"], "minHits": 2 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the first ETC complex whose function fails when mitochondrial protein synthesis is impaired here.",
+    "target": { "type": "edge", "edgeId": "Complex I:NADH->NAD+" },
+    "correctMsg": "Yes — Complex I. The m.3243A>G tRNA mutation cripples mitochondrial translation, hitting the (mtDNA-encoded) respiratory complexes; Complex I (the largest, most mtDNA-dependent) bears the brunt. NADH can't be reoxidized → high-energy-demand tissues (brain, muscle) fail and pyruvate is shunted to lactate.",
+    "wrongMsg": "Not quite. Pick the entry complex that oxidizes NADH — the most mtDNA-dependent and the most affected.",
+    "revealMsg": "Target: Complex I (NADH → NAD⁺). MELAS impairs mitochondrial translation, reducing Complex I (and others); the ETC stalls and lactate climbs despite full tissue oxygenation."
+  },
+  "mcqs": [
+    { "stem": "Why does MELAS follow maternal inheritance with variable severity among relatives?", "choices": ["mtDNA is maternally transmitted, and heteroplasmy (the proportion of mutant mtDNA per tissue) sets a threshold for disease expression", "It is X-linked dominant", "It is an autosomal recessive nuclear gene", "It arises only de novo"], "correct": 0, "explanation": "Mitochondria (and their DNA) come from the egg → maternal inheritance. Each cell carries a mix of normal and mutant mtDNA (heteroplasmy); symptoms appear once the mutant fraction passes a tissue-specific threshold, explaining the wide variability among maternal relatives." },
+    { "stem": "Why is lactate elevated despite normal arterial oxygenation?", "choices": ["A failing ETC can't reoxidize NADH, so pyruvate is reduced to lactate to regenerate NAD⁺ for glycolysis", "Hypoxia from the cardiomyopathy", "Renal tubular acidosis", "Hyperventilation"], "correct": 0, "explanation": "Oxygen delivery is fine, but the respiratory chain can't USE it efficiently. NADH accumulates, NAD⁺ becomes limiting, and the cell ferments pyruvate to lactate (via LDH) to keep glycolysis running — a recurring theme across ETC disorders and cyanide poisoning." },
+    { "stem": "What does the muscle biopsy classically show?", "choices": ["Ragged-red fibers — subsarcolemmal accumulation of abnormal mitochondria on Gomori trichrome", "Nemaline rods", "Central cores", "Grouped atrophy"], "correct": 0, "explanation": "Compensatory mitochondrial proliferation produces ragged-red fibers; many are COX (Complex IV)-deficient. SDH (Complex II, nuclear-encoded) staining is retained — a clue that the defect is in mtDNA-encoded subunits." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

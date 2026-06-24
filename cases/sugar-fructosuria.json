@@ -1,0 +1,45 @@
+{
+  "id": "sugar-fructosuria",
+  "pathway": "sugar",
+  "title": "The healthy child whose urine tests 'positive for sugar'",
+  "blurb": "An incidental, completely benign finding — a reducing substance in the urine that is fructose, not glucose, from a harmless enzyme quirk.",
+  "patient": { "age": "5 years", "sex": "M", "complaint": "Routine urine dipstick flagged 'reducing substances'; otherwise perfectly well." },
+  "opening": "5-year-old boy, thriving and asymptomatic, whose pre-op urine screen showed a positive Clinitest (reducing substances) but a NEGATIVE glucose-oxidase dipstick. He has no symptoms — no hypoglycemia, no vomiting, normal growth, normal liver. The lab confirms the urinary reducing substance is fructose, and it rises after he eats fruit. What do you want to ask, examine, or order next?",
+  "history": "Entirely well, normal development and growth, no episodes of vomiting or hypoglycemia, eats fruit freely without ill effect. Found incidentally. Family: a parent recalls being told the same thing as a child (autosomal recessive, benign).",
+  "exam": "Completely normal. No hepatomegaly, no jaundice, normal growth parameters, normal neuro exam.",
+  "labs": [
+    { "name": "Urine Clinitest (reducing substances)", "value": "Positive", "unit": "", "ref": "Negative", "flag": "high" },
+    { "name": "Urine glucose-oxidase dipstick", "value": "Negative", "unit": "", "ref": "Negative", "flag": "normal" },
+    { "name": "Urine sugar identified", "value": "Fructose", "unit": "", "ref": "—", "flag": "high" },
+    { "name": "Fasting glucose", "value": 86, "unit": "mg/dL", "ref": "70-100", "flag": "normal" },
+    { "name": "Liver enzymes", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Uric acid", "value": 4.0, "unit": "mg/dL", "ref": "2-5.5", "flag": "normal" },
+    { "name": "Response to fructose meal", "value": "Asymptomatic; fructosuria only", "unit": "", "ref": "—", "flag": "normal" },
+    { "name": "KHK gene", "value": "Biallelic variants", "unit": "", "ref": "Wild-type", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme is deficient?",
+      "mechanism": "Briefly: why is this BENIGN (no hypoglycemia or liver injury) unlike hereditary fructose intolerance?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 1.0, "accepts": ["essential fructosuria", "fructokinase deficiency", "benign fructosuria"] },
+      "cause": { "weight": 1.0, "accepts": ["fructokinase", "ketohexokinase", "khk"] },
+      "mechanism": { "weight": 1.0, "mustMention": ["fructose-1-phosphate", "phosphate", "trap"], "minHits": 1 }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the first step of fructose metabolism that is deficient here.",
+    "target": { "type": "edge", "edgeId": "Fructokinase:Fructose->Fructose-1-P" },
+    "correctMsg": "Yes — fructokinase (ketohexokinase). Without it, fructose is simply not phosphorylated to fructose-1-phosphate; it accumulates in blood and spills harmlessly into urine. Because NO fructose-1-phosphate is trapped, there is no phosphate sequestration, no ATP depletion, no hypoglycemia, and no liver injury — the disorder is benign.",
+    "wrongMsg": "Not quite. The benign block is the very FIRST step — phosphorylating fructose. (Aldolase B, one step later, is the dangerous HFI defect.)",
+    "revealMsg": "Target: Fructokinase (Fructose → Fructose-1-P). No F1P forms, so the disorder is asymptomatic — the perfect contrast to HFI."
+  },
+  "mcqs": [
+    { "stem": "Why is essential fructosuria benign while HFI is dangerous?", "choices": ["Fructokinase deficiency prevents F1P formation entirely (nothing toxic accumulates); HFI lets F1P form but not be cleaved, trapping phosphate and depleting ATP", "Essential fructosuria patients avoid fruit", "HFI is benign too", "Fructokinase deficiency causes mild hypoglycemia"], "correct": 0, "explanation": "The toxin in HFI is trapped fructose-1-phosphate. In fructokinase deficiency, F1P is never made — fructose just circulates and is excreted. Same sugar, one enzyme apart, opposite clinical consequences." },
+    { "stem": "Why does the Clinitest read positive while the glucose dipstick reads negative?", "choices": ["Clinitest detects any reducing sugar (including fructose); the dipstick uses glucose oxidase and is specific for glucose", "The dipstick was expired", "Fructose is glucose-oxidase positive", "The Clinitest detects protein"], "correct": 0, "explanation": "Clinitest (copper reduction) reacts with any reducing substance — fructose, galactose, lactose. The glucose-oxidase dipstick is glucose-specific. A positive Clinitest with a negative dipstick points to a non-glucose reducing sugar in the urine." },
+    { "stem": "What management does essential fructosuria require?", "choices": ["Reassurance — no treatment or dietary restriction is needed", "Lifelong fructose-free diet", "Allopurinol", "Liver transplant"], "correct": 0, "explanation": "It is a harmless incidental finding; the main 'treatment' is recognizing it so the child isn't mislabeled diabetic or subjected to needless restriction. Contrast with HFI, which demands strict lifelong avoidance of fructose/sucrose/sorbitol." }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}
