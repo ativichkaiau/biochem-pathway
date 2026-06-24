@@ -387,6 +387,12 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
   stroke: var(--cc); stroke-width: 1.6; stroke-dasharray: 8 6; stroke-opacity: 0.5;
 }
 .compartment.solid { stroke-dasharray: none; stroke-opacity: 0.42; }
+/* Decorative organelle artwork (cristae, ER membranes, lysosome granules) */
+.org-art { fill: none; stroke: var(--cc); stroke-width: 1.5; stroke-opacity: 0.17; stroke-linecap: round; stroke-linejoin: round; }
+.org-art.thin { stroke-width: 1.1; stroke-opacity: 0.13; }
+.org-art-dot { fill: var(--cc); fill-opacity: 0.15; stroke: none; }
+body.light .org-art { stroke-opacity: 0.22; }
+body.light .org-art-dot { fill-opacity: 0.2; }
 .compartment-tab rect {
   fill: color-mix(in srgb, var(--cc) 20%, var(--panel));
   stroke: var(--cc); stroke-opacity: 0.55; stroke-width: 1;
@@ -1400,7 +1406,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   </aside>
 
   <main>
-    <svg id="pathway-svg" width="3120" height="2320" viewBox="0 0 3120 2320" xmlns="http://www.w3.org/2000/svg">
+    <svg id="pathway-svg" width="3120" height="2580" viewBox="0 0 3120 2580" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
           <polygon id="mk-arrow" points="0 0, 10 5, 0 10" fill="#4d5560" />
@@ -1427,22 +1433,22 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <text x="480" y="468" class="pathway-label" data-pw="fa-ketones" style="font-size:9px;opacity:0.6;--pw: var(--pw-fa-ketones)">lipolysis · β-ox · lipogenesis</text>
       <text x="660" y="540" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones)">β-OXIDATION</text>
       <text x="880" y="995" class="pathway-label faint" data-pw="tca" style="--pw: var(--pw-tca)" text-anchor="middle">TCA</text>
-      <text x="600" y="1168" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones);font-size:11px">KETOGENESIS</text>
+      <text x="150" y="1198" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones);font-size:11px">KETOGENESIS</text>
       <text x="1140" y="650" class="pathway-label" data-pw="urea" style="--pw: var(--pw-urea)">UREA CYCLE</text>
-      <text x="1170" y="1220" class="pathway-label" data-pw="protein" style="--pw: var(--pw-protein)">AMINO ACIDS</text>
-      <text x="1655" y="92" class="pathway-label" data-pw="etc" style="--pw: var(--pw-etc)" text-anchor="middle">ETC / OXPHOS</text>
+      <text x="1300" y="1150" class="pathway-label" data-pw="protein" style="--pw: var(--pw-protein);font-size:11px">AMINO ACIDS</text>
+      <text x="870" y="1212" class="pathway-label" data-pw="etc" style="--pw: var(--pw-etc)" text-anchor="middle">ETC / OXPHOS</text>
       <text x="1090" y="160" class="pathway-label" data-pw="sterol" style="--pw: var(--pw-sterol)">CHOLESTEROL / STEROIDS</text>
-      <text x="1010" y="1220" class="pathway-label" data-pw="heme" style="--pw: var(--pw-heme)">HEME SYNTHESIS</text>
+      <text x="1290" y="1258" class="pathway-label" data-pw="heme" style="--pw: var(--pw-heme);font-size:11px">HEME SYNTHESIS</text>
       <text x="1990" y="90" class="pathway-label" data-pw="nucleotide" style="--pw: var(--pw-nucleotide)">PURINES</text>
       <text x="2030" y="630" class="pathway-label" data-pw="nucleotide" style="--pw: var(--pw-nucleotide)">PYRIMIDINES</text>
       <text x="560" y="168" class="pathway-label" data-pw="sugar" style="--pw: var(--pw-sugar)">DIETARY SUGARS</text>
       <text x="88" y="528" class="pathway-label" data-pw="ethanol" style="--pw: var(--pw-ethanol)">ETHANOL</text>
       <text x="1985" y="956" class="pathway-label" data-pw="onecarbon" style="--pw: var(--pw-onecarbon)">FOLATE · METHIONINE</text>
-      <text x="745" y="1456" class="pathway-label" data-pw="catechol" style="--pw: var(--pw-catechol)">CATECHOLAMINES</text>
+      <text x="745" y="1592" class="pathway-label" data-pw="catechol" style="--pw: var(--pw-catechol)">CATECHOLAMINES</text>
       <text x="1560" y="1146" class="pathway-label" data-pw="creatine" style="--pw: var(--pw-creatine)">CREATINE</text>
       <text x="442" y="114" class="pathway-label" data-pw="polyol" style="--pw: var(--pw-polyol);font-size:10px">POLYOL</text>
       <text x="1740" y="1360" class="pathway-label" data-pw="bilirubin" style="--pw: var(--pw-bilirubin)">BILIRUBIN / HEME DEGRADATION</text>
-      <text x="430" y="1600" class="pathway-label" data-pw="sphingo" style="--pw: var(--pw-sphingo)">SPHINGOLIPIDS · lysosomal storage</text>
+      <text x="430" y="1808" class="pathway-label" data-pw="sphingo" style="--pw: var(--pw-sphingo)">SPHINGOLIPIDS · lysosomal storage</text>
 
       <g id="edges"></g>
       <g id="nodes"></g>
@@ -1698,26 +1704,26 @@ const M = {
   'OAA':             { x: 792, y: 892, pathway: 'tca', info: 'Oxaloacetate (4C). Condenses with acetyl-CoA. Exits to gluconeogenesis (PEPCK), aspartate (AST transamination).' },
 
   // ==== ETC + COFACTORS ====
-  'NADH':            { x: 1550, y: 180, pathway: 'etc', cofactor: true, info: 'Reduced; delivers e⁻ to Complex I. ~2.5 ATP per NADH oxidized.' },
-  'NAD+':            { x: 1760, y: 180, pathway: 'etc', cofactor: true, info: 'Oxidized; required by GAPDH, PDH, IDH, α-KGDH, MDH, β-ox. Limiting in hypoxia / ethanol.' },
-  'FADH2':           { x: 1550, y: 280, pathway: 'etc', cofactor: true, info: 'Reduced cofactor from SDH and β-oxidation. ~1.5 ATP per FADH2.' },
-  'FAD':             { x: 1760, y: 280, pathway: 'etc', cofactor: true, info: 'Oxidized; covalently bound to SDH.' },
-  'CoQH2':           { x: 1550, y: 400, pathway: 'etc', info: 'Ubiquinol (reduced). Mobile lipid carrier; accepts e⁻ from Complex I & II.' },
-  'CoQ':             { x: 1760, y: 400, pathway: 'etc', info: 'Ubiquinone (oxidized).' },
-  'Cyt c (red)':     { x: 1550, y: 500, pathway: 'etc', info: 'Reduced cytochrome c. Substrate of Complex IV. Cytosolic release triggers apoptosis.' },
-  'O2':              { x: 1550, y: 600, pathway: 'etc', info: 'Final e⁻ acceptor at Complex IV. ETC stops without it.' },
-  'H2O':             { x: 1760, y: 600, pathway: 'etc', info: 'Product of Complex IV.' },
-  'H⁺ gradient':     { x: 1860, y: 700, pathway: 'etc', info: 'Proton motive force. Built by Complexes I, III, IV; consumed by ATP synthase.' },
-  'ADP':             { x: 1550, y: 780, pathway: 'etc', cofactor: true, info: 'Substrate of ATP synthase. Activator of PFK-1, PK, IDH.' },
-  'ATP':             { x: 1760, y: 780, pathway: 'etc', cofactor: true, info: 'Primary energy currency. ~30-32 ATP per glucose fully aerobic.' },
+  'NADH':            { x: 620, y: 1250, pathway: 'etc', cofactor: true, info: 'Reduced; delivers e⁻ to Complex I. ~2.5 ATP per NADH oxidized.' },
+  'NAD+':            { x: 778, y: 1250, pathway: 'etc', cofactor: true, info: 'Oxidized; required by GAPDH, PDH, IDH, α-KGDH, MDH, β-ox. Limiting in hypoxia / ethanol.' },
+  'CoQH2':           { x: 968, y: 1250, pathway: 'etc', info: 'Ubiquinol (reduced). Mobile lipid carrier; accepts e⁻ from Complex I & II.' },
+  'CoQ':             { x: 1126, y: 1250, pathway: 'etc', info: 'Ubiquinone (oxidized).' },
+  'FADH2':           { x: 620, y: 1368, pathway: 'etc', cofactor: true, info: 'Reduced cofactor from SDH and β-oxidation. ~1.5 ATP per FADH2.' },
+  'FAD':             { x: 778, y: 1368, pathway: 'etc', cofactor: true, info: 'Oxidized; covalently bound to SDH.' },
+  'Cyt c (red)':     { x: 968, y: 1368, pathway: 'etc', info: 'Reduced cytochrome c. Substrate of Complex IV. Cytosolic release triggers apoptosis.' },
+  'H2O':             { x: 1126, y: 1368, pathway: 'etc', info: 'Product of Complex IV.' },
+  'ADP':             { x: 620, y: 1486, pathway: 'etc', cofactor: true, info: 'Substrate of ATP synthase. Activator of PFK-1, PK, IDH.' },
+  'ATP':             { x: 778, y: 1486, pathway: 'etc', cofactor: true, info: 'Primary energy currency. ~30-32 ATP per glucose fully aerobic.' },
+  'O2':              { x: 968, y: 1486, pathway: 'etc', info: 'Final e⁻ acceptor at Complex IV. ETC stops without it.' },
+  'H⁺ gradient':     { x: 1126, y: 1486, pathway: 'etc', info: 'Proton motive force. Built by Complexes I, III, IV; consumed by ATP synthase.' },
   'CO2':             { x: 590, y: 880, pathway: 'tca', cofactor: true, info: 'Released by PDH (1×) + TCA (2×) per pyruvate. Also from PPP (6PGD). 6 CO₂ per glucose oxidized.' },
   'GTP':             { x: 1090, y: 1140, pathway: 'tca', cofactor: true, info: 'Substrate-level phosphorylation by SCS. Freely interconvertible with ATP via nucleoside diphosphate kinase.' },
 
   // ==== KETOGENESIS ====
-  'Acetoacetyl-CoA': { x: 700, y: 1205, pathway: 'fa-ketones', info: '2 acetyl-CoA condensed by thiolase (mitochondrial). Shared first step with cholesterol synthesis.' },
-  'HMG-CoA':         { x: 700, y: 1295, pathway: 'fa-ketones', info: 'β-Hydroxy-β-methylglutaryl-CoA. Mitochondrial = ketogenesis (lyase). Cytosolic = cholesterol (reductase, statin target).' },
-  'Acetoacetate':    { x: 612, y: 1380, pathway: 'fa-ketones', info: 'Ketone body. Released by liver; used by brain, heart, muscle in fasting. Can spontaneously decarboxylate → acetone (breath smell in DKA).' },
-  'β-OH-butyrate':   { x: 800, y: 1380, pathway: 'fa-ketones', info: 'β-Hydroxybutyrate — main circulating ketone in prolonged fasting. Reduced form: AcAc + NADH ⇌ βOHB + NAD+.' },
+  'Acetoacetyl-CoA': { x: 250, y: 1235, pathway: 'fa-ketones', info: '2 acetyl-CoA condensed by thiolase (mitochondrial). Shared first step with cholesterol synthesis.' },
+  'HMG-CoA':         { x: 250, y: 1325, pathway: 'fa-ketones', info: 'β-Hydroxy-β-methylglutaryl-CoA. Mitochondrial = ketogenesis (lyase). Cytosolic = cholesterol (reductase, statin target).' },
+  'Acetoacetate':    { x: 168, y: 1410, pathway: 'fa-ketones', info: 'Ketone body. Released by liver; used by brain, heart, muscle in fasting. Can spontaneously decarboxylate → acetone (breath smell in DKA).' },
+  'β-OH-butyrate':   { x: 350, y: 1410, pathway: 'fa-ketones', info: 'β-Hydroxybutyrate — main circulating ketone in prolonged fasting. Reduced form: AcAc + NADH ⇌ βOHB + NAD+.' },
 
   // ==== UREA CYCLE ====
   'NH4+':            { x: 1100, y: 700, pathway: 'urea', info: 'Ammonium. Toxic; from AA catabolism (mostly glutaminase, GDH). Must become urea (in liver).' },
@@ -1744,12 +1750,12 @@ const M = {
   'Vitamin D':       { x: 1420, y: 370, pathway: 'sterol', info: '7-dehydrocholesterol → cholecalciferol (skin/UV) → 25-OH (liver) → 1,25-(OH)₂ (kidney, active form).' },
 
   // ==== HEME SYNTHESIS ====
-  'Glycine':         { x: 1010, y: 1270, pathway: 'heme', info: 'Simplest amino acid. Condenses with succinyl-CoA (ALA synthase, B6-dependent) to begin heme synthesis.' },
-  'δ-ALA':           { x: 1130, y: 1270, pathway: 'heme', info: 'δ-Aminolevulinate. Product of ALA synthase (rate-limiting, mitochondrial). Accumulates in lead poisoning and acute intermittent porphyria.' },
-  'PBG':             { x: 1250, y: 1270, pathway: 'heme', info: 'Porphobilinogen. 2 ALA → PBG via ALA dehydratase (zinc enzyme — strongly inhibited by lead).' },
-  'Uropor III':      { x: 1375, y: 1330, pathway: 'heme', info: 'Uroporphyrinogen III. Built from 4 PBG (PBG deaminase, deficient in AIP). UROD deficiency → porphyria cutanea tarda.' },
-  'Protopor IX':     { x: 1505, y: 1330, pathway: 'heme', info: 'Protoporphyrin IX. Final intermediate; ferrochelatase inserts Fe²⁺. Accumulates in lead poisoning + erythropoietic protoporphyria.' },
-  'Heme':            { x: 1630, y: 1270, pathway: 'heme', info: 'Fe²⁺-protoporphyrin IX. Cofactor of hemoglobin, myoglobin, cytochromes, catalase, NOS. Heme feedback-inhibits ALA synthase.' },
+  'Glycine':         { x: 1290, y: 1295, pathway: 'heme', info: 'Simplest amino acid. Condenses with succinyl-CoA (ALA synthase, B6-dependent) to begin heme synthesis.' },
+  'δ-ALA':           { x: 1430, y: 1295, pathway: 'heme', info: 'δ-Aminolevulinate. Product of ALA synthase (rate-limiting, mitochondrial). Accumulates in lead poisoning and acute intermittent porphyria.' },
+  'PBG':             { x: 1570, y: 1295, pathway: 'heme', info: 'Porphobilinogen. 2 ALA → PBG via ALA dehydratase (zinc enzyme — strongly inhibited by lead).' },
+  'Uropor III':      { x: 1430, y: 1395, pathway: 'heme', info: 'Uroporphyrinogen III. Built from 4 PBG (PBG deaminase, deficient in AIP). UROD deficiency → porphyria cutanea tarda.' },
+  'Protopor IX':     { x: 1570, y: 1395, pathway: 'heme', info: 'Protoporphyrin IX. Final intermediate; ferrochelatase inserts Fe²⁺. Accumulates in lead poisoning + erythropoietic protoporphyria.' },
+  'Heme':            { x: 1710, y: 1345, pathway: 'heme', info: 'Fe²⁺-protoporphyrin IX. Cofactor of hemoglobin, myoglobin, cytochromes, catalase, NOS. Heme feedback-inhibits ALA synthase.' },
 
   // ==== PURINES ====
   'PRPP':            { x: 2010, y: 130, pathway: 'nucleotide', info: '5-Phosphoribosyl-1-PP. Activated ribose from R5P (PPP) + ATP. Shared substrate of de novo purine + pyrimidine synthesis and salvage.' },
@@ -1788,12 +1794,12 @@ const M = {
   'Cysteine':        { x: 2245, y: 1175, pathway: 'onecarbon', info: 'Made via transsulfuration (CBS, B6-dependent). Precursor of glutathione, taurine, CoA.' },
 
   // ==== CATECHOLAMINE SYNTHESIS ====
-  'Phenylalanine':   { x: 745, y: 1485, pathway: 'catechol', info: 'Essential AA. Hydroxylated to tyrosine by PAH (needs BH4). PAH deficiency = phenylketonuria (PKU).' },
-  'Tyrosine':        { x: 900, y: 1485, pathway: 'catechol', info: 'Precursor of catecholamines, melanin (tyrosinase), and thyroid hormone. Tyrosine hydroxylase (→L-DOPA) is rate-limiting + BH4-dependent.' },
-  'L-DOPA':          { x: 1040, y: 1485, pathway: 'catechol', info: 'L-3,4-dihydroxyphenylalanine. Crosses blood-brain barrier (unlike dopamine) → Parkinson’s therapy; given with carbidopa.' },
-  'Dopamine':        { x: 1175, y: 1485, pathway: 'catechol', info: 'CNS reward/movement; renal vasodilation. Made by DOPA decarboxylase (B6). Degraded by MAO + COMT.' },
-  'Norepinephrine':  { x: 1325, y: 1485, pathway: 'catechol', info: 'Sympathetic neurotransmitter. Made by dopamine β-hydroxylase (needs vitamin C).' },
-  'Epinephrine':     { x: 1480, y: 1485, pathway: 'catechol', info: 'Adrenal medulla hormone. PNMT (cortisol-induced) methylates NE using SAM. Drives glycogenolysis, lipolysis (links to the hormonal perturbations).' },
+  'Phenylalanine':   { x: 745, y: 1632, pathway: 'catechol', info: 'Essential AA. Hydroxylated to tyrosine by PAH (needs BH4). PAH deficiency = phenylketonuria (PKU).' },
+  'Tyrosine':        { x: 900, y: 1632, pathway: 'catechol', info: 'Precursor of catecholamines, melanin (tyrosinase), and thyroid hormone. Tyrosine hydroxylase (→L-DOPA) is rate-limiting + BH4-dependent.' },
+  'L-DOPA':          { x: 1040, y: 1632, pathway: 'catechol', info: 'L-3,4-dihydroxyphenylalanine. Crosses blood-brain barrier (unlike dopamine) → Parkinson’s therapy; given with carbidopa.' },
+  'Dopamine':        { x: 1175, y: 1632, pathway: 'catechol', info: 'CNS reward/movement; renal vasodilation. Made by DOPA decarboxylase (B6). Degraded by MAO + COMT.' },
+  'Norepinephrine':  { x: 1325, y: 1632, pathway: 'catechol', info: 'Sympathetic neurotransmitter. Made by dopamine β-hydroxylase (needs vitamin C).' },
+  'Epinephrine':     { x: 1480, y: 1632, pathway: 'catechol', info: 'Adrenal medulla hormone. PNMT (cortisol-induced) methylates NE using SAM. Drives glycogenolysis, lipolysis (links to the hormonal perturbations).' },
 
   // ==== CREATINE ====
   'Guanidinoacetate':{ x: 1560, y: 1175, pathway: 'creatine', info: 'Made from arginine + glycine (AGAT, kidney). First step of creatine synthesis.' },
@@ -1810,12 +1816,12 @@ const M = {
   'Urobilinogen':    { x: 2245, y: 1400, pathway: 'bilirubin', info: 'Made by gut bacteria from conjugated bilirubin. Some → stercobilin (brown stool); some reabsorbed → urobilin (yellow urine).' },
 
   // ==== SPHINGOLIPIDS (lysosomal degradation) ====
-  'Ceramide':        { x: 620, y: 1710, pathway: 'sphingo', info: 'Central hub of sphingolipid metabolism: sphingosine + fatty acid. Built de novo from serine + palmitoyl-CoA; the convergence point of all sphingolipid degradation.' },
-  'Sphingomyelin':   { x: 430, y: 1650, pathway: 'sphingo', info: 'Ceramide + phosphocholine. Degraded by sphingomyelinase → ceramide. Sphingomyelinase deficiency = Niemann-Pick A/B (cherry-red macula, hepatosplenomegaly).' },
-  'Glucocerebroside':{ x: 430, y: 1775, pathway: 'sphingo', info: 'Ceramide + glucose. Degraded by β-glucocerebrosidase. Deficiency = Gaucher (most common; Gaucher cells, hepatosplenomegaly, bone crises) — treatable with enzyme replacement.' },
-  'GM2 ganglioside': { x: 830, y: 1650, pathway: 'sphingo', info: 'Complex ganglioside. Degraded by hexosaminidase A. Deficiency = Tay-Sachs (cherry-red macula, no hepatosplenomegaly, fatal by ~age 4). Sandhoff if Hex A+B.' },
-  'Galactocerebroside': { x: 830, y: 1775, pathway: 'sphingo', info: 'Ceramide + galactose; a major myelin lipid. Degraded by galactocerebrosidase. Deficiency = Krabbe (globoid cells, peripheral neuropathy, optic atrophy).' },
-  'Sulfatide':       { x: 1040, y: 1775, pathway: 'sphingo', info: 'Sulfated galactocerebroside. Degraded by arylsulfatase A. Deficiency = metachromatic leukodystrophy (central + peripheral demyelination, ataxia).' },
+  'Ceramide':        { x: 620, y: 1908, pathway: 'sphingo', info: 'Central hub of sphingolipid metabolism: sphingosine + fatty acid. Built de novo from serine + palmitoyl-CoA; the convergence point of all sphingolipid degradation.' },
+  'Sphingomyelin':   { x: 430, y: 1848, pathway: 'sphingo', info: 'Ceramide + phosphocholine. Degraded by sphingomyelinase → ceramide. Sphingomyelinase deficiency = Niemann-Pick A/B (cherry-red macula, hepatosplenomegaly).' },
+  'Glucocerebroside':{ x: 430, y: 1973, pathway: 'sphingo', info: 'Ceramide + glucose. Degraded by β-glucocerebrosidase. Deficiency = Gaucher (most common; Gaucher cells, hepatosplenomegaly, bone crises) — treatable with enzyme replacement.' },
+  'GM2 ganglioside': { x: 830, y: 1848, pathway: 'sphingo', info: 'Complex ganglioside. Degraded by hexosaminidase A. Deficiency = Tay-Sachs (cherry-red macula, no hepatosplenomegaly, fatal by ~age 4). Sandhoff if Hex A+B.' },
+  'Galactocerebroside': { x: 830, y: 1973, pathway: 'sphingo', info: 'Ceramide + galactose; a major myelin lipid. Degraded by galactocerebrosidase. Deficiency = Krabbe (globoid cells, peripheral neuropathy, optic atrophy).' },
+  'Sulfatide':       { x: 1040, y: 1973, pathway: 'sphingo', info: 'Sulfated galactocerebroside. Degraded by arylsulfatase A. Deficiency = metachromatic leukodystrophy (central + peripheral demyelination, ataxia).' },
 };
 
 // Spread the layout: scale node POSITIONS only (box + text sizes stay the
@@ -2968,10 +2974,49 @@ const COMPARTMENTS = [
     nodes: ['Ceramide','Sphingomyelin','Glucocerebroside','GM2 ganglioside','Galactocerebroside','Sulfatide'] }
 ];
 
+// Decorative organelle artwork drawn faintly behind the dashed compartment boxes.
+function organelleArt(kind, x, y, w, h, cc) {
+  const cx = x + w / 2, cy = y + h / 2, p = [], R = v => Math.round(v);
+  if (kind === 'mito') {
+    // outer membrane capsule + interlocking cristae (the mitochondrion's signature folds)
+    const ix = x + 18, iy = y + 18, iw = w - 36, ih = h - 36, rx = Math.min(150, ih / 2);
+    p.push(`<rect class="org-art" x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" style="--cc:${cc}"/>`);
+    p.push(`<rect class="org-art thin" x="${R(ix + 12)}" y="${R(iy + 12)}" width="${R(iw - 24)}" height="${R(ih - 24)}" rx="${R(Math.max(8, rx - 12))}" style="--cc:${cc}"/>`);
+    // cristae: short interlocking membrane folds hugging the top & bottom, leaving the matrix interior open
+    const n = Math.max(6, Math.round(iw / 120)), fw = 26, L = Math.min(150, ih * 0.18), span = iw - 130, step = span / (n - 1);
+    for (let i = 0; i < n; i++) {
+      const fx = ix + 65 + step * i - fw / 2, t = iy + 14;
+      p.push(`<path class="org-art" d="M${R(fx)},${R(t)} L${R(fx)},${R(t + L)} A${fw / 2},${fw / 2} 0 0 0 ${R(fx + fw)},${R(t + L)} L${R(fx + fw)},${R(t)}" style="--cc:${cc}"/>`);
+    }
+    for (let i = 0; i < n - 1; i++) {
+      const fx = ix + 65 + step * (i + 0.5) - fw / 2, b = iy + ih - 14;
+      p.push(`<path class="org-art" d="M${R(fx)},${R(b)} L${R(fx)},${R(b - L)} A${fw / 2},${fw / 2} 0 0 1 ${R(fx + fw)},${R(b - L)} L${R(fx + fw)},${R(b)}" style="--cc:${cc}"/>`);
+    }
+  } else if (kind === 'er') {
+    // rough endoplasmic reticulum: stacked wavy membranes studded with ribosomes
+    const rows = 4, x0 = x + 26, x1 = x + w - 26, segs = 6, sw = (x1 - x0) / segs;
+    for (let r = 0; r < rows; r++) {
+      const yy = y + h * (r + 1) / (rows + 1);
+      let d = `M${R(x0)},${R(yy)}`;
+      for (let s = 1; s <= segs; s++) { const xx = x0 + sw * s, yo = (s % 2 ? -10 : 10); d += ` Q${R(xx - sw / 2)},${R(yy + yo)} ${R(xx)},${R(yy)}`; }
+      p.push(`<path class="org-art" d="${d}" style="--cc:${cc}"/>`);
+      for (let s = 0; s < segs; s++) { const xx = x0 + sw * (s + 0.5); p.push(`<circle class="org-art-dot" cx="${R(xx)}" cy="${R(yy + 9)}" r="2.6" style="--cc:${cc}"/>`); }
+    }
+  } else if (kind === 'lysosome') {
+    // a vesicle with a double membrane and granular stored contents
+    const rr = Math.min(w * 0.46, h * 0.46);
+    p.push(`<circle class="org-art" cx="${R(cx)}" cy="${R(cy)}" r="${R(rr)}" style="--cc:${cc}"/>`);
+    p.push(`<circle class="org-art thin" cx="${R(cx)}" cy="${R(cy)}" r="${R(rr - 9)}" style="--cc:${cc}"/>`);
+    const gr = [[0.18, 0.12, 4.5], [-0.42, 0.34, 3], [0.46, -0.34, 3.6], [-0.26, -0.46, 3], [0.55, 0.38, 3.2], [-0.56, -0.08, 4], [0.04, 0.56, 3], [0.32, -0.56, 2.6], [-0.12, 0.26, 3.6], [-0.5, 0.52, 2.6], [0.6, 0.02, 2.8], [-0.04, -0.18, 3.2]];
+    for (const [gx, gy, grad] of gr) p.push(`<circle class="org-art-dot" cx="${R(cx + gx * rr)}" cy="${R(cy + gy * rr)}" r="${grad}" style="--cc:${cc}"/>`);
+  }
+  return p.join('');
+}
+
 function renderCompartments() {
   const g = document.getElementById('compartments');
   if (!g) return;
-  const parts = [];
+  const parts = [], boxes = {};
   for (const c of COMPARTMENTS) {
     let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
     for (const n of c.nodes) {
@@ -2982,6 +3027,7 @@ function renderCompartments() {
     }
     if (maxX < minX) continue;
     const x = minX - c.pad, y = minY - c.pad, w = (maxX - minX) + c.pad * 2, h = (maxY - minY) + c.pad * 2;
+    boxes[c.label] = { x, y, w, h, cc: c.cc };
     parts.push(`<rect class="compartment" x="${x}" y="${y}" width="${w}" height="${h}" rx="22" style="--cc:${c.cc}"/>`);
     // label tab
     const tw = c.label.length * 6.6 + 22, th = 21;
@@ -2991,7 +3037,17 @@ function renderCompartments() {
     else { tx = x + 10; ty = y + 8; } // tl default
     parts.push(`<g class="compartment-tab" style="--cc:${c.cc}"><rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="7"/><text x="${tx + tw/2}" y="${ty + th/2 + 0.5}" text-anchor="middle" dominant-baseline="middle">${escapeText(c.label)}</text></g>`);
   }
-  g.innerHTML = parts.join('');
+  // organelle artwork, drawn first so it sits behind the dashed boxes (and all behind nodes)
+  const art = [];
+  const mm = boxes['MITOCHONDRION · matrix'], me = boxes['MITOCHONDRION · inner membrane (ETC)'];
+  if (mm && me) {
+    const ux = Math.min(mm.x, me.x), uy = Math.min(mm.y, me.y);
+    const uw = Math.max(mm.x + mm.w, me.x + me.w) - ux, uh = Math.max(mm.y + mm.h, me.y + me.h) - uy;
+    art.push(organelleArt('mito', ux, uy, uw, uh, mm.cc));
+  } else if (mm) { art.push(organelleArt('mito', mm.x, mm.y, mm.w, mm.h, mm.cc)); }
+  const er = boxes['ENDOPLASMIC RETICULUM · sterols']; if (er) art.push(organelleArt('er', er.x, er.y, er.w, er.h, er.cc));
+  const ly = boxes['LYSOSOME · sphingolipid degradation']; if (ly) art.push(organelleArt('lysosome', ly.x, ly.y, ly.w, ly.h, ly.cc));
+  g.innerHTML = art.join('') + parts.join('');
 }
 
 // ============================================
