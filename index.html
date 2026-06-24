@@ -1027,6 +1027,17 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
   text-transform: uppercase; margin-bottom: 8px;
 }
 .pert-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+/* Derived "cell state" readout (energy charge, redox, acid–base) */
+.cell-state { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--glass-brd); }
+.cell-state-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-2); margin-bottom: 7px; }
+.cell-state-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.cell-stat {
+  font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px;
+  border: 1px solid var(--glass-brd); background: var(--glass-2); color: var(--text-2); white-space: nowrap;
+}
+.cell-stat.up, .cell-stat.up2 { color: var(--up); border-color: color-mix(in srgb, var(--up) 38%, transparent); background: color-mix(in srgb, var(--up) 10%, var(--glass-2)); }
+.cell-stat.down, .cell-stat.down2 { color: var(--down); border-color: color-mix(in srgb, var(--down) 38%, transparent); background: color-mix(in srgb, var(--down) 10%, var(--glass-2)); }
+.cell-stat.warn { color: #e3a008; border-color: color-mix(in srgb, #e3a008 48%, transparent); background: color-mix(in srgb, #e3a008 14%, var(--glass-2)); }
 .pert-quick-chip {
   font-family: inherit; font-size: 11px; font-weight: 600;
   padding: 4px 10px; border-radius: 999px;
@@ -2196,7 +2207,6 @@ const P = [
 
   { id: 'glucagon', name: 'Glucagon (fasting signal)', cat: 'Hormonal',
     desc: 'PKA → ↓PFK-2 → ↓F2,6-BP → ↓PFK-1, ↑FBPase-1. Activates glycogen phos., PC, PEPCK; promotes β-oxidation + ketogenesis.',
-    inhibits: ['PFK-1', 'PK'],
     activates: ['Glycogen phos.', 'PC', 'PEPCK', 'FBPase-1', 'G6Pase', 'β-ox spiral', 'HMG-CoA syn.', 'Lipase'],
     inhibits: ['PFK-1', 'PK', 'Glycogen synthase', 'ACC', 'FAS'],
     effects: { 'Glycogen': -2, 'G1P': 1, 'UDP-Glucose': -2, 'Glucose-6-P': 1, 'Glucose': 1, 'Fructose-6-P': 1, 'Fructose-1,6-BP': -2, 'PEP': 1, 'Pyruvate': -2, 'Lactate': -1,
@@ -2522,8 +2532,18 @@ let selectedMetabolite = null;
 let selectedPerturbation = null;
 let selectedPathway = null;
 
+// Conserved cofactor / energy pools — the two members move in opposite
+// directions (a reduced↔oxidised or charged↔discharged couple).
+const COFACTOR_PAIRS = [
+  ['NADH', 'NAD+'], ['NADPH', 'NADP+'], ['FADH2', 'FAD'], ['CoQH2', 'CoQ'], ['ATP', 'ADP']
+];
+function cofactorPartnerOf(name) {
+  for (const [a, b] of COFACTOR_PAIRS) { if (a === name) return b; if (b === name) return a; }
+  return null;
+}
+
 function computeState() {
-  const state = {};
+  const state = {}, touched = {};
   for (const m in M) state[m] = 0;
   for (const pid of activePerturbations) {
     const p = P.find(x => x.id === pid);
@@ -2531,10 +2551,39 @@ function computeState() {
     for (const [m, d] of Object.entries(p.effects || {})) {
       if (state[m] === undefined) continue; // skip unknown metabolites
       state[m] = state[m] + d;
+      if (d !== 0) touched[m] = true;
     }
+  }
+  // Conserved pools: if only one member of a couple was driven, mirror it onto
+  // the untouched partner so the redox / energy balance stays physically
+  // consistent (e.g. NADH ↑ forces NAD⁺ ↓, high ATP forces ADP ↓). When a
+  // perturbation already specifies both members, its authored values stand.
+  for (const [a, b] of COFACTOR_PAIRS) {
+    if (state[a] === undefined || state[b] === undefined) continue;
+    if (touched[a] && !touched[b]) state[b] = -state[a];
+    else if (touched[b] && !touched[a]) state[a] = -state[b];
   }
   for (const m in state) state[m] = Math.max(-3, Math.min(3, state[m]));
   return state;
+}
+
+// Derived, systemic readouts — the physiological "true state" implied by the
+// metabolite changes: energy charge, redox ratio, lactate, ketones, acid–base.
+function deriveCellState(state) {
+  const g = n => state[n] || 0, cl = v => Math.max(-3, Math.min(3, v));
+  const energy = cl(g('ATP') - g('ADP'));
+  const redox = cl(g('NADH') - g('NAD+'));
+  const lactate = g('Lactate');
+  const ket = Math.max(g('Acetoacetate'), g('β-OH-butyrate'));
+  const rows = [{ label: 'Energy charge', d: energy }];
+  if (redox !== 0) rows.push({ label: 'NADH:NAD⁺', d: redox });
+  if (lactate >= 1) rows.push({ label: 'Lactate', d: lactate });
+  if (ket >= 1) rows.push({ label: 'Ketones', d: ket });
+  let acidosis = null;
+  if (lactate >= 2 && ket >= 2) acidosis = 'Mixed acidosis';
+  else if (ket >= 2) acidosis = 'Ketoacidosis';
+  else if (lactate >= 2) acidosis = 'Lactic acidosis';
+  return { rows, acidosis };
 }
 
 function deltaClass(d) {
@@ -2721,12 +2770,19 @@ function renderPertSummary() {
     const shortName = p.name.split(/[()]/)[0].trim();
     return `<span class="pert-active-chip" data-pertid="${escapeAttr(p.id)}">${escapeText(shortName)}<span class="pert-active-chip-x" data-rmpert="${escapeAttr(p.id)}" title="Remove">×</span></span>`;
   }).join('');
+  const cs = deriveCellState(computeState());
+  const statHtml = cs.rows.map(r => `<span class="cell-stat ${deltaClass(r.d)}">${escapeText(r.label)}&nbsp;${deltaArrow(r.d)}</span>`).join('')
+    + (cs.acidosis ? `<span class="cell-stat warn">${escapeText(cs.acidosis)}</span>` : '');
   el.innerHTML = `<div class="pert-summary">
     <div class="pert-summary-label">
       <span>Active · ${activePerturbations.size}</span>
       <button class="pert-clear-btn" id="pert-clear-all">Clear all</button>
     </div>
     <div class="pert-chips">${items}</div>
+    <div class="cell-state">
+      <div class="cell-state-label">Predicted cell state</div>
+      <div class="cell-state-row">${statHtml}</div>
+    </div>
   </div>`;
 }
 
@@ -2897,6 +2953,11 @@ function metaboliteBodyHTML(name, state) {
     if (!p || !p.effects) continue;
     if (p.effects[name] !== undefined && p.effects[name] !== 0) drivers.push({ name: p.name, delta: p.effects[name] });
   }
+  // If this node only moved because its conserved-pool partner did, say so.
+  if (!drivers.length && val !== 0) {
+    const partner = cofactorPartnerOf(name);
+    if (partner) drivers.push({ name: partner + ' pool (conserved)', delta: val });
+  }
   const pwLabel = (PATHWAY_INFO[m.pathway] && PATHWAY_INFO[m.pathway].label) || m.pathway;
   const organelle = ORGANELLE_OF[m.pathway] || '';
   return `
@@ -2974,41 +3035,56 @@ const COMPARTMENTS = [
     nodes: ['Ceramide','Sphingomyelin','Glucocerebroside','GM2 ganglioside','Galactocerebroside','Sulfatide'] }
 ];
 
-// Decorative organelle artwork drawn faintly behind the dashed compartment boxes.
+// BioRender-style organelle artwork (gradient-shaded, layered) drawn behind the compartment boxes.
 function organelleArt(kind, x, y, w, h, cc) {
-  const cx = x + w / 2, cy = y + h / 2, p = [], R = v => Math.round(v);
+  const cx = x + w / 2, cy = y + h / 2, p = [], R = v => Math.round(v), uid = 'oa-' + kind;
   if (kind === 'mito') {
-    // outer membrane capsule + interlocking cristae (the mitochondrion's signature folds)
-    const ix = x + 18, iy = y + 18, iw = w - 36, ih = h - 36, rx = Math.min(150, ih / 2);
-    p.push(`<rect class="org-art" x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" style="--cc:${cc}"/>`);
-    p.push(`<rect class="org-art thin" x="${R(ix + 12)}" y="${R(iy + 12)}" width="${R(iw - 24)}" height="${R(ih - 24)}" rx="${R(Math.max(8, rx - 12))}" style="--cc:${cc}"/>`);
-    // cristae: short interlocking membrane folds hugging the top & bottom, leaving the matrix interior open
-    const n = Math.max(6, Math.round(iw / 120)), fw = 26, L = Math.min(150, ih * 0.18), span = iw - 130, step = span / (n - 1);
-    for (let i = 0; i < n; i++) {
-      const fx = ix + 65 + step * i - fw / 2, t = iy + 14;
-      p.push(`<path class="org-art" d="M${R(fx)},${R(t)} L${R(fx)},${R(t + L)} A${fw / 2},${fw / 2} 0 0 0 ${R(fx + fw)},${R(t + L)} L${R(fx + fw)},${R(t)}" style="--cc:${cc}"/>`);
-    }
-    for (let i = 0; i < n - 1; i++) {
-      const fx = ix + 65 + step * (i + 0.5) - fw / 2, b = iy + ih - 14;
-      p.push(`<path class="org-art" d="M${R(fx)},${R(b)} L${R(fx)},${R(b - L)} A${fw / 2},${fw / 2} 0 0 1 ${R(fx + fw)},${R(b - L)} L${R(fx + fw)},${R(b)}" style="--cc:${cc}"/>`);
-    }
+    const ix = x + 16, iy = y + 16, iw = w - 32, ih = h - 32, rx = Math.min(175, ih / 2);
+    p.push(`<defs>
+      <linearGradient id="${uid}-fill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${cc}" stop-opacity="0.34"/><stop offset="1" stop-color="${cc}" stop-opacity="0.13"/>
+      </linearGradient>
+      <linearGradient id="${uid}-sheen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.18"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="${uid}-glow" x="-15%" y="-25%" width="130%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="15" flood-color="${cc}" flood-opacity="0.22"/></filter>
+    </defs>`);
+    // outer membrane (gradient matrix) + glossy sheen + inner membrane
+    p.push(`<rect x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" fill="url(#${uid}-fill)" stroke="${cc}" stroke-opacity="0.62" stroke-width="2.6" filter="url(#${uid}-glow)"/>`);
+    p.push(`<rect x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" fill="url(#${uid}-sheen)"/>`);
+    p.push(`<rect x="${R(ix + 11)}" y="${R(iy + 11)}" width="${R(iw - 22)}" height="${R(ih - 22)}" rx="${R(Math.max(8, rx - 11))}" fill="none" stroke="${cc}" stroke-opacity="0.34" stroke-width="1.5"/>`);
+    // cristae: filled, shaded membrane folds hugging the top & bottom (matrix interior stays open for the TCA ring)
+    const n = Math.max(6, Math.round(iw / 130)), fw = 30, L = Math.min(170, ih * 0.22), span = iw - 150, step = span / (n - 1), r = fw / 2;
+    const crista = (fx, base, dir) => { const tip = base + dir * L; return `<path d="M${R(fx)},${R(base)} L${R(fx)},${R(tip)} A${r},${r} 0 0 ${dir > 0 ? 0 : 1} ${R(fx + fw)},${R(tip)} L${R(fx + fw)},${R(base)} Z" fill="${cc}" fill-opacity="0.12" stroke="${cc}" stroke-opacity="0.42" stroke-width="1.4"/>`; };
+    for (let i = 0; i < n; i++) p.push(crista(ix + 75 + step * i - r, iy + 13, 1));
+    for (let i = 0; i < n - 1; i++) p.push(crista(ix + 75 + step * (i + 0.5) - r, iy + ih - 13, -1));
   } else if (kind === 'er') {
-    // rough endoplasmic reticulum: stacked wavy membranes studded with ribosomes
-    const rows = 4, x0 = x + 26, x1 = x + w - 26, segs = 6, sw = (x1 - x0) / segs;
-    for (let r = 0; r < rows; r++) {
-      const yy = y + h * (r + 1) / (rows + 1);
+    p.push(`<defs><linearGradient id="${uid}-rib" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${cc}" stop-opacity="0.30"/><stop offset="1" stop-color="${cc}" stop-opacity="0.14"/></linearGradient></defs>`);
+    // rough ER: stacked cisternae (thick translucent ribbons) studded with ribosome beads
+    const rows = 4, x0 = x + 30, x1 = x + w - 30, segs = 6, sw = (x1 - x0) / segs, th = 15;
+    for (let rr = 0; rr < rows; rr++) {
+      const yy = y + h * (rr + 0.9) / (rows + 0.8);
       let d = `M${R(x0)},${R(yy)}`;
-      for (let s = 1; s <= segs; s++) { const xx = x0 + sw * s, yo = (s % 2 ? -10 : 10); d += ` Q${R(xx - sw / 2)},${R(yy + yo)} ${R(xx)},${R(yy)}`; }
-      p.push(`<path class="org-art" d="${d}" style="--cc:${cc}"/>`);
-      for (let s = 0; s < segs; s++) { const xx = x0 + sw * (s + 0.5); p.push(`<circle class="org-art-dot" cx="${R(xx)}" cy="${R(yy + 9)}" r="2.6" style="--cc:${cc}"/>`); }
+      for (let s = 1; s <= segs; s++) { const xx = x0 + sw * s, yo = (s % 2 ? -11 : 11); d += ` Q${R(xx - sw / 2)},${R(yy + yo)} ${R(xx)},${R(yy)}`; }
+      p.push(`<path d="${d}" fill="none" stroke="url(#${uid}-rib)" stroke-width="${th}" stroke-linecap="round"/>`);
+      p.push(`<path d="${d}" fill="none" stroke="${cc}" stroke-opacity="0.5" stroke-width="1.4"/>`);
+      for (let s = 0; s < segs; s++) { const xx = x0 + sw * (s + 0.5), yo = ((s % 2) ? -11 : 11); p.push(`<circle cx="${R(xx)}" cy="${R(yy + th / 2 + 4 + yo * 0.18)}" r="3" fill="${cc}" fill-opacity="0.5"/>`); p.push(`<circle cx="${R(xx - sw * 0.34)}" cy="${R(yy - th / 2 - 4)}" r="2.6" fill="${cc}" fill-opacity="0.42"/>`); }
     }
   } else if (kind === 'lysosome') {
-    // a vesicle with a double membrane and granular stored contents
     const rr = Math.min(w * 0.46, h * 0.46);
-    p.push(`<circle class="org-art" cx="${R(cx)}" cy="${R(cy)}" r="${R(rr)}" style="--cc:${cc}"/>`);
-    p.push(`<circle class="org-art thin" cx="${R(cx)}" cy="${R(cy)}" r="${R(rr - 9)}" style="--cc:${cc}"/>`);
-    const gr = [[0.18, 0.12, 4.5], [-0.42, 0.34, 3], [0.46, -0.34, 3.6], [-0.26, -0.46, 3], [0.55, 0.38, 3.2], [-0.56, -0.08, 4], [0.04, 0.56, 3], [0.32, -0.56, 2.6], [-0.12, 0.26, 3.6], [-0.5, 0.52, 2.6], [0.6, 0.02, 2.8], [-0.04, -0.18, 3.2]];
-    for (const [gx, gy, grad] of gr) p.push(`<circle class="org-art-dot" cx="${R(cx + gx * rr)}" cy="${R(cy + gy * rr)}" r="${grad}" style="--cc:${cc}"/>`);
+    p.push(`<defs>
+      <radialGradient id="${uid}-fill" cx="0.4" cy="0.34" r="0.78">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.20"/><stop offset="0.42" stop-color="${cc}" stop-opacity="0.18"/><stop offset="1" stop-color="${cc}" stop-opacity="0.40"/>
+      </radialGradient>
+      <filter id="${uid}-glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="13" flood-color="${cc}" flood-opacity="0.24"/></filter>
+    </defs>`);
+    // membrane-bound vesicle with a radial-shaded lumen and heterogeneous cargo granules
+    p.push(`<circle cx="${R(cx)}" cy="${R(cy)}" r="${R(rr)}" fill="url(#${uid}-fill)" stroke="${cc}" stroke-opacity="0.62" stroke-width="3" filter="url(#${uid}-glow)"/>`);
+    const gr = [[0.16, 0.10, 7, 'f'], [-0.40, 0.30, 5, 'r'], [0.44, -0.30, 6, 'f'], [-0.24, -0.42, 4.5, 'r'], [0.52, 0.34, 5, 'f'], [-0.54, -0.06, 6, 'r'], [0.02, 0.52, 4.5, 'f'], [0.30, -0.52, 4, 'r'], [-0.10, 0.22, 6, 'f'], [-0.46, 0.48, 4, 'f'], [0.58, 0.02, 4.5, 'r'], [-0.02, -0.16, 5.5, 'f']];
+    for (const [gx, gy, grad, t] of gr) {
+      if (t === 'f') p.push(`<circle cx="${R(cx + gx * rr)}" cy="${R(cy + gy * rr)}" r="${grad}" fill="${cc}" fill-opacity="0.28"/>`);
+      else p.push(`<circle cx="${R(cx + gx * rr)}" cy="${R(cy + gy * rr)}" r="${grad}" fill="none" stroke="${cc}" stroke-opacity="0.45" stroke-width="1.4"/>`);
+    }
   }
   return p.join('');
 }
