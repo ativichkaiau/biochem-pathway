@@ -1882,7 +1882,7 @@ const E = [
   // ==== GLUCONEOGENESIS BYPASS ====
   { e: 'G6Pase', from: 'Glucose-6-P', to: 'Glucose', gluconeogenesis: true, curved: true, labelOff: 28 },
   { e: 'FBPase-1', from: 'Fructose-1,6-BP', to: 'Fructose-6-P', gluconeogenesis: true, curved: true, labelOff: 34 },
-  { e: 'PC', from: 'Pyruvate', to: 'OAA', gluconeogenesis: true, curved: true },
+  { e: 'PC', from: 'Pyruvate', to: 'OAA', gluconeogenesis: true, curved: true, labelT: 0.35, labelDX: -8, labelDY: -8 },
   { e: 'PEPCK', from: 'OAA', to: 'PEP', gluconeogenesis: true, curved: true },
 
   // ==== LIPOLYSIS · β-OXIDATION · LIPOGENESIS ====
@@ -1905,7 +1905,7 @@ const E = [
   { e: 'Aconitase', from: 'Citrate', to: 'Isocitrate', labelDX: 30, labelDY: -28 },
   { e: 'IDH', from: 'Isocitrate', to: 'α-KG' },
   { e: 'α-KGDH', from: 'α-KG', to: 'Succinyl-CoA' },
-  { e: 'SCS', from: 'Succinyl-CoA', to: 'Succinate' },
+  { e: 'SCS', from: 'Succinyl-CoA', to: 'Succinate', labelDX: 20, labelDY: 16 },
   { e: 'SDH (CII)', from: 'Succinate', to: 'Fumarate', labelDX: -34, labelDY: 46 },
   { e: 'Fumarase', from: 'Fumarate', to: 'Malate' },
   { e: 'MDH', from: 'Malate', to: 'OAA' },
@@ -1955,7 +1955,7 @@ const E = [
   { e: 'cyclization', from: 'Squalene', to: 'Cholesterol' },
   { e: 'CYP7A1', from: 'Cholesterol', to: 'Bile acids' },
   { e: 'steroidogenesis', from: 'Cholesterol', to: 'Steroid hormones', curved: true },
-  { e: 'UV / hydroxylases', from: 'Cholesterol', to: 'Vitamin D' },
+  { e: 'UV / hydroxylases', from: 'Cholesterol', to: 'Vitamin D', labelOff: -26 },
 
   // ==== HEME SYNTHESIS ====
   { e: 'ALA synthase', from: 'Succinyl-CoA', to: 'δ-ALA', curved: true },
@@ -2028,7 +2028,7 @@ const E = [
 
   // ==== BILIRUBIN / HEME DEGRADATION ====
   { e: 'Heme oxygenase', from: 'Heme', to: 'Biliverdin' },
-  { e: 'Biliverdin reductase', from: 'Biliverdin', to: 'Bilirubin (UCB)' },
+  { e: 'Biliverdin reductase', from: 'Biliverdin', to: 'Bilirubin (UCB)', labelOff: -26 },
   { e: 'UGT1A1', from: 'Bilirubin (UCB)', to: 'Conj. bilirubin' },
   { e: 'gut bacteria', from: 'Conj. bilirubin', to: 'Urobilinogen' },
 
