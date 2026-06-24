@@ -1427,7 +1427,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <text x="480" y="468" class="pathway-label" data-pw="fa-ketones" style="font-size:9px;opacity:0.6;--pw: var(--pw-fa-ketones)">lipolysis · β-ox · lipogenesis</text>
       <text x="660" y="540" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones)">β-OXIDATION</text>
       <text x="880" y="995" class="pathway-label faint" data-pw="tca" style="--pw: var(--pw-tca)" text-anchor="middle">TCA</text>
-      <text x="380" y="1180" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones)">KETOGENESIS</text>
+      <text x="600" y="1168" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones);font-size:11px">KETOGENESIS</text>
       <text x="1140" y="650" class="pathway-label" data-pw="urea" style="--pw: var(--pw-urea)">UREA CYCLE</text>
       <text x="1170" y="1220" class="pathway-label" data-pw="protein" style="--pw: var(--pw-protein)">AMINO ACIDS</text>
       <text x="1655" y="92" class="pathway-label" data-pw="etc" style="--pw: var(--pw-etc)" text-anchor="middle">ETC / OXPHOS</text>
@@ -1714,10 +1714,10 @@ const M = {
   'GTP':             { x: 1090, y: 1140, pathway: 'tca', cofactor: true, info: 'Substrate-level phosphorylation by SCS. Freely interconvertible with ATP via nucleoside diphosphate kinase.' },
 
   // ==== KETOGENESIS ====
-  'Acetoacetyl-CoA': { x: 460, y: 920, pathway: 'fa-ketones', info: '2 acetyl-CoA condensed by thiolase. Shared first step with cholesterol synthesis.' },
-  'HMG-CoA':         { x: 460, y: 1000, pathway: 'fa-ketones', info: 'β-Hydroxy-β-methylglutaryl-CoA. Mitochondrial = ketogenesis (lyase). Cytosolic = cholesterol (reductase, statin target).' },
-  'Acetoacetate':    { x: 380, y: 1080, pathway: 'fa-ketones', info: 'Ketone body. Released by liver; used by brain, heart, muscle in fasting. Can spontaneously decarboxylate → acetone (breath smell in DKA).' },
-  'β-OH-butyrate':   { x: 540, y: 1080, pathway: 'fa-ketones', info: 'β-Hydroxybutyrate — main circulating ketone in prolonged fasting. Reduced form: AcAc + NADH ⇌ βOHB + NAD+.' },
+  'Acetoacetyl-CoA': { x: 700, y: 1205, pathway: 'fa-ketones', info: '2 acetyl-CoA condensed by thiolase (mitochondrial). Shared first step with cholesterol synthesis.' },
+  'HMG-CoA':         { x: 700, y: 1295, pathway: 'fa-ketones', info: 'β-Hydroxy-β-methylglutaryl-CoA. Mitochondrial = ketogenesis (lyase). Cytosolic = cholesterol (reductase, statin target).' },
+  'Acetoacetate':    { x: 612, y: 1380, pathway: 'fa-ketones', info: 'Ketone body. Released by liver; used by brain, heart, muscle in fasting. Can spontaneously decarboxylate → acetone (breath smell in DKA).' },
+  'β-OH-butyrate':   { x: 800, y: 1380, pathway: 'fa-ketones', info: 'β-Hydroxybutyrate — main circulating ketone in prolonged fasting. Reduced form: AcAc + NADH ⇌ βOHB + NAD+.' },
 
   // ==== UREA CYCLE ====
   'NH4+':            { x: 1100, y: 700, pathway: 'urea', info: 'Ammonium. Toxic; from AA catabolism (mostly glutaminase, GDH). Must become urea (in liver).' },
