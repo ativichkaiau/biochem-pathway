@@ -20,6 +20,7 @@
   --down2: #da3633;
   --neutral: #6e7681;
   --gluco: #d29922;
+  --cell-mem: #8fa0c4;
   --purple: #bc8cff;
   --rate: #ffd166;
   --edge: #4d5560;
@@ -76,6 +77,7 @@ body.light {
   --down2: #a40e26;
   --neutral: #6e7781;
   --gluco: #9a6700;
+  --cell-mem: #5d6a96;
   --purple: #8250df;
   --rate: #b7791f;
   --edge: #aab2bd;
@@ -299,7 +301,7 @@ main {
   background: transparent;
 }
 
-#pathway-svg { display: block; min-width: 3120px; }
+#pathway-svg { display: block; min-width: 3264px; }
 
 .node { cursor: pointer; }
 .node rect {
@@ -403,6 +405,21 @@ body.light .org-art-dot { fill-opacity: 0.2; }
 }
 body.case-pinpoint #compartments,
 body[data-dive] #compartments { opacity: 0.35; transition: opacity 0.28s; }
+
+/* Plasma membrane (the cell boundary) — a faint lipid bilayer enclosing everything */
+.cell-membrane { fill: none; stroke: var(--cell-mem); stroke-width: 2.4; stroke-opacity: 0.5; }
+.cell-membrane-fill { fill: color-mix(in srgb, var(--cell-mem) 4%, transparent); }
+.cell-membrane-tab rect { fill: color-mix(in srgb, var(--cell-mem) 22%, var(--panel)); stroke: var(--cell-mem); stroke-opacity: 0.6; stroke-width: 1; }
+.cell-membrane-tab text { fill: var(--cell-mem); font-size: 12.5px; font-weight: 800; letter-spacing: 1.4px; font-family: "SF Mono","Menlo",monospace; }
+
+/* Membrane transport proteins straddling the cell / mitochondrial membranes */
+#transporters { pointer-events: none; }
+.transporter-lobe { fill: color-mix(in srgb, var(--tc) 34%, var(--panel)); stroke: var(--tc); stroke-width: 1.5; stroke-opacity: 0.85; pointer-events: auto; }
+.transporter-arrow { fill: var(--tc); opacity: 0.85; }
+.transporter-label { fill: var(--tc); font-size: 11px; font-weight: 700; font-family: "SF Mono","Menlo",monospace; letter-spacing: 0.3px; }
+.transporter-label-bg { fill: var(--panel); opacity: 0.72; }
+body.case-pinpoint #transporters,
+body[data-dive] #transporters { opacity: 0.32; transition: opacity 0.28s; }
 
 .pathway-label {
   font-size: 14px;
@@ -1417,7 +1434,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   </aside>
 
   <main>
-    <svg id="pathway-svg" width="3120" height="2580" viewBox="0 0 3120 2580" xmlns="http://www.w3.org/2000/svg">
+    <svg id="pathway-svg" width="3264" height="2624" viewBox="-72 -24 3264 2624" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
           <polygon id="mk-arrow" points="0 0, 10 5, 0 10" fill="#4d5560" />
@@ -1462,6 +1479,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <text x="430" y="1808" class="pathway-label" data-pw="sphingo" style="--pw: var(--pw-sphingo)">SPHINGOLIPIDS · lysosomal storage</text>
 
       <g id="edges"></g>
+      <g id="transporters"></g>
       <g id="nodes"></g>
     </svg>
   </main>
@@ -3024,6 +3042,72 @@ function escapeAttr(s) {
 // ---- Organelle compartment boxes (drawn once behind the map) ----
 // Each box is auto-sized to the bounding box of its member nodes (so it
 // tracks LAYOUT_SCALE), with a labelled tab in a chosen corner.
+// The plasma membrane — a rounded boundary enclosing the whole cell, with the
+// organelles nested inside. Sized to wrap every node with margin.
+const CELL_MEMBRANE = { x: -34, y: 22, w: 3152, h: 2538, rx: 72 };
+
+// Membrane transport proteins. (x,y) sits on a membrane line; axis is the
+// membrane orientation there ('h' = horizontal span, 'v' = vertical); arrow
+// shows transport direction; mem picks the colour (cell vs mitochondrion).
+const TRANSPORTERS = [
+  { name: 'GLUT', carries: 'Glucose uptake from blood', x: 403, y: 22, axis: 'h', arrow: 'down', mem: 'cell', lx: 403, ly: -6 },
+  { name: 'MCT', carries: 'Lactate / ketone-body exchange', x: -34, y: 1008, axis: 'v', arrow: 'leftright', mem: 'cell', lx: 22, ly: 1010 },
+  { name: 'MPC', carries: 'Pyruvate → mitochondrial matrix', x: 673, y: 1008, axis: 'v', arrow: 'right', mem: 'mito', lx: 632, ly: 1040 },
+  { name: 'CPT1', carries: 'Acyl-carnitine into matrix for β-oxidation', x: 905, y: 962, axis: 'h', arrow: 'down', mem: 'mito', lx: 905, ly: 936 },
+  { name: 'CIC', carries: 'Citrate → cytosol for fatty-acid synthesis', x: 1205, y: 962, axis: 'h', arrow: 'up', mem: 'mito', lx: 1205, ly: 936 },
+  { name: 'Mal–Asp', carries: 'Malate–aspartate shuttle (cytosolic NADH in)', x: 1443, y: 1235, axis: 'v', arrow: 'leftright', mem: 'mito', lx: 1494, ly: 1239 },
+  { name: 'ANT', carries: 'Adenine-nucleotide translocase: ATP out / ADP in', x: 900, y: 1914, axis: 'h', arrow: 'updown', mem: 'mito', lx: 900, ly: 1944 }
+];
+
+// Faint lipid-bilayer rectangle (double line) + a labelled tab.
+function drawCellMembrane() {
+  const c = CELL_MEMBRANE, inset = 9, tab = 'CELL · cytosol';
+  const tw = tab.length * 6.6 + 22, th = 21, tx = c.x + c.w / 2 - tw / 2, ty = c.y - th / 2;
+  return `<rect class="cell-membrane-fill" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" rx="${c.rx}"/>`
+    + `<rect class="cell-membrane" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" rx="${c.rx}"/>`
+    + `<rect class="cell-membrane" x="${c.x + inset}" y="${c.y + inset}" width="${c.w - 2 * inset}" height="${c.h - 2 * inset}" rx="${Math.max(4, c.rx - inset)}"/>`
+    + `<g class="cell-membrane-tab"><rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="7"/>`
+    + `<text x="${tx + tw / 2}" y="${ty + th / 2 + 0.5}" text-anchor="middle" dominant-baseline="middle">${tab}</text></g>`;
+}
+
+function renderTransporters() {
+  const g = document.getElementById('transporters');
+  if (!g) return;
+  const R = v => Math.round(v);
+  const arrowPoly = (x, y, d, col) => {
+    const s = 5, off = 11;
+    const ox = d === 'left' ? -off : d === 'right' ? off : 0;
+    const oy = d === 'down' ? off : d === 'up' ? -off : 0;
+    const cx = x + ox, cy = y + oy;
+    let pts;
+    if (d === 'down') pts = `${cx - s},${cy - s} ${cx + s},${cy - s} ${cx},${cy + s}`;
+    else if (d === 'up') pts = `${cx - s},${cy + s} ${cx + s},${cy + s} ${cx},${cy - s}`;
+    else if (d === 'left') pts = `${cx + s},${cy - s} ${cx + s},${cy + s} ${cx - s},${cy}`;
+    else pts = `${cx - s},${cy - s} ${cx - s},${cy + s} ${cx + s},${cy}`;
+    return `<polygon class="transporter-arrow" style="--tc:${col}" points="${pts}"/>`;
+  };
+  const parts = TRANSPORTERS.map(t => {
+    const col = t.mem === 'cell' ? 'var(--cell-mem)' : 'var(--pw-tca)';
+    const p = [];
+    if (t.axis === 'h') {
+      const lw = 13, lh = 32;
+      p.push(`<rect class="transporter-lobe" style="--tc:${col}" x="${R(t.x - 2 - lw)}" y="${R(t.y - lh / 2)}" width="${lw}" height="${lh}" rx="5"/>`);
+      p.push(`<rect class="transporter-lobe" style="--tc:${col}" x="${R(t.x + 2)}" y="${R(t.y - lh / 2)}" width="${lw}" height="${lh}" rx="5"/>`);
+    } else {
+      const lw = 32, lh = 13;
+      p.push(`<rect class="transporter-lobe" style="--tc:${col}" x="${R(t.x - lw / 2)}" y="${R(t.y - 2 - lh)}" width="${lw}" height="${lh}" rx="5"/>`);
+      p.push(`<rect class="transporter-lobe" style="--tc:${col}" x="${R(t.x - lw / 2)}" y="${R(t.y + 2)}" width="${lw}" height="${lh}" rx="5"/>`);
+    }
+    const dirs = t.arrow === 'updown' ? ['up', 'down'] : t.arrow === 'leftright' ? ['left', 'right'] : [t.arrow];
+    dirs.forEach(d => p.push(arrowPoly(t.x, t.y, d, col)));
+    const lbw = t.name.length * 6.6 + 8;
+    p.push(`<rect class="transporter-label-bg" x="${R(t.lx - lbw / 2)}" y="${R(t.ly - 8)}" width="${R(lbw)}" height="15" rx="4"/>`);
+    p.push(`<text class="transporter-label" style="--tc:${col}" x="${R(t.lx)}" y="${R(t.ly + 0.5)}" text-anchor="middle" dominant-baseline="middle">${escapeText(t.name)}</text>`);
+    return `<g class="transporter"><title>${escapeText(t.name)} — ${escapeText(t.carries)}</title>${p.join('')}</g>`;
+  });
+  g.innerHTML = parts.join('');
+}
+
 const COMPARTMENTS = [
   { label: 'MITOCHONDRION · matrix', cc: 'var(--pw-tca)', pad: 30, tab: 'tr',
     nodes: ['Acetyl-CoA','Citrate','Isocitrate','α-KG','Succinyl-CoA','Succinate','Fumarate','Malate','OAA','GTP','CO2'] },
@@ -3123,7 +3207,7 @@ function renderCompartments() {
   } else if (mm) { art.push(organelleArt('mito', mm.x, mm.y, mm.w, mm.h, mm.cc)); }
   const er = boxes['ENDOPLASMIC RETICULUM · sterols']; if (er) art.push(organelleArt('er', er.x, er.y, er.w, er.h, er.cc));
   const ly = boxes['LYSOSOME · sphingolipid degradation']; if (ly) art.push(organelleArt('lysosome', ly.x, ly.y, ly.w, ly.h, ly.cc));
-  g.innerHTML = art.join('') + parts.join('');
+  g.innerHTML = drawCellMembrane() + art.join('') + parts.join('');
   // Fit each label tab to the actual rendered text width (monospace + letter-spacing varies)
   g.querySelectorAll('.compartment-tab').forEach(tab => {
     const text = tab.querySelector('text'), rect = tab.querySelector('rect');
@@ -3142,6 +3226,7 @@ function renderCompartments() {
 // ============================================
 
 renderCompartments();
+renderTransporters();
 renderPerturbationList();
 renderAll();
 
