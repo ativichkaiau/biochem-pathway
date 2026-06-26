@@ -1254,6 +1254,68 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 }
 .cmd-hint kbd.help-key { font-size: 10px; padding: 1px 6px; }
 @media (prefers-reduced-motion: reduce) { #cmd-palette { animation: none; } }
+
+/* Scrim shown behind slide-in panels on small screens */
+#panel-scrim { display: none; }
+
+/* ============================================================
+   RESPONSIVE — tablet (iPad) & mobile
+   ============================================================ */
+@media (max-width: 900px) {
+  header { height: 56px; padding: 0 12px; }
+  .brand { gap: 9px; }
+  .brand-mark { width: 30px; height: 30px; font-size: 15px; }
+  header h1 { font-size: 16px; }
+  .subtitle { display: none; }
+  #focus-btn { display: none; }   /* redundant on mobile — panels are overlays */
+  .header-actions { gap: 5px; flex: 1; justify-content: flex-end; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .header-actions::-webkit-scrollbar { display: none; }
+  .header-actions .lbl { display: none; }   /* icon-only buttons */
+  .btn { padding: 8px 10px; flex-shrink: 0; }
+  .toggle-btn .ico { font-size: 15px; }
+
+  /* Layout becomes a single full-width map; panels slide in over it */
+  .layout, .layout.hide-left, .layout.hide-right, .layout.hide-left.hide-right {
+    display: block; grid-template-columns: none; height: calc(100dvh - 56px);
+  }
+  main { height: 100%; }
+  aside {
+    position: fixed; top: 56px; bottom: 0; width: min(86vw, 360px);
+    z-index: 46; padding: 16px;
+    transition: transform 0.28s cubic-bezier(.2,.8,.2,1);
+    box-shadow: 0 18px 50px -10px var(--shadow);
+  }
+  #perturbations-aside { left: 0; right: auto; transform: translateX(0); border-right: 1px solid var(--glass-brd); }
+  aside.right { right: 0; left: auto; transform: translateX(0); border-left: 1px solid var(--glass-brd); }
+  /* the hide-* classes push the panel back off-screen */
+  .layout.hide-left #perturbations-aside { transform: translateX(-102%); }
+  .layout.hide-right aside.right { transform: translateX(102%); }
+
+  #panel-scrim { display: block; position: fixed; inset: 56px 0 0; z-index: 45;
+    background: rgba(0,0,0,0.45); opacity: 0; visibility: hidden; transition: opacity 0.28s; }
+  .layout:not(.hide-left) ~ #panel-scrim,
+  .layout:not(.hide-right) ~ #panel-scrim { opacity: 1; visibility: visible; }
+
+  /* Overlays: trim padding so cards use the small viewport */
+  #intro { padding: 18px 14px; place-items: start center; }
+  .intro-skip { top: 12px; right: 12px; }
+  #case-overlay, #cases-browser { padding: 18px 14px; }
+  .case-header { padding: 16px 18px 12px; }
+  .case-title { font-size: 19px; }
+  .cases-grid { grid-template-columns: 1fr; gap: 12px; }
+  .help-card, .cmd-panel { width: min(560px, 100%); }
+  .score-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  header h1 { font-size: 15px; }
+  #help-btn { display: none; }   /* shortcuts are keyboard-only; reachable via command palette */
+  .btn { padding: 7px 9px; font-size: 11.5px; }
+  aside { width: min(92vw, 340px); }
+  .intro-card { padding: 24px 18px 16px; border-radius: 22px; }
+  .case-header { flex-wrap: wrap; }
+  .case-shell, .help-card { border-radius: 18px; }
+}
 </style>
 </head>
 <body>
@@ -1547,6 +1609,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     </div>
   </aside>
 </div>
+<div id="panel-scrim"></div>
 
 <div id="cmd-palette" aria-hidden="true">
   <div class="cmd-box" role="dialog" aria-label="Command palette">
@@ -3470,8 +3533,24 @@ function syncToggleButtons() {
   focusBtn.classList.toggle('active', layoutEl.classList.contains('hide-left') && layoutEl.classList.contains('hide-right'));
 }
 
-tlBtn.addEventListener('click', () => { layoutEl.classList.toggle('hide-left'); syncToggleButtons(); });
-trBtn.addEventListener('click', () => { layoutEl.classList.toggle('hide-right'); syncToggleButtons(); });
+// On small screens the panels slide in as overlays — only one at a time.
+const isMobileLayout = () => window.matchMedia('(max-width: 900px)').matches;
+tlBtn.addEventListener('click', () => {
+  const opening = layoutEl.classList.contains('hide-left');
+  layoutEl.classList.toggle('hide-left');
+  if (opening && isMobileLayout()) layoutEl.classList.add('hide-right');
+  syncToggleButtons();
+});
+trBtn.addEventListener('click', () => {
+  const opening = layoutEl.classList.contains('hide-right');
+  layoutEl.classList.toggle('hide-right');
+  if (opening && isMobileLayout()) layoutEl.classList.add('hide-left');
+  syncToggleButtons();
+});
+document.getElementById('panel-scrim').addEventListener('click', () => {
+  layoutEl.classList.add('hide-left', 'hide-right');
+  syncToggleButtons();
+});
 // Both panels start collapsed by default — reflect that on the header buttons.
 syncToggleButtons();
 focusBtn.addEventListener('click', () => {
