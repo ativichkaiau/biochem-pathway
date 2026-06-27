@@ -3223,15 +3223,23 @@ const CELL_TYPES = [
   { id: 'all', tab: 'All cells', label: 'CELL', absent: [],
     note: 'Every pathway is shown. Pick a cell type to see which reactions it actually runs.' },
   { id: 'liver', tab: 'Liver', label: 'HEPATOCYTE', absent: ['catechol', 'polyol'],
-    note: 'The metabolic hub — the only cell with a full urea cycle, gluconeogenesis (glucose-6-phosphatase) and ketogenesis; also handles cholesterol, bilirubin and ethanol.' },
-  { id: 'muscle', tab: 'Muscle', label: 'MYOCYTE', absent: ['urea', 'sterol', 'sugar', 'ethanol', 'bilirubin', 'catechol', 'polyol', 'heme'],
-    note: 'Skeletal muscle: glycolysis, its own glycogen (no glucose export — lacks G6Pase), TCA/ETC, β-oxidation and creatine phosphate. No urea cycle or gluconeogenesis.' },
-  { id: 'brain', tab: 'Neuron', label: 'NEURON', absent: ['urea', 'fa-ketones', 'sterol', 'sugar', 'ethanol', 'bilirubin', 'heme', 'polyol'],
-    note: 'Glucose-dependent (uses ketone bodies in starvation). Synthesises neurotransmitters; cannot β-oxidise fatty acids or perform gluconeogenesis.' },
-  { id: 'adipo', tab: 'Adipose', label: 'ADIPOCYTE', absent: ['urea', 'heme', 'bilirubin', 'catechol', 'creatine', 'ethanol', 'polyol', 'sterol'],
+    note: 'The metabolic hub — the only cell with a full urea cycle, gluconeogenesis (glucose-6-phosphatase) and ketogenesis; also handles cholesterol, bile acids, bilirubin conjugation and ethanol.' },
+  { id: 'muscle', tab: 'Muscle', label: 'MYOCYTE', absent: ['urea', 'sterol', 'sugar', 'ethanol', 'bilirubin', 'catechol', 'polyol'],
+    note: 'Skeletal muscle: glycolysis, its own glycogen (no glucose export — lacks G6Pase), TCA/ETC, β-oxidation, BCAA catabolism and creatine phosphate. No urea cycle or gluconeogenesis.' },
+  { id: 'cardiac', tab: 'Cardiac', label: 'CARDIOMYOCYTE', absent: ['urea', 'sterol', 'sugar', 'ethanol', 'bilirubin', 'catechol', 'polyol'],
+    note: 'Heart muscle: oxidises fatty acids as its main fuel (also ketones and lactate), is packed with mitochondria and buffers ATP with creatine phosphate. No gluconeogenesis or urea cycle.' },
+  { id: 'brain', tab: 'Neuron', label: 'NEURON', absent: ['urea', 'fa-ketones', 'sugar', 'ethanol', 'bilirubin'],
+    note: 'Glucose-dependent (uses ketone bodies in starvation). Makes neurotransmitters, synthesises its own cholesterol for myelin and runs the polyol pathway; cannot β-oxidise fatty acids.' },
+  { id: 'adipo', tab: 'Adipose', label: 'ADIPOCYTE', absent: ['urea', 'sterol', 'bilirubin', 'catechol', 'creatine', 'ethanol', 'polyol'],
     note: 'Fat storage: lipogenesis (triglyceride synthesis) and lipolysis, with PPP-derived NADPH; takes up glucose via GLUT4.' },
-  { id: 'rbc', tab: 'RBC', label: 'ERYTHROCYTE', absent: ['tca', 'etc', 'fa-ketones', 'urea', 'protein', 'sterol', 'heme', 'nucleotide', 'sugar', 'ethanol', 'onecarbon', 'catechol', 'creatine', 'polyol', 'bilirubin', 'sphingo'],
-    note: 'No mitochondria or nucleus: only anaerobic glycolysis (→ lactate), the pentose-phosphate pathway (NADPH for glutathione) and 2,3-BPG.' }
+  { id: 'kidney', tab: 'Kidney', label: 'RENAL TUBULE', absent: ['urea', 'sugar', 'ethanol', 'bilirubin', 'catechol'],
+    note: 'The second gluconeogenic organ. Excretes ammonia (glutamine → NH₄⁺) for acid–base balance, runs the polyol pathway, starts creatine synthesis (AGAT) and activates vitamin D.' },
+  { id: 'adrenal', tab: 'Adrenal', label: 'ADRENAL CELL', absent: ['urea', 'ethanol', 'bilirubin', 'creatine', 'polyol', 'sugar'],
+    note: 'Steroidogenic cortex (cortisol, aldosterone and androgens from cholesterol, using PPP-derived NADPH) plus a catecholamine-making medulla — the only tissue with PNMT → epinephrine.' },
+  { id: 'intestine', tab: 'Intestine', label: 'ENTEROCYTE', absent: ['urea', 'sterol', 'ethanol', 'bilirubin', 'catechol', 'creatine', 'polyol'],
+    note: 'Absorbs dietary sugars (fructose, galactose); burns glutamine as its main fuel; re-esterifies fat into chylomicrons and turns over rapidly (active nucleotide synthesis).' },
+  { id: 'rbc', tab: 'RBC', label: 'ERYTHROCYTE', absent: ['tca', 'etc', 'fa-ketones', 'urea', 'protein', 'sterol', 'heme', 'nucleotide', 'sugar', 'ethanol', 'onecarbon', 'catechol', 'creatine', 'bilirubin', 'sphingo'],
+    note: 'No mitochondria or nucleus: only anaerobic glycolysis (→ lactate), the pentose-phosphate pathway (NADPH for glutathione), 2,3-BPG and the polyol pathway.' }
 ];
 let selectedCell = 'all';
 function currentCell() { return CELL_TYPES.find(c => c.id === selectedCell) || CELL_TYPES[0]; }
