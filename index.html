@@ -170,20 +170,43 @@ header {
   align-items: center;
   justify-content: space-between;
 }
-.brand { display: flex; align-items: center; gap: 11px; }
+.brand { display: flex; align-items: center; gap: 13px; }
 .brand-mark {
-  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-  display: grid; place-items: center; font-size: 17px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  box-shadow: 0 4px 14px -3px var(--accent), 0 0 0 1px var(--glass-hi) inset;
+  width: 46px; height: 46px; border-radius: 15px; flex-shrink: 0;
+  display: grid; place-items: center; font-size: 23px; position: relative; overflow: hidden;
+  background: linear-gradient(150deg, var(--pw-tca) 0%, var(--accent) 52%, var(--purple) 100%);
+  box-shadow:
+    0 9px 20px -7px color-mix(in srgb, var(--accent) 65%, transparent),
+    inset 2px 3px 5px rgba(255,255,255,0.5),
+    inset -3px -5px 9px rgba(0,0,0,0.28);
 }
-header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.1; }
+.brand-mark::after {
+  content: ""; position: absolute; top: 3px; left: 4px; right: 8px; height: 42%;
+  border-radius: 12px 12px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
+  pointer-events: none;
+}
+header h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.05; }
 header h1 .accent {
-  background: linear-gradient(120deg, var(--accent), var(--purple) 90%);
+  background: linear-gradient(120deg, var(--pw-tca), var(--accent) 50%, var(--purple) 95%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
-  margin-left: 5px; font-weight: 700;
+  margin-left: 5px; font-weight: 800;
 }
-.subtitle { color: var(--text-2); font-size: 11px; margin-top: 1px; }
+.subtitle { color: var(--text-2); font-size: 11px; margin-top: 2px; }
+/* Right-side Mode cluster (themed day/night toggle) */
+.header-actions { display: flex; gap: 10px; align-items: center; }
+.header-btns { display: flex; gap: 8px; align-items: center; }
+.mode-cluster { display: flex; align-items: center; gap: 9px; padding-left: 14px; border-left: 1px solid var(--glass-brd); }
+.mode-label { font-size: 10px; font-weight: 700; letter-spacing: 1.6px; color: var(--text-2); text-transform: uppercase; }
+.mode-toggle {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--text);
+  padding: 9px 18px; border-radius: 999px; border: none; cursor: pointer;
+  background: var(--clay-surface); box-shadow: var(--clay);
+  transition: transform 0.14s, box-shadow 0.14s, background 0.14s;
+}
+.mode-toggle:hover { transform: translateY(-2px); background: var(--clay-surface-2); }
+.mode-toggle:active { transform: translateY(1px); box-shadow: var(--clay-pressed); }
+.mode-toggle .ico { font-size: 15px; line-height: 1; }
 .btn {
   background: var(--clay-surface);
   color: var(--text);
@@ -1314,15 +1337,19 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   #cell-select { top: 62px; }
   #cell-note { top: 104px; font-size: 11px; padding: 6px 12px; }
   .brand { gap: 9px; }
-  .brand-mark { width: 30px; height: 30px; font-size: 15px; }
-  header h1 { font-size: 16px; }
+  .brand-mark { width: 38px; height: 38px; font-size: 19px; border-radius: 12px; }
+  header h1 { font-size: 17px; }
   .subtitle { display: none; }
   #focus-btn { display: none; }   /* redundant on mobile — panels are overlays */
-  .header-actions { gap: 5px; flex: 1; justify-content: flex-end; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .header-actions { gap: 6px; flex: 1; justify-content: flex-end; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .header-actions::-webkit-scrollbar { display: none; }
   .header-actions .lbl { display: none; }   /* icon-only buttons */
   .btn { padding: 8px 10px; flex-shrink: 0; }
   .toggle-btn .ico { font-size: 15px; }
+  .header-btns { gap: 5px; }
+  .mode-cluster { padding-left: 0; border-left: none; gap: 0; flex-shrink: 0; }
+  .mode-label { display: none; }
+  .mode-toggle { padding: 8px 11px; font-size: 12px; }
 
   /* Layout becomes a single full-width map; panels slide in over it */
   .layout, .layout.hide-left, .layout.hide-right, .layout.hide-left.hide-right {
@@ -1528,13 +1555,18 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     </div>
   </div>
   <div class="header-actions">
-    <button class="btn" id="cases-btn" title="Browse all clinical cases"><span class="ico">📋</span><span class="lbl">Cases</span></button>
-    <button class="btn" id="help-btn" title="Help &amp; shortcuts  ( ? )"><span class="ico">?</span><span class="lbl">Help</span></button>
-    <button class="btn" id="theme-btn" title="Toggle day / night mode  ( t )"><span class="ico">☀</span><span class="lbl">Day</span></button>
-    <button class="btn toggle-btn" id="toggle-left" title="Show / hide perturbations panel  ( [ )"><span class="ico">◧</span><span class="lbl">Perturbations</span></button>
-    <button class="btn toggle-btn" id="toggle-right" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Metabolites</span><span class="ico">◨</span></button>
-    <button class="btn" id="focus-btn" title="Focus mode — hide both panels  ( f )"><span class="ico">⤢</span><span class="lbl">Focus</span></button>
-    <button class="btn" id="reset-btn">Reset <span class="count-badge zero" id="active-count">0</span></button>
+    <div class="header-btns">
+      <button class="btn" id="cases-btn" title="Browse all clinical cases"><span class="ico">📋</span><span class="lbl">Cases</span></button>
+      <button class="btn" id="help-btn" title="Help &amp; shortcuts  ( ? )"><span class="ico">?</span><span class="lbl">Help</span></button>
+      <button class="btn toggle-btn" id="toggle-left" title="Show / hide perturbations panel  ( [ )"><span class="ico">◧</span><span class="lbl">Perturbations</span></button>
+      <button class="btn toggle-btn" id="toggle-right" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Metabolites</span><span class="ico">◨</span></button>
+      <button class="btn" id="focus-btn" title="Focus mode — hide both panels  ( f )"><span class="ico">⤢</span><span class="lbl">Focus</span></button>
+      <button class="btn" id="reset-btn">Reset <span class="count-badge zero" id="active-count">0</span></button>
+    </div>
+    <div class="mode-cluster">
+      <span class="mode-label">Mode</span>
+      <button class="mode-toggle" id="theme-btn" title="Toggle day / night mode  ( t )"><span class="ico">☀️</span><span class="lbl">Day</span></button>
+    </div>
   </div>
 </header>
 
@@ -3596,7 +3628,7 @@ function openPathway(pw, opts) {
 const themeBtn = document.getElementById('theme-btn');
 function applyTheme(light) {
   document.body.classList.toggle('light', light);
-  themeBtn.querySelector('.ico').textContent = light ? '☾' : '☀';
+  themeBtn.querySelector('.ico').textContent = light ? '🌙' : '☀️';
   themeBtn.querySelector('.lbl').textContent = light ? 'Night' : 'Day';
   try { localStorage.setItem('biochem-theme', light ? 'light' : 'dark'); } catch (e) {}
 }
