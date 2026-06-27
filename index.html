@@ -37,6 +37,14 @@
   --glass-brd: rgba(255, 255, 255, 0.08);
   --glass-hi: rgba(255, 255, 255, 0.10);
   --shadow: rgba(0, 0, 0, 0.45);
+  /* Claymorphism — soft puffy clay surfaces */
+  --clay-surface: #242c39;
+  --clay-surface-2: #2d3543;
+  --clay-radius: 16px;
+  --clay: 5px 7px 16px rgba(0,0,0,0.5), -3px -3px 10px rgba(255,255,255,0.03), inset 2px 2px 4px rgba(255,255,255,0.11), inset -3px -4px 8px rgba(0,0,0,0.48);
+  --clay-sm: 3px 4px 9px rgba(0,0,0,0.42), inset 1px 1px 3px rgba(255,255,255,0.10), inset -2px -3px 6px rgba(0,0,0,0.42);
+  --clay-pressed: inset 3px 4px 8px rgba(0,0,0,0.55), inset -2px -2px 5px rgba(255,255,255,0.06);
+  --clay-card: 14px 20px 56px -18px rgba(0,0,0,0.62), inset 3px 3px 8px rgba(255,255,255,0.09), inset -5px -7px 15px rgba(0,0,0,0.42);
   --blob1: rgba(56, 130, 246, 0.42);
   --blob2: rgba(167, 85, 247, 0.36);
   --blob3: rgba(20, 200, 170, 0.32);
@@ -94,6 +102,13 @@ body.light {
   --glass-brd: rgba(15, 23, 42, 0.08);
   --glass-hi: rgba(255, 255, 255, 0.9);
   --shadow: rgba(80, 100, 140, 0.18);
+  /* Claymorphism — soft pastel clay surfaces */
+  --clay-surface: #eef1f8;
+  --clay-surface-2: #f7f9fd;
+  --clay: 7px 9px 18px rgba(174,184,206,0.6), -6px -6px 14px rgba(255,255,255,0.95), inset 2px 2px 5px rgba(255,255,255,0.9), inset -3px -4px 8px rgba(174,184,206,0.55);
+  --clay-sm: 4px 5px 11px rgba(174,184,206,0.5), -3px -3px 8px rgba(255,255,255,0.9), inset 1px 1px 3px rgba(255,255,255,0.85), inset -2px -3px 6px rgba(174,184,206,0.45);
+  --clay-pressed: inset 3px 4px 8px rgba(174,184,206,0.6), inset -2px -2px 5px rgba(255,255,255,0.85);
+  --clay-card: 16px 22px 54px -18px rgba(174,184,206,0.7), -8px -8px 22px rgba(255,255,255,0.9), inset 3px 3px 8px rgba(255,255,255,0.9), inset -5px -7px 15px rgba(174,184,206,0.5);
   --blob1: rgba(56, 130, 246, 0.22);
   --blob2: rgba(167, 85, 247, 0.18);
   --blob3: rgba(20, 184, 166, 0.18);
@@ -170,23 +185,22 @@ header h1 .accent {
 }
 .subtitle { color: var(--text-2); font-size: 11px; margin-top: 1px; }
 .btn {
-  background: var(--glass-2);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: var(--clay-surface);
   color: var(--text);
-  border: 1px solid var(--glass-brd);
-  padding: 7px 14px;
-  border-radius: 9px;
+  border: none;
+  padding: 8px 15px;
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay);
   cursor: pointer;
   font-size: 12px;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
 }
-.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
+.btn:hover { transform: translateY(-2px); background: var(--clay-surface-2); }
+.btn:active { transform: translateY(1px); box-shadow: var(--clay-pressed); }
 .count-badge {
   display: inline-block;
   padding: 1px 7px;
@@ -199,7 +213,8 @@ header h1 .accent {
   text-align: center;
 }
 .count-badge.zero { background: var(--border); color: var(--text-2); }
-.toggle-btn.active { background: rgba(88,166,255,0.18); border-color: var(--accent); color: var(--accent); }
+.toggle-btn.active { background: color-mix(in srgb, var(--accent) 16%, var(--clay-surface)); color: var(--accent); box-shadow: var(--clay-pressed); }
+.toggle-btn.active:hover { transform: none; }
 .toggle-btn .ico { font-size: 13px; line-height: 1; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
 @media (max-width: 1100px) { .toggle-btn .lbl { display: none; } }
@@ -209,31 +224,30 @@ header h1 .accent {
 .cell-select-btn {
   display: inline-flex; align-items: center; gap: 8px;
   font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text);
-  padding: 7px 15px; border-radius: 999px; cursor: pointer;
-  background: var(--glass); border: 1px solid var(--glass-brd);
-  -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
-  box-shadow: 0 10px 34px -14px var(--shadow); transition: border-color 0.14s;
+  padding: 9px 17px; border-radius: 999px; cursor: pointer;
+  background: var(--clay-surface); border: none;
+  box-shadow: var(--clay); transition: transform 0.14s, background 0.14s;
 }
-.cell-select-btn:hover { border-color: var(--accent); }
+.cell-select-btn:hover { transform: translateY(-2px); background: var(--clay-surface-2); }
 .cell-select-btn .eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 1.4px; color: var(--text-2); text-transform: uppercase; }
 .cell-select-btn .caret { color: var(--text-2); font-size: 10px; transition: transform 0.16s; }
-#cell-select.open .cell-select-btn { border-color: var(--accent); }
+#cell-select.open .cell-select-btn { box-shadow: var(--clay-pressed); }
 #cell-select.open .caret { transform: rotate(180deg); }
 .cell-select-menu {
-  position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
-  min-width: 200px; max-height: 72vh; overflow-y: auto; display: none;
-  background: var(--glass); border: 1px solid var(--glass-brd); border-radius: 14px; padding: 5px;
-  -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
-  box-shadow: 0 20px 54px -18px var(--shadow);
+  position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+  min-width: 210px; max-height: 72vh; overflow-y: auto; display: none;
+  background: var(--clay-surface); border: none; border-radius: 20px; padding: 8px;
+  box-shadow: var(--clay);
 }
 #cell-select.open .cell-select-menu { display: block; }
 .cell-menu-item {
   display: block; width: 100%; text-align: left; white-space: nowrap;
-  font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--text);
-  padding: 8px 13px; border-radius: 9px; border: none; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--text);
+  padding: 9px 14px; border-radius: 12px; border: none; background: transparent; cursor: pointer;
+  transition: box-shadow 0.12s, background 0.12s;
 }
-.cell-menu-item:hover { background: var(--glass-2); }
-.cell-menu-item.active { background: var(--accent); color: #fff; }
+.cell-menu-item:hover { background: var(--clay-surface-2); box-shadow: var(--clay-sm); }
+.cell-menu-item.active { color: var(--accent); box-shadow: var(--clay-pressed); background: color-mix(in srgb, var(--accent) 12%, var(--clay-surface)); }
 #cell-note {
   position: fixed; top: 118px; left: 50%; transform: translateX(-50%); z-index: 24;
   max-width: min(560px, 94vw); text-align: center; line-height: 1.45;
@@ -695,11 +709,10 @@ body.light #intro {
 
 .intro-card {
   position: relative; overflow: hidden;
-  width: min(920px, 100%); min-width: 0; padding: 34px 42px 22px; border-radius: 28px;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(34px) saturate(160%); backdrop-filter: blur(34px) saturate(160%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 50px 130px -40px var(--shadow);
+  width: min(920px, 100%); min-width: 0; padding: 34px 42px 26px; border-radius: 36px;
+  background: var(--clay-surface);
+  border: none;
+  box-shadow: var(--clay-card);
   animation: cardIn 0.6s cubic-bezier(.2,.85,.25,1) both;
   text-align: center;
 }
@@ -877,10 +890,9 @@ body.light #case-overlay {
 
 .case-shell {
   width: min(960px, 100%); margin: 0 auto;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(34px) saturate(160%); backdrop-filter: blur(34px) saturate(160%);
-  border: 1px solid var(--glass-brd); border-radius: 22px;
-  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 50px 130px -40px var(--shadow);
+  background: var(--clay-surface);
+  border: none; border-radius: 32px;
+  box-shadow: var(--clay-card);
   display: flex; flex-direction: column;
   animation: caseIn 0.4s cubic-bezier(.2,.85,.25,1) both;
 }
@@ -1091,28 +1103,26 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
 .cell-state-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-2); margin-bottom: 7px; }
 .cell-state-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .cell-stat {
-  font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px;
-  border: 1px solid var(--glass-brd); background: var(--glass-2); color: var(--text-2); white-space: nowrap;
+  font-size: 11px; font-weight: 700; padding: 4px 11px; border-radius: 999px;
+  border: none; background: var(--clay-surface); color: var(--text-2); white-space: nowrap; box-shadow: var(--clay-sm);
 }
-.cell-stat.up, .cell-stat.up2 { color: var(--up); border-color: color-mix(in srgb, var(--up) 38%, transparent); background: color-mix(in srgb, var(--up) 10%, var(--glass-2)); }
-.cell-stat.down, .cell-stat.down2 { color: var(--down); border-color: color-mix(in srgb, var(--down) 38%, transparent); background: color-mix(in srgb, var(--down) 10%, var(--glass-2)); }
-.cell-stat.warn { color: #e3a008; border-color: color-mix(in srgb, #e3a008 48%, transparent); background: color-mix(in srgb, #e3a008 14%, var(--glass-2)); }
+.cell-stat.up, .cell-stat.up2 { color: var(--up); background: color-mix(in srgb, var(--up) 13%, var(--clay-surface)); }
+.cell-stat.down, .cell-stat.down2 { color: var(--down); background: color-mix(in srgb, var(--down) 13%, var(--clay-surface)); }
+.cell-stat.warn { color: #e3a008; background: color-mix(in srgb, #e3a008 15%, var(--clay-surface)); }
 .pert-quick-chip {
-  font-family: inherit; font-size: 11px; font-weight: 600;
-  padding: 4px 10px; border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  cursor: pointer; transition: all 0.12s; white-space: nowrap;
+  font-family: inherit; font-size: 11px; font-weight: 700;
+  padding: 6px 13px; border-radius: 999px;
+  background: var(--clay-surface); color: var(--accent); border: none; box-shadow: var(--clay-sm);
+  cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; white-space: nowrap;
 }
-.pert-quick-chip:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px); }
+.pert-quick-chip:hover { transform: translateY(-2px); }
+.pert-quick-chip:active { transform: translateY(0); box-shadow: var(--clay-pressed); }
 .pert-active-chip {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 600;
-  padding: 3px 4px 3px 9px; border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
-  color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700;
+  padding: 5px 6px 5px 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 15%, var(--clay-surface));
+  color: var(--accent); border: none; box-shadow: var(--clay-pressed);
 }
 .pert-active-chip-x {
   display: inline-flex; width: 16px; height: 16px; border-radius: 50%;
@@ -1150,11 +1160,10 @@ body.light #cases-browser {
 .cases-head {
   display: flex; align-items: flex-start; justify-content: space-between;
   gap: 18px; margin-bottom: 22px;
-  padding: 22px 26px; border-radius: 20px;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 40px 100px -40px var(--shadow);
+  padding: 24px 28px; border-radius: 28px;
+  background: var(--clay-surface);
+  border: none;
+  box-shadow: var(--clay-card);
 }
 .cases-head-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: 1.8px; color: var(--accent); margin-bottom: 6px; }
 .cases-head-title { font-size: 26px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.6px; }
@@ -1170,13 +1179,13 @@ body.light #cases-browser {
 }
 .case-card {
   position: relative;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
-  border: 1px solid var(--glass-brd);
-  border-radius: 16px;
-  padding: 16px 18px 16px 26px;
+  background: var(--clay-surface);
+  border: none;
+  border-radius: 20px;
+  padding: 17px 20px 17px 28px;
   cursor: pointer;
-  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+  box-shadow: var(--clay);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 .case-card::before {
   content: ''; position: absolute; top: 14px; bottom: 14px; left: 12px;
@@ -1186,9 +1195,8 @@ body.light #cases-browser {
   opacity: 0.85;
 }
 .case-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--pw, var(--accent));
-  box-shadow: 0 18px 38px -18px color-mix(in srgb, var(--pw, var(--accent)) 60%, transparent);
+  transform: translateY(-4px);
+  box-shadow: var(--clay-card), 0 22px 44px -22px color-mix(in srgb, var(--pw, var(--accent)) 55%, transparent);
 }
 .case-card-pw {
   font-size: 9.5px; letter-spacing: 1.8px; font-weight: 700;
@@ -1218,10 +1226,9 @@ body.light #help-modal { background: linear-gradient(180deg, rgba(243,246,251,0.
 #help-modal.open { display: grid; }
 .help-card {
   width: min(620px, 100%); max-width: 100%;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%);
-  border: 1px solid var(--glass-brd); border-radius: 22px;
-  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 40px 100px -30px var(--shadow);
+  background: var(--clay-surface);
+  border: none; border-radius: 30px;
+  box-shadow: var(--clay-card);
   padding: 26px 30px 24px;
 }
 .help-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 8px; }
@@ -1256,10 +1263,9 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 #cmd-palette.open { display: grid; place-items: start center; }
 .cmd-box {
   width: min(660px, 100%);
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%);
-  border: 1px solid var(--glass-brd); border-radius: 14px;
-  box-shadow: 0 1px 0 var(--glass-hi) inset, 0 40px 100px -30px var(--shadow);
+  background: var(--clay-surface);
+  border: none; border-radius: 26px;
+  box-shadow: var(--clay-card);
   overflow: hidden;
 }
 .cmd-input {
