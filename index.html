@@ -204,22 +204,36 @@ header h1 .accent {
 .header-actions { display: flex; gap: 8px; align-items: center; }
 @media (max-width: 1100px) { .toggle-btn .lbl { display: none; } }
 
-/* ===== Cell-type selector (floating tab bar over the map) ===== */
-#cell-tabs {
-  position: fixed; top: 74px; left: 50%; transform: translateX(-50%); z-index: 25;
-  display: flex; gap: 3px; padding: 4px; max-width: 96vw; overflow-x: auto;
-  background: var(--glass); border: 1px solid var(--glass-brd); border-radius: 999px;
+/* ===== Cell-type selector (compact floating dropdown over the map) ===== */
+#cell-select { position: fixed; top: 74px; left: 50%; transform: translateX(-50%); z-index: 26; }
+.cell-select-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text);
+  padding: 7px 15px; border-radius: 999px; cursor: pointer;
+  background: var(--glass); border: 1px solid var(--glass-brd);
   -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
-  box-shadow: 0 10px 34px -14px var(--shadow); scrollbar-width: none;
+  box-shadow: 0 10px 34px -14px var(--shadow); transition: border-color 0.14s;
 }
-#cell-tabs::-webkit-scrollbar { display: none; }
-.cell-tab {
-  font-family: inherit; font-size: 11.5px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
-  padding: 5px 13px; border-radius: 999px; border: 1px solid transparent;
-  background: transparent; color: var(--text-2); cursor: pointer; transition: background 0.14s, color 0.14s;
+.cell-select-btn:hover { border-color: var(--accent); }
+.cell-select-btn .eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 1.4px; color: var(--text-2); text-transform: uppercase; }
+.cell-select-btn .caret { color: var(--text-2); font-size: 10px; transition: transform 0.16s; }
+#cell-select.open .cell-select-btn { border-color: var(--accent); }
+#cell-select.open .caret { transform: rotate(180deg); }
+.cell-select-menu {
+  position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  min-width: 200px; max-height: 72vh; overflow-y: auto; display: none;
+  background: var(--glass); border: 1px solid var(--glass-brd); border-radius: 14px; padding: 5px;
+  -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
+  box-shadow: 0 20px 54px -18px var(--shadow);
 }
-.cell-tab:hover { color: var(--text); background: var(--glass-2); }
-.cell-tab.active { background: var(--accent); color: #fff; }
+#cell-select.open .cell-select-menu { display: block; }
+.cell-menu-item {
+  display: block; width: 100%; text-align: left; white-space: nowrap;
+  font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--text);
+  padding: 8px 13px; border-radius: 9px; border: none; background: transparent; cursor: pointer;
+}
+.cell-menu-item:hover { background: var(--glass-2); }
+.cell-menu-item.active { background: var(--accent); color: #fff; }
 #cell-note {
   position: fixed; top: 118px; left: 50%; transform: translateX(-50%); z-index: 24;
   max-width: min(560px, 94vw); text-align: center; line-height: 1.45;
@@ -1291,9 +1305,8 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
    ============================================================ */
 @media (max-width: 900px) {
   header { height: 56px; padding: 0 12px; }
-  #cell-tabs { top: 62px; padding: 3px; }
-  .cell-tab { padding: 5px 10px; font-size: 11px; }
-  #cell-note { top: 102px; font-size: 11px; padding: 6px 12px; }
+  #cell-select { top: 62px; }
+  #cell-note { top: 104px; font-size: 11px; padding: 6px 12px; }
   .brand { gap: 9px; }
   .brand-mark { width: 30px; height: 30px; font-size: 15px; }
   header h1 { font-size: 16px; }
@@ -1519,7 +1532,10 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   </div>
 </header>
 
-<div id="cell-tabs" role="tablist" aria-label="Cell type"></div>
+<div id="cell-select">
+  <button class="cell-select-btn" id="cell-select-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+  <div class="cell-select-menu" id="cell-select-menu" role="listbox"></div>
+</div>
 <div id="cell-note"></div>
 
 <div class="layout hide-left hide-right">
@@ -3244,11 +3260,12 @@ const CELL_TYPES = [
 let selectedCell = 'all';
 function currentCell() { return CELL_TYPES.find(c => c.id === selectedCell) || CELL_TYPES[0]; }
 
-function renderCellTabs() {
-  const el = document.getElementById('cell-tabs');
-  if (!el) return;
-  el.innerHTML = CELL_TYPES.map(c =>
-    `<button class="cell-tab${c.id === selectedCell ? ' active' : ''}" data-cell="${c.id}" title="${escapeAttr(c.note)}">${escapeText(c.tab)}</button>`).join('');
+function renderCellMenu() {
+  const btn = document.getElementById('cell-select-btn'), menu = document.getElementById('cell-select-menu');
+  if (!btn || !menu) return;
+  btn.innerHTML = `<span class="eyebrow">Cell</span><span class="cell-cur">${escapeText(currentCell().tab)}</span><span class="caret">▾</span>`;
+  menu.innerHTML = CELL_TYPES.map(c =>
+    `<button class="cell-menu-item${c.id === selectedCell ? ' active' : ''}" data-cell="${c.id}" title="${escapeAttr(c.note)}">${escapeText(c.tab)}</button>`).join('');
 }
 
 // Dim the pathways a cell doesn't run, via one generated stylesheet (targets the
@@ -3270,7 +3287,7 @@ function applyCellFilter() {
 
 function selectCell(id) {
   selectedCell = id;
-  renderCellTabs();
+  renderCellMenu();
   applyCellFilter();
   renderCompartments();        // refresh the plasma-membrane label
   const note = document.getElementById('cell-note');
@@ -3393,13 +3410,21 @@ renderTransporters();
 renderPerturbationList();
 renderAll();
 
-// Cell-type selector
-renderCellTabs();
+// Cell-type selector (compact dropdown)
+renderCellMenu();
 applyCellFilter();
-document.getElementById('cell-tabs').addEventListener('click', (e) => {
-  const btn = e.target.closest('.cell-tab');
-  if (btn) selectCell(btn.dataset.cell);
+const cellSelectEl = document.getElementById('cell-select');
+document.getElementById('cell-select-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = cellSelectEl.classList.toggle('open');
+  document.getElementById('cell-select-btn').setAttribute('aria-expanded', open);
 });
+document.getElementById('cell-select-menu').addEventListener('click', (e) => {
+  const item = e.target.closest('.cell-menu-item');
+  if (item) { selectCell(item.dataset.cell); cellSelectEl.classList.remove('open'); }
+});
+document.addEventListener('click', (e) => { if (!cellSelectEl.contains(e.target)) cellSelectEl.classList.remove('open'); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cellSelectEl.classList.remove('open'); });
 
 // Quick-start chips + active chips at top of left panel
 document.getElementById('pert-summary').addEventListener('click', (e) => {
