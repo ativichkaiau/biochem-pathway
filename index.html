@@ -1525,7 +1525,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <text x="880" y="995" class="pathway-label faint" data-pw="tca" style="--pw: var(--pw-tca)" text-anchor="middle">TCA</text>
       <text x="150" y="1198" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones);font-size:11px">KETOGENESIS</text>
       <text x="1140" y="650" class="pathway-label" data-pw="urea" style="--pw: var(--pw-urea)">UREA CYCLE</text>
-      <text x="1300" y="1150" class="pathway-label" data-pw="protein" style="--pw: var(--pw-protein);font-size:11px">AMINO ACIDS</text>
+      <text x="1344" y="1130" class="pathway-label" data-pw="protein" style="--pw: var(--pw-protein);font-size:11px">AMINO ACIDS</text>
       <text x="870" y="1212" class="pathway-label" data-pw="etc" style="--pw: var(--pw-etc)" text-anchor="middle">ETC / OXPHOS</text>
       <text x="1090" y="160" class="pathway-label" data-pw="sterol" style="--pw: var(--pw-sterol)">CHOLESTEROL / STEROIDS</text>
       <text x="1290" y="1258" class="pathway-label" data-pw="heme" style="--pw: var(--pw-heme);font-size:11px">HEME SYNTHESIS</text>
@@ -1822,7 +1822,7 @@ const M = {
   'Carbamoyl-P':     { x: 1210, y: 700, pathway: 'urea', info: 'Carbamoyl phosphate. CPS1 (mitochondrial, rate-limiting): NH3 + CO2 + 2 ATP → carbamoyl-P + 2 ADP + Pi.' },
   'Citrulline':      { x: 1310, y: 760, pathway: 'urea', info: '6C non-protein amino acid. Made in mito by OTC; exported to cytosol.' },
   'Argininosuccinate': { x: 1310, y: 850, pathway: 'urea', info: 'Cytosolic. ASS: citrulline + aspartate + ATP → argininosuccinate + AMP + PPi.' },
-  'Arginine':        { x: 1210, y: 920, pathway: 'urea', info: 'Hydrolyzed by arginase → ornithine + urea. Also substrate for NO synthase, polyamines, creatine.' },
+  'Arginine':        { x: 1242, y: 920, pathway: 'urea', info: 'Hydrolyzed by arginase → ornithine + urea. Also substrate for NO synthase, polyamines, creatine.' },
   'Ornithine':       { x: 1100, y: 850, pathway: 'urea', info: '5C non-protein amino acid. Nitrogen carrier — re-enters mito to restart cycle.' },
   'Urea':            { x: 1100, y: 970, pathway: 'urea', info: 'CO(NH₂)₂. Excreted in urine (~30 g/day). 2 N atoms per molecule: one from NH4+, one from aspartate.' },
   'Aspartate':       { x: 1420, y: 850, pathway: 'protein', info: 'Donates 2nd N to urea cycle (via ASS). Made from OAA via AST transamination — direct link between TCA, urea, and amino acid metabolism.' },
@@ -1830,8 +1830,8 @@ const M = {
   // ==== PROTEIN / AMINO ACIDS ====
   'Alanine':         { x: 525, y: 720, pathway: 'protein', info: 'Glucogenic AA. Cahill cycle: muscle → liver alanine carries N as Pyruvate. ALT: Alanine + α-KG ⇌ Pyruvate + Glutamate.' },
   'AA pool':         { x: 1060, y: 1170, pathway: 'protein', info: 'Generic amino acid pool. AAs are catabolized via transamination → Glutamate, then GDH releases NH₄⁺. Carbon skeletons enter TCA at 7 entry points (pyruvate, acetyl-CoA, α-KG, succinyl-CoA, fumarate, OAA, acetoacetate).' },
-  'Glutamate':       { x: 1200, y: 1170, pathway: 'protein', info: 'Central N carrier. GDH: Glutamate + NAD⁺ ⇌ α-KG + NH₄⁺. Also forms glutamine, GABA, glutathione, proline.' },
-  'Glutamine':       { x: 1340, y: 1170, pathway: 'protein', info: 'Non-toxic N-transport molecule (blood). Glutaminase (kidney, gut) → Glutamate + NH₄⁺. Glutamine synthetase (astrocytes, muscle) protects against ammonia.' },
+  'Glutamate':       { x: 1244, y: 1170, pathway: 'protein', info: 'Central N carrier. GDH: Glutamate + NAD⁺ ⇌ α-KG + NH₄⁺. Also forms glutamine, GABA, glutathione, proline.' },
+  'Glutamine':       { x: 1384, y: 1170, pathway: 'protein', info: 'Non-toxic N-transport molecule (blood). Glutaminase (kidney, gut) → Glutamate + NH₄⁺. Glutamine synthetase (astrocytes, muscle) protects against ammonia.' },
 
   // ==== CHOLESTEROL / STEROIDS ====
   'Mevalonate':      { x: 1110, y: 210, pathway: 'sterol', info: 'Product of HMG-CoA reductase — the committed, rate-limiting step of cholesterol synthesis (statin target). Converted to 5-C isoprene units.' },
