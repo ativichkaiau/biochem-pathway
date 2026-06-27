@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Interactive Metabolism — Glycolysis · TCA · ETC · PPP · Glycogen · Lipid · Protein · Urea · Heme · Nucleotides · Cholesterol</title>
+<title>Biochem Met · VESTRIPPN3.0</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -14,6 +14,7 @@
   --text: #e6edf3;
   --text-2: #8b949e;
   --accent: #58a6ff;
+  --brand-teal: #2dd4bf;
   --up: #56d364;
   --up2: #2ea043;
   --down: #f85149;
@@ -79,6 +80,7 @@ body.light {
   --text: #1f2328;
   --text-2: #59636e;
   --accent: #0969da;
+  --brand-teal: #0f8f83;
   --up: #1a7f37;
   --up2: #0f5323;
   --down: #cf222e;
@@ -173,23 +175,50 @@ header {
 .brand { display: flex; align-items: center; gap: 13px; }
 .brand-mark {
   width: 46px; height: 46px; border-radius: 15px; flex-shrink: 0;
-  display: grid; place-items: center; font-size: 23px; position: relative; overflow: hidden;
-  background: linear-gradient(150deg, var(--pw-tca) 0%, var(--accent) 52%, var(--purple) 100%);
+  display: grid; place-items: center; position: relative; overflow: hidden;
+  background: var(--clay-surface);
+  color: var(--brand-teal);
+  border: 1px solid color-mix(in srgb, var(--brand-teal) 52%, var(--glass-brd));
   box-shadow:
-    0 9px 20px -7px color-mix(in srgb, var(--accent) 65%, transparent),
+    0 9px 20px -8px color-mix(in srgb, var(--brand-teal) 72%, transparent),
     inset 2px 3px 5px rgba(255,255,255,0.5),
     inset -3px -5px 9px rgba(0,0,0,0.28);
+}
+.brand-mark span {
+  position: relative; z-index: 1;
+  font-size: 27px; line-height: 1;
+  font-weight: 950; letter-spacing: -2px;
 }
 .brand-mark::after {
   content: ""; position: absolute; top: 3px; left: 4px; right: 8px; height: 42%;
   border-radius: 12px 12px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
   pointer-events: none;
 }
-header h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.05; }
+.brand-lockup { min-width: 0; }
+.parent-brand {
+  color: var(--text);
+  font-size: 9.5px;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: 1.8px;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+.parent-brand .brand-v { color: var(--brand-teal); }
+.branch-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; line-height: 1; }
 header h1 .accent {
-  background: linear-gradient(120deg, var(--pw-tca), var(--accent) 50%, var(--purple) 95%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  margin-left: 5px; font-weight: 800;
+  color: var(--brand-teal);
+  margin-left: 4px; font-weight: 800;
+}
+.branch-tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 6px; border-radius: 999px;
+  color: var(--brand-teal);
+  border: 1px solid color-mix(in srgb, var(--brand-teal) 38%, transparent);
+  background: color-mix(in srgb, var(--brand-teal) 10%, transparent);
+  font-size: 8px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; white-space: nowrap;
 }
 .subtitle { color: var(--text-2); font-size: 11px; margin-top: 2px; }
 /* Right-side Mode cluster (themed day/night toggle) */
@@ -750,18 +779,21 @@ body.light #intro {
 @keyframes cardIn { from { opacity: 0; transform: translateY(22px) scale(0.97); } to { opacity: 1; transform: none; } }
 
 .intro-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
   font-size: 11px; font-weight: 700; letter-spacing: 2.4px;
-  color: var(--gluco);
+  color: var(--text-2);
 }
 .intro-eyebrow::before, .intro-eyebrow::after {
   content: ""; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--gluco); box-shadow: 0 0 18px var(--gluco);
+  background: var(--brand-teal); box-shadow: 0 0 18px var(--brand-teal);
 }
+.intro-eyebrow .vestrippn { color: var(--text); font-weight: 900; }
+.intro-eyebrow .vestrippn .brand-v { color: var(--brand-teal); }
+.intro-eyebrow .branch-divider { color: var(--brand-teal); opacity: 0.7; }
+.intro-eyebrow .branch-label { color: var(--text-2); }
 .intro-title { font-size: 50px; font-weight: 850; letter-spacing: -1.6px; line-height: 1.02; margin-bottom: 10px; }
 .intro-title span {
-  background: linear-gradient(120deg, var(--gluco), var(--lbl-nucleo), var(--purple));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+  color: var(--brand-teal);
 }
 .intro-sub { color: var(--text-2); font-size: 14px; line-height: 1.5; max-width: 650px; margin: 0 auto 18px; }
 .intro-sub strong { color: var(--text); font-weight: 700; }
@@ -1338,7 +1370,10 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   #cell-note { top: 104px; font-size: 11px; padding: 6px 12px; }
   .brand { gap: 9px; }
   .brand-mark { width: 38px; height: 38px; font-size: 19px; border-radius: 12px; }
+  .brand-mark span { font-size: 23px; }
+  .parent-brand { font-size: 8px; letter-spacing: 1.35px; margin-bottom: 3px; }
   header h1 { font-size: 17px; }
+  .branch-tag { display: none; }
   .subtitle { display: none; }
   #focus-btn { display: none; }   /* redundant on mobile — panels are overlays */
   .header-actions { gap: 6px; flex: 1; justify-content: flex-end; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -1401,9 +1436,13 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 <div id="intro">
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
   <div class="intro-card">
-    <div class="intro-eyebrow">BIOCHEMICAL FLUX LAB</div>
+    <div class="intro-eyebrow">
+      <span class="vestrippn"><span class="brand-v">V</span>ESTRIPPN3.0</span>
+      <span class="branch-divider">/</span>
+      <span class="branch-label">BIOCHEMISTRY BRANCH</span>
+    </div>
     <h1 class="intro-title">Biochem <span>Met</span></h1>
-    <p class="intro-sub"><strong>Balance substrates, enzymes, cofactors, and ATP yield</strong> across one metabolism map. Toggle a condition and watch the biochemical consequences move through the network.</p>
+    <p class="intro-sub"><strong>Biochem Met is the metabolism branch of VESTRIPPN3.0.</strong> Balance substrates, enzymes, cofactors, and ATP yield across one interactive map.</p>
     <div class="intro-chipline" aria-hidden="true">
       <span>Carbon skeletons</span><span>Enzyme control</span><span>NAD⁺ / NADH</span><span>ATP yield</span>
     </div>
@@ -1548,10 +1587,13 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 
 <header>
   <div class="brand">
-    <div class="brand-mark">⚗️</div>
-    <div>
-      <h1>Biochem<span class="accent">Met</span></h1>
-      <div class="subtitle">Interactive metabolism map</div>
+    <div class="brand-mark" aria-hidden="true"><span>V</span></div>
+    <div class="brand-lockup">
+      <div class="parent-brand"><span class="brand-v">V</span>ESTRIPPN3.0</div>
+      <div class="branch-row">
+        <h1>Biochem<span class="accent">Met</span></h1>
+        <span class="branch-tag">Metabolism branch</span>
+      </div>
     </div>
   </div>
   <div class="header-actions">
@@ -1715,7 +1757,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     <div class="help-card-head">
       <div>
         <div class="help-card-eyebrow">? HELP &amp; SHORTCUTS</div>
-        <h2 class="help-card-title" id="help-title">How Biochem Met works</h2>
+        <h2 class="help-card-title" id="help-title">VESTRIPPN3.0 · Biochem Met</h2>
       </div>
       <button class="btn" id="help-close">Close ✕</button>
     </div>
