@@ -3186,7 +3186,7 @@ const COMPARTMENTS = [
 function organelleArt(kind, x, y, w, h, cc) {
   const cx = x + w / 2, cy = y + h / 2, p = [], R = v => Math.round(v), uid = 'oa-' + kind;
   if (kind === 'mito') {
-    const ix = x + 16, iy = y + 16, iw = w - 32, ih = h - 32, rx = Math.min(175, ih / 2);
+    const ix = x - 10, iy = y - 10, iw = w + 20, ih = h + 20, rx = Math.min(175, ih / 2);
     p.push(`<defs>
       <linearGradient id="${uid}-fill" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="${cc}" stop-opacity="0.34"/><stop offset="1" stop-color="${cc}" stop-opacity="0.13"/>
@@ -3200,11 +3200,20 @@ function organelleArt(kind, x, y, w, h, cc) {
     p.push(`<rect x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" fill="url(#${uid}-fill)" stroke="${cc}" stroke-opacity="0.62" stroke-width="2.6" filter="url(#${uid}-glow)"/>`);
     p.push(`<rect x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" fill="url(#${uid}-sheen)"/>`);
     p.push(`<rect x="${R(ix + 11)}" y="${R(iy + 11)}" width="${R(iw - 22)}" height="${R(ih - 22)}" rx="${R(Math.max(8, rx - 11))}" fill="none" stroke="${cc}" stroke-opacity="0.34" stroke-width="1.5"/>`);
-    // cristae: filled, shaded membrane folds hugging the top & bottom (matrix interior stays open for the TCA ring)
-    const n = Math.max(6, Math.round(iw / 130)), fw = 30, L = Math.min(170, ih * 0.22), span = iw - 150, step = span / (n - 1), r = fw / 2;
-    const crista = (fx, base, dir) => { const tip = base + dir * L; return `<path d="M${R(fx)},${R(base)} L${R(fx)},${R(tip)} A${r},${r} 0 0 ${dir > 0 ? 0 : 1} ${R(fx + fw)},${R(tip)} L${R(fx + fw)},${R(base)} Z" fill="${cc}" fill-opacity="0.12" stroke="${cc}" stroke-opacity="0.42" stroke-width="1.4"/>`; };
-    for (let i = 0; i < n; i++) p.push(crista(ix + 75 + step * i - r, iy + 13, 1));
-    for (let i = 0; i < n - 1; i++) p.push(crista(ix + 75 + step * (i + 0.5) - r, iy + ih - 13, -1));
+    // cristae: the inner membrane folded into scalloped ridges that hug the top &
+    // bottom walls, leaving the matrix interior open for the TCA ring.
+    const cx0 = ix + 58, cx1 = ix + iw - 58, scN = Math.max(4, Math.round((cx1 - cx0) / 64));
+    const sw = (cx1 - cx0) / scN, rr = sw / 2, depth = 26;
+    const scallop = (baseY, down) => {
+      for (let layer = 0; layer < 2; layer++) {
+        const yy = baseY + (down ? 1 : -1) * layer * 8;
+        let d = `M${R(cx0)},${R(yy)}`;
+        for (let i = 0; i < scN; i++) d += ` a${R(rr)},${depth} 0 0 ${down ? 1 : 0} ${R(sw)},0`;
+        p.push(`<path d="${d}" fill="none" stroke="${cc}" stroke-opacity="${layer === 0 ? 0.4 : 0.2}" stroke-width="1.4" stroke-linecap="round"/>`);
+      }
+    };
+    scallop(iy + 22, true);
+    scallop(iy + ih - 22, false);
   } else if (kind === 'er') {
     p.push(`<defs><linearGradient id="${uid}-rib" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${cc}" stop-opacity="0.30"/><stop offset="1" stop-color="${cc}" stop-opacity="0.14"/></linearGradient></defs>`);
     // rough ER: stacked cisternae (thick translucent ribbons) studded with ribosome beads
