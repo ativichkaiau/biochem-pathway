@@ -14,7 +14,8 @@
   --text: #e6edf3;
   --text-2: #8b949e;
   --accent: #58a6ff;
-  --brand-teal: #2dd4bf;
+  --brand-teal: #49ad94;
+  --brand-blue: #3478f6;
   --up: #56d364;
   --up2: #2ea043;
   --down: #f85149;
@@ -80,7 +81,8 @@ body.light {
   --text: #1f2328;
   --text-2: #59636e;
   --accent: #0969da;
-  --brand-teal: #0f8f83;
+  --brand-teal: #3c9b85;
+  --brand-blue: #2869eb;
   --up: #1a7f37;
   --up2: #0f5323;
   --down: #cf222e;
@@ -176,49 +178,41 @@ header {
 .brand-mark {
   width: 46px; height: 46px; border-radius: 15px; flex-shrink: 0;
   display: grid; place-items: center; position: relative; overflow: hidden;
-  background: var(--clay-surface);
-  color: var(--brand-teal);
-  border: 1px solid color-mix(in srgb, var(--brand-teal) 52%, var(--glass-brd));
+  background: linear-gradient(145deg, #8bd5c4 0%, #56ad95 48%, #347b6b 100%);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.38);
   box-shadow:
-    0 9px 20px -8px color-mix(in srgb, var(--brand-teal) 72%, transparent),
-    inset 2px 3px 5px rgba(255,255,255,0.5),
-    inset -3px -5px 9px rgba(0,0,0,0.28);
+    0 10px 22px -8px rgba(48,124,106,0.8),
+    inset 2px 3px 6px rgba(255,255,255,0.58),
+    inset -3px -5px 9px rgba(27,92,78,0.42);
 }
 .brand-mark span {
   position: relative; z-index: 1;
   font-size: 27px; line-height: 1;
-  font-weight: 950; letter-spacing: -2px;
+  font-weight: 950; letter-spacing: -1.5px;
+  text-shadow: 0 2px 3px rgba(22,82,69,0.38);
 }
 .brand-mark::after {
   content: ""; position: absolute; top: 3px; left: 4px; right: 8px; height: 42%;
   border-radius: 12px 12px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
   pointer-events: none;
 }
-.brand-lockup { min-width: 0; }
-.parent-brand {
+.vestrippn-wordmark {
   color: var(--text);
-  font-size: 9.5px;
-  font-weight: 850;
+  font-size: 20px;
+  font-weight: 900;
   line-height: 1;
-  letter-spacing: 1.8px;
+  letter-spacing: -0.4px;
   white-space: nowrap;
-  margin-bottom: 4px;
 }
-.parent-brand .brand-v { color: var(--brand-teal); }
-.branch-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
-header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; line-height: 1; }
-header h1 .accent {
-  color: var(--brand-teal);
-  margin-left: 4px; font-weight: 800;
-}
-.branch-tag {
-  display: inline-flex; align-items: center;
-  padding: 2px 6px; border-radius: 999px;
-  color: var(--brand-teal);
-  border: 1px solid color-mix(in srgb, var(--brand-teal) 38%, transparent);
-  background: color-mix(in srgb, var(--brand-teal) 10%, transparent);
-  font-size: 8px; font-weight: 800; letter-spacing: 1px;
-  text-transform: uppercase; white-space: nowrap;
+.vestrippn-wordmark .brand-version { color: var(--brand-blue); }
+.branch-identity {
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+  padding-left: 2px;
 }
 .subtitle { color: var(--text-2); font-size: 11px; margin-top: 2px; }
 /* Right-side Mode cluster (themed day/night toggle) */
@@ -270,6 +264,7 @@ header h1 .accent {
 .toggle-btn .ico { font-size: 13px; line-height: 1; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
 @media (max-width: 1100px) { .toggle-btn .lbl { display: none; } }
+@media (max-width: 1180px) { .branch-identity { display: none; } }
 
 /* ===== Cell-type selector (compact floating dropdown over the map) ===== */
 #cell-select { position: fixed; top: 74px; left: 50%; transform: translateX(-50%); z-index: 26; }
@@ -780,21 +775,23 @@ body.light #intro {
 
 .intro-eyebrow {
   display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
-  font-size: 11px; font-weight: 700; letter-spacing: 2.4px;
+  font-size: 11px; font-weight: 700; letter-spacing: 1.8px;
   color: var(--text-2);
 }
-.intro-eyebrow::before, .intro-eyebrow::after {
-  content: ""; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--brand-teal); box-shadow: 0 0 18px var(--brand-teal);
+.intro-brand-mark {
+  width: 30px; height: 30px; display: inline-grid; place-items: center;
+  border-radius: 10px; color: #fff;
+  font-size: 18px; font-weight: 950; letter-spacing: -1px;
+  background: linear-gradient(145deg, #8bd5c4 0%, #56ad95 48%, #347b6b 100%);
+  border: 1px solid rgba(255,255,255,0.38);
+  box-shadow: 0 7px 16px -7px rgba(48,124,106,0.85), inset 1px 2px 4px rgba(255,255,255,0.5);
+  text-shadow: 0 1px 2px rgba(22,82,69,0.35);
 }
-.intro-eyebrow .vestrippn { color: var(--text); font-weight: 900; }
-.intro-eyebrow .vestrippn .brand-v { color: var(--brand-teal); }
-.intro-eyebrow .branch-divider { color: var(--brand-teal); opacity: 0.7; }
+.intro-eyebrow .vestrippn-wordmark { font-size: 13px; letter-spacing: -0.15px; }
+.intro-eyebrow .branch-divider { color: var(--text-2); opacity: 0.55; margin: 0 3px; }
 .intro-eyebrow .branch-label { color: var(--text-2); }
 .intro-title { font-size: 50px; font-weight: 850; letter-spacing: -1.6px; line-height: 1.02; margin-bottom: 10px; }
-.intro-title span {
-  color: var(--brand-teal);
-}
+.intro-title span { color: inherit; }
 .intro-sub { color: var(--text-2); font-size: 14px; line-height: 1.5; max-width: 650px; margin: 0 auto 18px; }
 .intro-sub strong { color: var(--text); font-weight: 700; }
 
@@ -1371,9 +1368,8 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   .brand { gap: 9px; }
   .brand-mark { width: 38px; height: 38px; font-size: 19px; border-radius: 12px; }
   .brand-mark span { font-size: 23px; }
-  .parent-brand { font-size: 8px; letter-spacing: 1.35px; margin-bottom: 3px; }
-  header h1 { font-size: 17px; }
-  .branch-tag { display: none; }
+  header .vestrippn-wordmark { font-size: 15px; }
+  .branch-identity { display: none; }
   .subtitle { display: none; }
   #focus-btn { display: none; }   /* redundant on mobile — panels are overlays */
   .header-actions { gap: 6px; flex: 1; justify-content: flex-end; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -1420,7 +1416,9 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 }
 
 @media (max-width: 560px) {
-  header h1 { font-size: 15px; }
+  header .vestrippn-wordmark { font-size: 13px; letter-spacing: -0.25px; }
+  .brand-mark { width: 34px; height: 34px; border-radius: 11px; }
+  .brand-mark span { font-size: 21px; }
   #help-btn { display: none; }   /* shortcuts are keyboard-only; reachable via command palette */
   .btn { padding: 7px 9px; font-size: 11.5px; }
   aside { width: min(92vw, 340px); }
@@ -1437,7 +1435,8 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
   <div class="intro-card">
     <div class="intro-eyebrow">
-      <span class="vestrippn"><span class="brand-v">V</span>ESTRIPPN3.0</span>
+      <span class="intro-brand-mark" aria-hidden="true">V</span>
+      <span class="vestrippn-wordmark">VESTRIPPN<span class="brand-version">3.0</span></span>
       <span class="branch-divider">/</span>
       <span class="branch-label">BIOCHEMISTRY BRANCH</span>
     </div>
@@ -1588,13 +1587,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 <header>
   <div class="brand">
     <div class="brand-mark" aria-hidden="true"><span>V</span></div>
-    <div class="brand-lockup">
-      <div class="parent-brand"><span class="brand-v">V</span>ESTRIPPN3.0</div>
-      <div class="branch-row">
-        <h1>Biochem<span class="accent">Met</span></h1>
-        <span class="branch-tag">Metabolism branch</span>
-      </div>
-    </div>
+    <div class="vestrippn-wordmark">VESTRIPPN<span class="brand-version">3.0</span></div>
   </div>
   <div class="header-actions">
     <div class="header-btns">
@@ -1605,6 +1598,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <button class="btn" id="focus-btn" title="Focus mode — hide both panels  ( f )"><span class="ico">⤢</span><span class="lbl">Focus</span></button>
       <button class="btn" id="reset-btn">Reset <span class="count-badge zero" id="active-count">0</span></button>
     </div>
+    <div class="branch-identity">Biochem Met</div>
     <div class="mode-cluster">
       <span class="mode-label">Mode</span>
       <button class="mode-toggle" id="theme-btn" title="Toggle day / night mode  ( t )"><span class="ico">☀️</span><span class="lbl">Day</span></button>
