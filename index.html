@@ -3186,34 +3186,20 @@ const COMPARTMENTS = [
 function organelleArt(kind, x, y, w, h, cc) {
   const cx = x + w / 2, cy = y + h / 2, p = [], R = v => Math.round(v), uid = 'oa-' + kind;
   if (kind === 'mito') {
-    const ix = x - 10, iy = y - 10, iw = w + 20, ih = h + 20, rx = Math.min(175, ih / 2);
-    p.push(`<defs>
-      <linearGradient id="${uid}-fill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="${cc}" stop-opacity="0.34"/><stop offset="1" stop-color="${cc}" stop-opacity="0.13"/>
-      </linearGradient>
-      <linearGradient id="${uid}-sheen" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#ffffff" stop-opacity="0.18"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
-      </linearGradient>
-      <filter id="${uid}-glow" x="-15%" y="-25%" width="130%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="15" flood-color="${cc}" flood-opacity="0.22"/></filter>
-    </defs>`);
-    // outer membrane (gradient matrix) + glossy sheen + inner membrane
-    p.push(`<rect x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" fill="url(#${uid}-fill)" stroke="${cc}" stroke-opacity="0.62" stroke-width="2.6" filter="url(#${uid}-glow)"/>`);
-    p.push(`<rect x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" fill="url(#${uid}-sheen)"/>`);
-    p.push(`<rect x="${R(ix + 11)}" y="${R(iy + 11)}" width="${R(iw - 22)}" height="${R(ih - 22)}" rx="${R(Math.max(8, rx - 11))}" fill="none" stroke="${cc}" stroke-opacity="0.34" stroke-width="1.5"/>`);
-    // cristae: the inner membrane folded into scalloped ridges that hug the top &
-    // bottom walls, leaving the matrix interior open for the TCA ring.
-    const cx0 = ix + 58, cx1 = ix + iw - 58, scN = Math.max(4, Math.round((cx1 - cx0) / 64));
-    const sw = (cx1 - cx0) / scN, rr = sw / 2, depth = 26;
+    const ix = x - 10, iy = y - 10, iw = w + 20, ih = h + 20, rx = Math.min(150, ih / 2);
+    // a clean double membrane (the mitochondrion's signature) with a barely-there matrix tint
+    p.push(`<rect x="${R(ix)}" y="${R(iy)}" width="${R(iw)}" height="${R(ih)}" rx="${R(rx)}" fill="${cc}" fill-opacity="0.05" stroke="${cc}" stroke-opacity="0.5" stroke-width="2"/>`);
+    p.push(`<rect x="${R(ix + 13)}" y="${R(iy + 13)}" width="${R(iw - 26)}" height="${R(ih - 26)}" rx="${R(Math.max(8, rx - 13))}" fill="none" stroke="${cc}" stroke-opacity="0.3" stroke-width="1.3"/>`);
+    // cristae: a subtle scalloped fold on the inner membrane, top & bottom (matrix interior stays open)
+    const cx0 = ix + 72, cx1 = ix + iw - 72, scN = Math.max(4, Math.round((cx1 - cx0) / 72));
+    const sw = (cx1 - cx0) / scN, rr = sw / 2, depth = 20;
     const scallop = (baseY, down) => {
-      for (let layer = 0; layer < 2; layer++) {
-        const yy = baseY + (down ? 1 : -1) * layer * 8;
-        let d = `M${R(cx0)},${R(yy)}`;
-        for (let i = 0; i < scN; i++) d += ` a${R(rr)},${depth} 0 0 ${down ? 1 : 0} ${R(sw)},0`;
-        p.push(`<path d="${d}" fill="none" stroke="${cc}" stroke-opacity="${layer === 0 ? 0.4 : 0.2}" stroke-width="1.4" stroke-linecap="round"/>`);
-      }
+      let d = `M${R(cx0)},${R(baseY)}`;
+      for (let i = 0; i < scN; i++) d += ` a${R(rr)},${depth} 0 0 ${down ? 1 : 0} ${R(sw)},0`;
+      p.push(`<path d="${d}" fill="none" stroke="${cc}" stroke-opacity="0.24" stroke-width="1.2" stroke-linecap="round"/>`);
     };
-    scallop(iy + 22, true);
-    scallop(iy + ih - 22, false);
+    scallop(iy + 26, true);
+    scallop(iy + ih - 26, false);
   } else if (kind === 'er') {
     p.push(`<defs><linearGradient id="${uid}-rib" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${cc}" stop-opacity="0.30"/><stop offset="1" stop-color="${cc}" stop-opacity="0.14"/></linearGradient></defs>`);
     // rough ER: stacked cisternae (thick translucent ribbons) studded with ribosome beads
