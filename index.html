@@ -2447,7 +2447,8 @@ const P = [
   { id: 'otc-deficiency', name: 'Urea cycle defect (OTC)', cat: 'Genetic / disease',
     desc: 'OTC deficiency = X-linked, most common urea cycle disorder. NH4+ accumulates → hyperammonemia → CNS toxicity. Tx: low-protein diet, benzoate, lactulose.',
     inhibits: ['OTC'],
-    effects: { 'NH4+': 3, 'Carbamoyl-P': 3, 'Citrulline': -3, 'Argininosuccinate': -3, 'Arginine': -3, 'Ornithine': 2, 'Urea': -3 } },
+    effects: { 'NH4+': 3, 'Carbamoyl-P': 3, 'Citrulline': -3, 'Argininosuccinate': -3, 'Arginine': -3, 'Ornithine': 2, 'Urea': -3,
+      'Orotate': 2, 'UMP': 1 } },
 
   { id: 'pdh-deficiency', name: 'PDH deficiency', cat: 'Genetic / disease',
     desc: 'Congenital pyruvate dehydrogenase deficiency. Pyruvate cannot enter TCA → lactic acidosis, neurological symptoms. Tx: ketogenic diet (bypasses PDH).',
@@ -2524,9 +2525,8 @@ const P = [
 
   // ---- NUCLEOTIDE DRUGS / DISEASE ----
   { id: 'methotrexate', name: 'Methotrexate (DHFR)', cat: 'Drug',
-    desc: 'Inhibits dihydrofolate reductase → no THF regeneration → blocks dTMP (and de novo purine) synthesis. Chemo, RA, psoriasis, ectopic pregnancy. Rescue: leucovorin.',
-    inhibits: ['Thymidylate synthase'],
-    effects: { 'dTMP': -3, 'IMP': -2, 'AMP': -1, 'GMP': -1, 'UMP': 1 } },
+    desc: 'Inhibits dihydrofolate reductase (DHFR) → no THF regeneration → blocks dTMP (and de novo purine) synthesis. Chemo, RA, psoriasis, ectopic pregnancy. Rescue: leucovorin.',
+    effects: { 'THF': -3, '5,10-Methylene-THF': -3, 'dTMP': -3, 'IMP': -2, 'AMP': -1, 'GMP': -1, 'UMP': 1 } },
 
   { id: '5fu', name: '5-Fluorouracil (TS)', cat: 'Drug',
     desc: 'Forms F-dUMP → covalently blocks thymidylate synthase → "thymineless death". Colorectal/breast/GI chemo. Toxicity worsened by DPD deficiency.',
@@ -2539,8 +2539,8 @@ const P = [
     effects: { 'PRPP': 1, 'IMP': -3, 'AMP': -2, 'GMP': -2, 'Uric acid': -1 } },
 
   { id: 'hydroxyurea', name: 'Hydroxyurea (RNR)', cat: 'Drug',
-    desc: 'Inhibits ribonucleotide reductase → ↓dNTPs → S-phase arrest. Also ↑HbF in sickle cell. CML, polycythemia vera.',
-    effects: { 'dTMP': -2, 'AMP': -1, 'GMP': -1, 'UMP': 1 } },
+    desc: 'Inhibits ribonucleotide reductase (NDP → dNDP) → ↓dNTPs → S-phase arrest. Also ↑HbF in sickle cell. CML, polycythemia vera.',
+    effects: { 'dTMP': -3 } },
 
   { id: 'allopurinol', name: 'Allopurinol / Febuxostat (XO)', cat: 'Drug',
     desc: 'Inhibits xanthine oxidase → ↓uric acid. Chronic gout, tumor lysis prophylaxis. Builds up xanthine/hypoxanthine (more soluble).',
@@ -2606,7 +2606,7 @@ const P = [
   { id: 'b12-def', name: 'Vitamin B12 deficiency', cat: 'Toxin / disease',
     desc: 'Methionine synthase fails → "methyl-folate trap": folate stuck as 5-methyl-THF → functional folate deficiency (megaloblastic anemia) + methylmalonic acid buildup → subacute combined degeneration (neuro).',
     inhibits: ['MS (B12)'],
-    effects: { 'Homocysteine': 3, 'Methionine': -2, 'SAM': -2, 'THF': -2, '5,10-Methylene-THF': 1, 'dTMP': -2, 'Succinyl-CoA': -1 } },
+    effects: { 'Homocysteine': 3, 'Methionine': -2, 'SAM': -2, 'THF': -2, '5,10-Methylene-THF': -2, 'dTMP': -2, 'Succinyl-CoA': -1 } },
 
   { id: 'homocystinuria', name: 'Homocystinuria (CBS)', cat: 'Genetic / disease',
     desc: 'Cystathionine β-synthase deficiency. Homocysteine ↑↑↑ → Marfanoid habitus, lens dislocation (downward), thrombosis, intellectual disability. Some respond to high-dose B6.',
