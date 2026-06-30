@@ -2494,8 +2494,8 @@ const P = [
     effects: { 'NADH': 1, 'NAD+': -1, 'ATP': -1, 'ADP': 1, 'Lactate': 2, 'Pyruvate': 1, 'Glucose': -1, 'Glucose-6-P': -1, 'OAA': -1 } },
 
   { id: 'aspirin-od', name: 'Aspirin (salicylate) overdose', cat: 'Drug',
-    desc: 'High-dose salicylate uncouples OxPhos (mild) + stimulates respiratory center → mixed respiratory alkalosis + metabolic acidosis.',
-    effects: { 'H⁺ gradient': -2, 'ATP': -2, 'O2': -1, 'NADH': -1, 'Lactate': 2, 'CO2': 1 } },
+    desc: 'High-dose salicylate uncouples OxPhos (mild) + stimulates the respiratory center → early respiratory alkalosis (hyperventilation blows off CO₂), then a metabolic (anion-gap, lactate) acidosis.',
+    effects: { 'H⁺ gradient': -2, 'ATP': -2, 'O2': -1, 'NADH': -1, 'Lactate': 2 } },
 
   { id: 'statin', name: 'Statin (HMG-CoA reductase)', cat: 'Drug',
     desc: 'Inhibits cytosolic HMG-CoA reductase — committed step of cholesterol synthesis. Lowers LDL; modest HDL ↑. Ketogenesis (mito HMG-CoA lyase) unaffected.',
