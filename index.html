@@ -409,11 +409,12 @@ main {
 .node { cursor: pointer; }
 .node rect {
   stroke: var(--pw, var(--border));
-  stroke-opacity: 0.85;
+  stroke-opacity: 0.95;
   stroke-width: 1.5;
-  fill: var(--panel-2);
+  fill: color-mix(in srgb, var(--pw, var(--border)) 18%, var(--panel-2));
   transition: fill 0.2s, stroke 0.2s;
 }
+body.light .node rect { fill: color-mix(in srgb, var(--pw, var(--border)) 15%, #ffffff); }
 .node text.label {
   fill: var(--text);
   font-size: 11.5px;
