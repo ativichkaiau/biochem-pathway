@@ -7,15 +7,15 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0d1117;
-  --panel: #161b22;
-  --panel-2: #1c2128;
-  --border: #30363d;
-  --text: #e6edf3;
-  --text-2: #8b949e;
-  --accent: #58a6ff;
-  --brand-teal: #49ad94;
-  --brand-blue: #3478f6;
+  --bg: #080b11;
+  --panel: #0e1420;
+  --panel-2: #141c29;
+  --border: #24303f;
+  --text: #e8eef6;
+  --text-2: #7e8da0;
+  --accent: #35d6c0;
+  --brand-teal: #35d6c0;
+  --brand-blue: #4b7bff;
   --up: #56d364;
   --up2: #2ea043;
   --down: #f85149;
@@ -25,33 +25,33 @@
   --cell-mem: #8fa0c4;
   --purple: #bc8cff;
   --rate: #ffd166;
-  --edge: #4d5560;
-  --chip: #0d1117;
+  --edge: #3c4a5b;
+  --chip: #080b11;
   --lbl-sterol: #f0a0c8;
   --lbl-heme: #e0526b;
   --lbl-nucleo: #5fd0c5;
   --lbl-lipid: #e6a86c;
-  --glow1: rgba(88, 166, 255, 0.04);
-  --glow2: rgba(86, 211, 100, 0.04);
-  --glow3: rgba(210, 153, 34, 0.04);
-  --glass: rgba(18, 23, 31, 0.55);
-  --glass-2: rgba(28, 34, 44, 0.72);
-  --glass-brd: rgba(255, 255, 255, 0.08);
-  --glass-hi: rgba(255, 255, 255, 0.10);
-  --shadow: rgba(0, 0, 0, 0.45);
-  /* Claymorphism — soft puffy clay surfaces */
-  --clay-surface: #242c39;
-  --clay-surface-2: #2d3543;
+  --glow1: rgba(75, 123, 255, 0.05);
+  --glow2: rgba(53, 214, 192, 0.05);
+  --glow3: rgba(255, 85, 85, 0.04);
+  --glass: rgba(10, 15, 24, 0.58);
+  --glass-2: rgba(18, 26, 38, 0.74);
+  --glass-brd: rgba(90, 220, 205, 0.10);
+  --glass-hi: rgba(150, 230, 220, 0.12);
+  --shadow: rgba(0, 0, 0, 0.55);
+  /* Claymorphism — backlit structure-viewer panels */
+  --clay-surface: #131b28;
+  --clay-surface-2: #1b2534;
   --clay-radius: 16px;
-  --clay: 5px 7px 16px rgba(0,0,0,0.5), -3px -3px 10px rgba(255,255,255,0.03), inset 2px 2px 4px rgba(255,255,255,0.11), inset -3px -4px 8px rgba(0,0,0,0.48);
-  --clay-sm: 3px 4px 9px rgba(0,0,0,0.42), inset 1px 1px 3px rgba(255,255,255,0.10), inset -2px -3px 6px rgba(0,0,0,0.42);
-  --clay-pressed: inset 3px 4px 8px rgba(0,0,0,0.55), inset -2px -2px 5px rgba(255,255,255,0.06);
-  --clay-card: 14px 20px 56px -18px rgba(0,0,0,0.62), inset 3px 3px 8px rgba(255,255,255,0.09), inset -5px -7px 15px rgba(0,0,0,0.42);
-  --blob1: rgba(56, 130, 246, 0.42);
-  --blob2: rgba(167, 85, 247, 0.36);
-  --blob3: rgba(20, 200, 170, 0.32);
-  --base-grad: radial-gradient(120% 120% at 50% 0%, #11161f 0%, #0a0d13 60%, #070a0f 100%);
-  --biochem-line: rgba(132, 196, 228, 0.11);
+  --clay: 5px 7px 16px rgba(0,0,0,0.55), -3px -3px 10px rgba(70,200,190,0.035), inset 2px 2px 4px rgba(120,220,210,0.10), inset -3px -4px 8px rgba(0,0,0,0.5);
+  --clay-sm: 3px 4px 9px rgba(0,0,0,0.46), inset 1px 1px 3px rgba(120,220,210,0.09), inset -2px -3px 6px rgba(0,0,0,0.46);
+  --clay-pressed: inset 3px 4px 8px rgba(0,0,0,0.58), inset -2px -2px 5px rgba(90,210,200,0.07);
+  --clay-card: 14px 20px 56px -18px rgba(0,0,0,0.66), inset 3px 3px 8px rgba(120,220,210,0.09), inset -5px -7px 15px rgba(0,0,0,0.46);
+  --blob1: rgba(75, 123, 255, 0.36);
+  --blob2: rgba(53, 214, 192, 0.30);
+  --blob3: rgba(255, 85, 85, 0.20);
+  --base-grad: radial-gradient(120% 120% at 50% 0%, #0c1420 0%, #080b11 58%, #05070c 100%);
+  --biochem-line: rgba(90, 205, 210, 0.10);
   /* Pathway colors — one per group */
   --pw-glycolysis: #58a6ff;
   --pw-glycogen-ppp: #f1b840;
@@ -75,15 +75,15 @@
   --elabel: #c9d2dc;
 }
 body.light {
-  --bg: #f6f8fa;
+  --bg: #f4f7fa;
   --panel: #ffffff;
-  --panel-2: #eef1f5;
-  --border: #d0d7de;
-  --text: #1f2328;
-  --text-2: #59636e;
-  --accent: #0969da;
-  --brand-teal: #3c9b85;
-  --brand-blue: #2869eb;
+  --panel-2: #eaf1f4;
+  --border: #ccd8df;
+  --text: #14202b;
+  --text-2: #566572;
+  --accent: #0e9c8a;
+  --brand-teal: #0e9c8a;
+  --brand-blue: #2f5fe0;
   --up: #1a7f37;
   --up2: #0f5323;
   --down: #cf222e;
@@ -93,32 +93,32 @@ body.light {
   --cell-mem: #5d6a96;
   --purple: #8250df;
   --rate: #b7791f;
-  --edge: #aab2bd;
+  --edge: #a2b3bf;
   --chip: #ffffff;
   --lbl-sterol: #bf3989;
   --lbl-heme: #cf222e;
   --lbl-nucleo: #137268;
   --lbl-lipid: #9a6700;
-  --glow1: rgba(9, 105, 218, 0.05);
-  --glow2: rgba(26, 127, 55, 0.05);
-  --glow3: rgba(154, 103, 0, 0.05);
-  --glass: rgba(255, 255, 255, 0.6);
-  --glass-2: rgba(255, 255, 255, 0.8);
-  --glass-brd: rgba(15, 23, 42, 0.08);
+  --glow1: rgba(47, 95, 224, 0.05);
+  --glow2: rgba(14, 156, 138, 0.05);
+  --glow3: rgba(200, 60, 60, 0.04);
+  --glass: rgba(255, 255, 255, 0.62);
+  --glass-2: rgba(255, 255, 255, 0.82);
+  --glass-brd: rgba(14, 156, 138, 0.12);
   --glass-hi: rgba(255, 255, 255, 0.9);
-  --shadow: rgba(80, 100, 140, 0.18);
-  /* Claymorphism — soft pastel clay surfaces */
-  --clay-surface: #eef1f8;
-  --clay-surface-2: #f7f9fd;
-  --clay: 7px 9px 18px rgba(174,184,206,0.6), -6px -6px 14px rgba(255,255,255,0.95), inset 2px 2px 5px rgba(255,255,255,0.9), inset -3px -4px 8px rgba(174,184,206,0.55);
-  --clay-sm: 4px 5px 11px rgba(174,184,206,0.5), -3px -3px 8px rgba(255,255,255,0.9), inset 1px 1px 3px rgba(255,255,255,0.85), inset -2px -3px 6px rgba(174,184,206,0.45);
-  --clay-pressed: inset 3px 4px 8px rgba(174,184,206,0.6), inset -2px -2px 5px rgba(255,255,255,0.85);
-  --clay-card: 16px 22px 54px -18px rgba(174,184,206,0.7), -8px -8px 22px rgba(255,255,255,0.9), inset 3px 3px 8px rgba(255,255,255,0.9), inset -5px -7px 15px rgba(174,184,206,0.5);
-  --blob1: rgba(56, 130, 246, 0.22);
-  --blob2: rgba(167, 85, 247, 0.18);
-  --blob3: rgba(20, 184, 166, 0.18);
-  --base-grad: radial-gradient(120% 120% at 50% 0%, #f3f6fb 0%, #eef2f8 55%, #e7edf5 100%);
-  --biochem-line: rgba(30, 90, 150, 0.12);
+  --shadow: rgba(70, 110, 130, 0.18);
+  /* Claymorphism — crystallographic white panels */
+  --clay-surface: #e9f1f3;
+  --clay-surface-2: #f5fafb;
+  --clay: 7px 9px 18px rgba(160,185,195,0.55), -6px -6px 14px rgba(255,255,255,0.95), inset 2px 2px 5px rgba(255,255,255,0.9), inset -3px -4px 8px rgba(160,185,195,0.5);
+  --clay-sm: 4px 5px 11px rgba(160,185,195,0.48), -3px -3px 8px rgba(255,255,255,0.9), inset 1px 1px 3px rgba(255,255,255,0.85), inset -2px -3px 6px rgba(160,185,195,0.42);
+  --clay-pressed: inset 3px 4px 8px rgba(160,185,195,0.58), inset -2px -2px 5px rgba(255,255,255,0.85);
+  --clay-card: 16px 22px 54px -18px rgba(160,185,195,0.65), -8px -8px 22px rgba(255,255,255,0.9), inset 3px 3px 8px rgba(255,255,255,0.9), inset -5px -7px 15px rgba(160,185,195,0.48);
+  --blob1: rgba(47, 95, 224, 0.16);
+  --blob2: rgba(14, 180, 160, 0.16);
+  --blob3: rgba(210, 70, 70, 0.10);
+  --base-grad: radial-gradient(120% 120% at 50% 0%, #f2f7fa 0%, #eaf1f5 55%, #e3edf1 100%);
+  --biochem-line: rgba(20, 120, 140, 0.12);
   --pw-glycolysis: #0969da;
   --pw-glycogen-ppp: #a06208;
   --pw-tca: #0d8f5e;
@@ -195,13 +195,13 @@ header {
 .brand-mark {
   width: 46px; height: 46px; border-radius: 15px; flex-shrink: 0;
   display: grid; place-items: center; position: relative; overflow: hidden;
-  background: linear-gradient(145deg, #8bd5c4 0%, #56ad95 48%, #347b6b 100%);
+  background: linear-gradient(145deg, #5fe6d2 0%, #35d6c0 42%, #3f6dff 100%);
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.38);
+  border: 1px solid rgba(180,240,232,0.45);
   box-shadow:
-    0 10px 22px -8px rgba(48,124,106,0.8),
-    inset 2px 3px 6px rgba(255,255,255,0.58),
-    inset -3px -5px 9px rgba(27,92,78,0.42);
+    0 10px 22px -8px rgba(53,214,192,0.72),
+    inset 2px 3px 6px rgba(255,255,255,0.52),
+    inset -3px -5px 9px rgba(30,80,150,0.46);
 }
 .brand-mark span {
   position: relative; z-index: 1;
@@ -803,10 +803,10 @@ body.light #intro {
   width: 30px; height: 30px; display: inline-grid; place-items: center;
   border-radius: 10px; color: #fff;
   font-size: 18px; font-weight: 950; letter-spacing: -1px;
-  background: linear-gradient(145deg, #8bd5c4 0%, #56ad95 48%, #347b6b 100%);
-  border: 1px solid rgba(255,255,255,0.38);
-  box-shadow: 0 7px 16px -7px rgba(48,124,106,0.85), inset 1px 2px 4px rgba(255,255,255,0.5);
-  text-shadow: 0 1px 2px rgba(22,82,69,0.35);
+  background: linear-gradient(145deg, #5fe6d2 0%, #35d6c0 42%, #3f6dff 100%);
+  border: 1px solid rgba(180,240,232,0.45);
+  box-shadow: 0 7px 16px -7px rgba(53,214,192,0.8), inset 1px 2px 4px rgba(255,255,255,0.5);
+  text-shadow: 0 1px 2px rgba(20,70,110,0.35);
 }
 .intro-eyebrow .vestrippn-wordmark { font-size: 13px; letter-spacing: -0.15px; }
 .intro-eyebrow .branch-divider { color: var(--text-2); opacity: 0.55; margin: 0 3px; }
@@ -1512,7 +1512,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <span class="branch-label">BIOCHEMISTRY BRANCH</span>
     </div>
     <h1 class="intro-title">Biochem <span>Met</span></h1>
-    <p class="intro-sub"><strong>Biochem Met is the metabolism branch of VESTRIPPN3.0.</strong> Balance substrates, enzymes, cofactors, and ATP yield across one interactive map.</p>
+    <p class="intro-sub"><strong>Biochem Met renders metabolism like a molecular structure.</strong> Bind inhibitors, mutate enzymes, and watch flux, redox couples, and ATP yield resolve across the network.</p>
     <div class="intro-chipline" aria-hidden="true">
       <span>Carbon skeletons</span><span>Enzyme control</span><span>NAD⁺ / NADH</span><span>ATP yield</span>
     </div>
@@ -1800,7 +1800,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 
     <div class="sub-header" style="margin-top:18px">Detail</div>
     <div id="detail" class="detail-box">
-      <p class="muted">Click a metabolite in the pathway or list, or any perturbation, for details.</p>
+      <p class="muted">Select a metabolite in the structure or list, or any perturbation, to inspect it.</p>
     </div>
   </aside>
 </div>
@@ -1871,7 +1871,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     <div class="case-header">
       <div>
         <div class="case-eyebrow"><span class="case-eyebrow-pw" id="case-pw-label">PATHWAY</span> · BIOCHEM MET LAB</div>
-        <h2 class="case-title" id="case-title">Loading case…</h2>
+        <h2 class="case-title" id="case-title">Resolving structure…</h2>
         <div class="case-blurb" id="case-blurb"></div>
       </div>
       <button class="btn case-close" id="case-close" title="Close case (Esc)">Close ✕</button>
@@ -3215,7 +3215,7 @@ function renderDetail(state) {
       return;
     }
   }
-  d.innerHTML = `<p class="muted">Click a metabolite in the pathway or list, or any perturbation, for details.</p>`;
+  d.innerHTML = `<p class="muted">Select a metabolite in the structure or list, or any perturbation, to inspect it.</p>`;
 }
 
 // Shared detail body for a metabolite — used by both the right-panel detail
