@@ -51,6 +51,7 @@
   --blob2: rgba(167, 85, 247, 0.36);
   --blob3: rgba(20, 200, 170, 0.32);
   --base-grad: radial-gradient(120% 120% at 50% 0%, #11161f 0%, #0a0d13 60%, #070a0f 100%);
+  --biochem-line: rgba(132, 196, 228, 0.11);
   /* Pathway colors — one per group */
   --pw-glycolysis: #58a6ff;
   --pw-glycogen-ppp: #f1b840;
@@ -117,6 +118,7 @@ body.light {
   --blob2: rgba(167, 85, 247, 0.18);
   --blob3: rgba(20, 184, 166, 0.18);
   --base-grad: radial-gradient(120% 120% at 50% 0%, #f3f6fb 0%, #eef2f8 55%, #e7edf5 100%);
+  --biochem-line: rgba(30, 90, 150, 0.12);
   --pw-glycolysis: #0969da;
   --pw-glycogen-ppp: #a06208;
   --pw-tca: #0d8f5e;
@@ -161,6 +163,21 @@ body {
 @keyframes drift2 { 0%,100%{transform:translate(0,0) scale(1.05)} 50%{transform:translate(-6vw,-5vh) scale(0.92)} }
 @keyframes drift3 { 0%,100%{transform:translate(0,0) scale(0.95)} 50%{transform:translate(-8vw,4vh) scale(1.18)} }
 @media (prefers-reduced-motion: reduce) { #atmos .blob { animation: none; } }
+
+/* ===== Biochem molecular ambience — faint floating chemical structures ===== */
+#biochem-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+#biochem-bg svg { width: 100%; height: 100%; display: block; }
+#biochem-bg .mol { fill: none; stroke: var(--biochem-line); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+#biochem-bg .atom { fill: var(--biochem-line); stroke: none; }
+#biochem-bg .molwrap { transform-box: fill-box; transform-origin: center; }
+.mfloat1 { animation: mfloat1 44s ease-in-out infinite; }
+.mfloat2 { animation: mfloat2 54s ease-in-out infinite; }
+.mfloat3 { animation: mfloat3 38s ease-in-out infinite; }
+@keyframes mfloat1 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-16px) rotate(7deg)} }
+@keyframes mfloat2 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(18px) rotate(-6deg)} }
+@keyframes mfloat3 { 0%,100%{transform:translate(0,0) rotate(0deg)} 50%{transform:translate(12px,-12px) rotate(5deg)} }
+@media (prefers-reduced-motion: reduce) { .mfloat1,.mfloat2,.mfloat3 { animation: none; } }
+
 header, .layout { position: relative; z-index: 1; }
 header {
   height: 64px;
@@ -1431,6 +1448,55 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 </head>
 <body>
 <div id="atmos" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+<div id="biochem-bg" aria-hidden="true">
+  <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <!-- glucose / pyranose ring -->
+    <g transform="translate(175,165)"><g class="molwrap mfloat1">
+      <path class="mol" d="M0,-30 L26,-15 L26,15 L0,30 L-26,15 L-26,-15 Z"/>
+      <path class="mol" d="M0,-30 L0,-48 M26,15 L44,25 M-26,15 L-44,25 M26,-15 L44,-25"/>
+    </g></g>
+    <!-- ATP: adenine ring + triphosphate chain -->
+    <g transform="translate(560,90)"><g class="molwrap mfloat3">
+      <path class="mol" d="M0,-20 L17,-10 L17,10 L0,20 L-17,10 L-17,-10 Z"/>
+      <path class="mol" d="M17,0 L40,0"/>
+      <circle class="mol" cx="49" cy="0" r="8"/><path class="mol" d="M57,0 L68,0"/>
+      <circle class="mol" cx="77" cy="0" r="8"/><path class="mol" d="M85,0 L96,0"/>
+      <circle class="mol" cx="105" cy="0" r="8"/>
+    </g></g>
+    <!-- benzene / aromatic ring -->
+    <g transform="translate(1410,150)"><g class="molwrap mfloat2">
+      <path class="mol" d="M0,-30 L26,-15 L26,15 L0,30 L-26,15 L-26,-15 Z"/>
+      <circle class="mol" cx="0" cy="0" r="15"/>
+    </g></g>
+    <!-- purine (fused bicyclic ring) -->
+    <g transform="translate(1470,540)"><g class="molwrap mfloat1">
+      <path class="mol" d="M0,-28 L24,-14 L24,14 L0,28 L-24,14 L-24,-14 Z"/>
+      <path class="mol" d="M24,-14 L48,-20 L58,0 L48,20 L24,14"/>
+    </g></g>
+    <!-- DNA double helix -->
+    <g transform="translate(1510,760)"><g class="molwrap mfloat2">
+      <path class="mol" d="M0,-150 C 36,-112 36,-112 0,-75 C -36,-38 -36,-38 0,0 C 36,38 36,38 0,75 C -36,112 -36,112 0,150"/>
+      <path class="mol" d="M0,-150 C -36,-112 -36,-112 0,-75 C 36,-38 36,-38 0,0 C -36,38 -36,38 0,75 C 36,112 36,112 0,150"/>
+      <path class="mol" d="M-22,-122 L22,-122 M-30,-94 L30,-94 M-22,-56 L22,-56 M-30,-19 L30,-19 M-22,19 L22,19 M-30,56 L30,56 M-22,94 L22,94 M-30,122 L30,122"/>
+    </g></g>
+    <!-- fatty-acid chain + carboxyl -->
+    <g transform="translate(540,930)"><g class="molwrap mfloat3">
+      <path class="mol" d="M-70,0 L-46,-14 L-22,0 L2,-14 L26,0 L50,-14 L74,0"/>
+      <path class="mol" d="M74,0 L90,-11 M74,0 L90,12"/>
+    </g></g>
+    <!-- peptide backbone -->
+    <g transform="translate(120,720)"><g class="molwrap mfloat1">
+      <path class="mol" d="M-56,0 L-34,-15 L-12,0 L10,-15 L32,0 L54,-15"/>
+      <path class="mol" d="M-12,0 L-12,20"/><circle class="atom" cx="-12" cy="26" r="4"/>
+      <path class="mol" d="M10,-15 L10,-34"/>
+    </g></g>
+    <!-- lone hexose ring, deep center-right -->
+    <g transform="translate(980,470)"><g class="molwrap mfloat2">
+      <path class="mol" d="M0,-24 L21,-12 L21,12 L0,24 L-21,12 L-21,-12 Z"/>
+      <path class="mol" d="M0,-24 L0,-40 M-21,12 L-36,20"/>
+    </g></g>
+  </svg>
+</div>
 
 <div id="intro">
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
