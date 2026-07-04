@@ -528,7 +528,10 @@ body.case-pinpoint #compartments,
 body[data-dive] #compartments { opacity: 0.35; transition: opacity 0.28s; }
 
 /* Plasma membrane (the cell boundary) — a faint lipid bilayer enclosing everything */
-.cell-membrane { fill: none; stroke: var(--cell-mem); stroke-width: 2.4; stroke-opacity: 0.5; }
+.cell-membrane { fill: none; stroke: var(--cell-mem); stroke-width: 2.2; stroke-opacity: 0.55; }
+/* the two leaflets of the bilayer, drawn as rows of phospholipid heads */
+.cell-membrane.leaflet { stroke-dasharray: 0.6 6; stroke-linecap: round; stroke-width: 3.2; stroke-opacity: 0.7; }
+.cell-membrane-core { stroke: none; fill: color-mix(in srgb, var(--cell-mem) 13%, transparent); }
 .cell-membrane-fill { fill: color-mix(in srgb, var(--cell-mem) 4%, transparent); }
 .cell-membrane-tab rect { fill: color-mix(in srgb, var(--cell-mem) 22%, var(--panel)); stroke: var(--cell-mem); stroke-opacity: 0.6; stroke-width: 1; }
 .cell-membrane-tab text { fill: var(--cell-mem); font-size: 12.5px; font-weight: 800; letter-spacing: 1.4px; font-family: "SF Mono","Menlo",monospace; }
@@ -1444,6 +1447,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   .case-header { flex-wrap: wrap; }
   .case-shell, .help-card { border-radius: 18px; }
 }
+
 </style>
 </head>
 <body>
@@ -1846,6 +1850,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 </div>
 
 <div id="node-popover" role="dialog" aria-label="Metabolite detail"></div>
+
 
 <div id="cases-browser" aria-hidden="true">
   <div class="cases-shell">
@@ -3313,13 +3318,24 @@ const TRANSPORTERS = [
   { name: 'ANT', carries: 'Adenine-nucleotide translocase: ATP out / ADP in', x: 900, y: 1914, axis: 'h', arrow: 'updown', mem: 'mito', lx: 900, ly: 1944 }
 ];
 
-// Faint lipid-bilayer rectangle (double line) + a labelled tab.
+function roundRectPath(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  const x2 = x + w, y2 = y + h;
+  return `M${x + r},${y} L${x2 - r},${y} Q${x2},${y} ${x2},${y + r} L${x2},${y2 - r} Q${x2},${y2} ${x2 - r},${y2}`
+    + ` L${x + r},${y2} Q${x},${y2} ${x},${y2 - r} L${x},${y + r} Q${x},${y} ${x + r},${y} Z`;
+}
+
+// Plasma membrane drawn as a phospholipid bilayer: two leaflets of lipid heads
+// (dotted lines) with a tinted hydrophobic core between them, + a labelled tab.
 function drawCellMembrane() {
-  const c = CELL_MEMBRANE, inset = 9, tab = (typeof currentCell === 'function' ? currentCell().label : 'CELL') + ' · cytosol';
+  const c = CELL_MEMBRANE, core = 16, tab = (typeof currentCell === 'function' ? currentCell().label : 'CELL') + ' · cytosol';
   const tw = tab.length * 6.6 + 22, th = 21, tx = c.x + c.w / 2 - tw / 2, ty = c.y - th / 2;
-  return `<rect class="cell-membrane-fill" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" rx="${c.rx}"/>`
-    + `<rect class="cell-membrane" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" rx="${c.rx}"/>`
-    + `<rect class="cell-membrane" x="${c.x + inset}" y="${c.y + inset}" width="${c.w - 2 * inset}" height="${c.h - 2 * inset}" rx="${Math.max(4, c.rx - inset)}"/>`
+  const ix = c.x + core, iy = c.y + core, iw = c.w - 2 * core, ih = c.h - 2 * core, irx = Math.max(6, c.rx - core);
+  const band = roundRectPath(c.x, c.y, c.w, c.h, c.rx) + ' ' + roundRectPath(ix, iy, iw, ih, irx);
+  return `<rect class="cell-membrane-fill" x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="${irx}"/>`
+    + `<path class="cell-membrane-core" d="${band}" fill-rule="evenodd"/>`
+    + `<rect class="cell-membrane leaflet" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" rx="${c.rx}"/>`
+    + `<rect class="cell-membrane leaflet" x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="${irx}"/>`
     + `<g class="cell-membrane-tab"><rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="7"/>`
     + `<text x="${tx + tw / 2}" y="${ty + th / 2 + 0.5}" text-anchor="middle" dominant-baseline="middle">${tab}</text></g>`;
 }
@@ -3409,21 +3425,28 @@ function renderCellMenu() {
     `<button class="cell-menu-item${c.id === selectedCell ? ' active' : ''}" data-cell="${c.id}" title="${escapeAttr(c.note)}">${escapeText(c.tab)}</button>`).join('');
 }
 
-// Dim the pathways a cell doesn't run, via one generated stylesheet (targets the
-// persistent data-pw / data-org-pw attributes, so it survives re-renders).
+// Cell-specific rendering, via one generated stylesheet (targets the persistent
+// data-pw / data-org-pw attributes, so it survives re-renders). Absent metabolic
+// pathways are dimmed to show they're off; absent ORGANELLES are physically removed
+// (the membrane art, compartment box, tab and transporters fade out entirely) so an
+// RBC really loses its mitochondrion, ER and lysosome rather than just greying them.
+const ORGANELLE_PW = new Set(['tca', 'etc', 'sterol', 'sphingo']);
 function applyCellFilter() {
   let style = document.getElementById('cell-filter-style');
   if (!style) { style = document.createElement('style'); style.id = 'cell-filter-style'; document.head.appendChild(style); }
   const cell = currentCell();
   if (!cell.absent.length) { style.textContent = ''; return; }
-  const sels = [];
+  const dim = [], gone = [];
   for (const pw of cell.absent) {
-    sels.push(`#pathway-svg .node[data-pw="${pw}"]`);
-    sels.push(`#pathway-svg .pathway-label[data-pw="${pw}"]`);
-    sels.push(`#pathway-svg .edge-group[data-from-pw="${pw}"]`);
-    sels.push(`#pathway-svg [data-org-pw="${pw}"]`);
+    dim.push(`#pathway-svg .node[data-pw="${pw}"]`);
+    dim.push(`#pathway-svg .pathway-label[data-pw="${pw}"]`);
+    dim.push(`#pathway-svg .edge-group[data-from-pw="${pw}"]`);
+    (ORGANELLE_PW.has(pw) ? gone : dim).push(`#pathway-svg [data-org-pw="${pw}"]`);
   }
-  style.textContent = sels.join(',') + '{opacity:0.1;transition:opacity 0.35s ease;}';
+  let css = '';
+  if (dim.length) css += dim.join(',') + '{opacity:0.1;transition:opacity 0.4s ease;}';
+  if (gone.length) css += gone.join(',') + '{opacity:0;visibility:hidden;transition:opacity 0.4s ease;}';
+  style.textContent = css;
 }
 
 function selectCell(id) {
@@ -3451,15 +3474,16 @@ function organelleArt(kind, x, y, w, h, cc) {
         + ` Q${R(mx)},${R(y2 + bB)} ${R(bx + rx)},${R(y2)} Q${R(bx)},${R(y2)} ${R(bx)},${R(y2 - ry)}`
         + ` Q${R(bx - bL)},${R(my)} ${R(bx)},${R(by + ry)} Q${R(bx)},${R(by)} ${R(bx + rx)},${R(by)} Z`;
     };
-    p.push(`<path d="${mitoPath(ix, iy, iw, ih, 40, 44, 52, 0)}" fill="${cc}" fill-opacity="0.05" stroke="${cc}" stroke-opacity="0.52" stroke-width="2.2" stroke-linejoin="round"/>`);
-    p.push(`<path d="${mitoPath(ix + 13, iy + 12, iw - 26, ih - 24, 32, 36, 42, 0)}" fill="none" stroke="${cc}" stroke-opacity="0.32" stroke-width="1.3" stroke-linejoin="round"/>`);
+    p.push(`<defs><radialGradient id="${uid}-matrix" cx="0.42" cy="0.4" r="0.78"><stop offset="0" stop-color="${cc}" stop-opacity="0.15"/><stop offset="1" stop-color="${cc}" stop-opacity="0.035"/></radialGradient></defs>`);
+    p.push(`<path d="${mitoPath(ix, iy, iw, ih, 40, 44, 52, 0)}" fill="url(#${uid}-matrix)" stroke="${cc}" stroke-opacity="0.66" stroke-width="2.6" stroke-linejoin="round"/>`);
+    p.push(`<path d="${mitoPath(ix + 13, iy + 12, iw - 26, ih - 24, 32, 36, 42, 0)}" fill="none" stroke="${cc}" stroke-opacity="0.42" stroke-width="1.5" stroke-linejoin="round"/>`);
     // cristae: a subtle scalloped fold on the inner membrane, top & bottom (matrix interior stays open)
     const cx0 = ix + 80, cx1 = ix + iw - 80, scN = Math.max(4, Math.round((cx1 - cx0) / 72));
     const sw = (cx1 - cx0) / scN, rr = sw / 2, depth = 20;
     const scallop = (baseY, down) => {
       let d = `M${R(cx0)},${R(baseY)}`;
       for (let i = 0; i < scN; i++) d += ` a${R(rr)},${depth} 0 0 ${down ? 1 : 0} ${R(sw)},0`;
-      p.push(`<path d="${d}" fill="none" stroke="${cc}" stroke-opacity="0.24" stroke-width="1.2" stroke-linecap="round"/>`);
+      p.push(`<path d="${d}" fill="none" stroke="${cc}" stroke-opacity="0.34" stroke-width="1.5" stroke-linecap="round"/>`);
     };
     scallop(iy + 30, true);
     scallop(iy + ih - 30, false);
@@ -3472,8 +3496,8 @@ function organelleArt(kind, x, y, w, h, cc) {
       let d = `M${R(x0)},${R(yy)}`;
       for (let s = 1; s <= segs; s++) { const xx = x0 + sw * s, yo = (s % 2 ? -11 : 11); d += ` Q${R(xx - sw / 2)},${R(yy + yo)} ${R(xx)},${R(yy)}`; }
       p.push(`<path d="${d}" fill="none" stroke="url(#${uid}-rib)" stroke-width="${th}" stroke-linecap="round"/>`);
-      p.push(`<path d="${d}" fill="none" stroke="${cc}" stroke-opacity="0.5" stroke-width="1.4"/>`);
-      for (let s = 0; s < segs; s++) { const xx = x0 + sw * (s + 0.5), yo = ((s % 2) ? -11 : 11); p.push(`<circle cx="${R(xx)}" cy="${R(yy + th / 2 + 4 + yo * 0.18)}" r="3" fill="${cc}" fill-opacity="0.5"/>`); p.push(`<circle cx="${R(xx - sw * 0.34)}" cy="${R(yy - th / 2 - 4)}" r="2.6" fill="${cc}" fill-opacity="0.42"/>`); }
+      p.push(`<path d="${d}" fill="none" stroke="${cc}" stroke-opacity="0.6" stroke-width="1.5"/>`);
+      for (let s = 0; s < segs; s++) { const xx = x0 + sw * (s + 0.5), yo = ((s % 2) ? -11 : 11); p.push(`<circle cx="${R(xx)}" cy="${R(yy + th / 2 + 4 + yo * 0.18)}" r="3" fill="${cc}" fill-opacity="0.6"/>`); p.push(`<circle cx="${R(xx - sw * 0.34)}" cy="${R(yy - th / 2 - 4)}" r="2.6" fill="${cc}" fill-opacity="0.5"/>`); }
     }
   } else if (kind === 'lysosome') {
     const rr = Math.min(w * 0.46, h * 0.46);
@@ -3484,7 +3508,7 @@ function organelleArt(kind, x, y, w, h, cc) {
       <filter id="${uid}-glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="13" flood-color="${cc}" flood-opacity="0.24"/></filter>
     </defs>`);
     // membrane-bound vesicle with a radial-shaded lumen and heterogeneous cargo granules
-    p.push(`<circle cx="${R(cx)}" cy="${R(cy)}" r="${R(rr)}" fill="url(#${uid}-fill)" stroke="${cc}" stroke-opacity="0.62" stroke-width="3" filter="url(#${uid}-glow)"/>`);
+    p.push(`<circle cx="${R(cx)}" cy="${R(cy)}" r="${R(rr)}" fill="url(#${uid}-fill)" stroke="${cc}" stroke-opacity="0.72" stroke-width="3" filter="url(#${uid}-glow)"/>`);
     const gr = [[0.16, 0.10, 7, 'f'], [-0.40, 0.30, 5, 'r'], [0.44, -0.30, 6, 'f'], [-0.24, -0.42, 4.5, 'r'], [0.52, 0.34, 5, 'f'], [-0.54, -0.06, 6, 'r'], [0.02, 0.52, 4.5, 'f'], [0.30, -0.52, 4, 'r'], [-0.10, 0.22, 6, 'f'], [-0.46, 0.48, 4, 'f'], [0.58, 0.02, 4.5, 'r'], [-0.02, -0.16, 5.5, 'f']];
     for (const [gx, gy, grad, t] of gr) {
       if (t === 'f') p.push(`<circle cx="${R(cx + gx * rr)}" cy="${R(cy + gy * rr)}" r="${grad}" fill="${cc}" fill-opacity="0.28"/>`);
