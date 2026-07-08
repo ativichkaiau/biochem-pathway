@@ -488,6 +488,14 @@ body[data-dive] .pathway-label.faint { opacity: 0.05; }
 .edge.gluconeogenesis { stroke: var(--gluco); stroke-dasharray: 6 3; opacity: 0.85; }
 .edge.gluconeogenesis.inhibited { stroke: var(--down); }
 .edge.gluconeogenesis.activated { stroke: var(--up); }
+/* Flux — dots streaming along each reaction; speed/colour track enzyme activity. */
+.flux-flow { fill: none; stroke: var(--accent); stroke-width: 3.4; stroke-linecap: round;
+  stroke-dasharray: 0.1 24; opacity: 0.5; pointer-events: none; animation: flux-march 2.6s linear infinite; }
+.flux-flow.fast { stroke: var(--up); opacity: 0.9; stroke-width: 4; animation-duration: 1.1s; }
+.flux-flow.slow { stroke: var(--down); opacity: 0.22; animation-duration: 6s; }
+.flux-flow.idle { opacity: 0.14; animation-duration: 4.6s; }
+@keyframes flux-march { to { stroke-dashoffset: -24.1; } }
+@media (prefers-reduced-motion: reduce) { .flux-flow { animation: none; opacity: 0; } }
 
 .edge-label {
   font-size: 10px;
@@ -1286,7 +1294,31 @@ body.light #cases-browser {
   text-transform: uppercase;
 }
 .cases-close { padding: 6px 14px; flex-shrink: 0; }
-@media (prefers-reduced-motion: reduce) { #cases-browser, .case-card { animation: none; transition: none; } }
+/* Learner progress dashboard (top of the cases browser) */
+#cases-progress:empty { display: none; }
+#cases-progress { margin: 0 0 20px; }
+.prog-stats { display: flex; gap: 10px; margin-bottom: 12px; }
+.prog-stat { flex: 1; text-align: center; padding: 10px 8px; border-radius: 12px; background: var(--glass-2); border: 1px solid var(--glass-brd); }
+.prog-stat b { display: block; font-size: 20px; font-weight: 800; color: var(--accent); line-height: 1.1; }
+.prog-stat span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-2); font-weight: 700; }
+.prog-row { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; }
+.prog-weak { flex: 1 1 240px; }
+.prog-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-2); font-weight: 700; margin-bottom: 6px; }
+.prog-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.prog-weak-chip { font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 999px; cursor: pointer;
+  background: color-mix(in srgb, var(--down) 15%, transparent); color: var(--down); border: 1px solid color-mix(in srgb, var(--down) 34%, transparent); }
+.prog-weak-chip.empty { background: var(--glass-2); color: var(--text-2); border-color: var(--glass-brd); cursor: default; }
+.prog-rec { flex: 1 1 240px; text-align: left; display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: transform 0.12s;
+  background: color-mix(in srgb, var(--accent) 12%, var(--glass-2)); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+.prog-rec:hover { transform: translateY(-2px); }
+.prog-rec-eyebrow { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: var(--accent); }
+.prog-rec-title { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.3; }
+.prog-rec-pw { font-size: 10.5px; color: var(--text-2); }
+.case-badge { position: absolute; top: 12px; right: 14px; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 999px; z-index: 1; }
+.case-badge.strong { background: color-mix(in srgb, var(--up) 20%, transparent); color: var(--up); }
+.case-badge.ok { background: color-mix(in srgb, var(--gluco) 24%, transparent); color: var(--gluco); }
+.case-badge.weak { background: color-mix(in srgb, var(--down) 18%, transparent); color: var(--down); }
+@media (prefers-reduced-motion: reduce) { #cases-browser, .case-card, .prog-rec { animation: none; transition: none; } }
 
 /* ===== Help modal (header "?" button) ===== */
 #help-modal {
@@ -1838,6 +1870,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <h4>Keyboard</h4>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">⌘</kbd><kbd class="help-key">K</kbd><span style="margin:0 4px;opacity:0.5">or</span><kbd class="help-key">/</kbd></span><span class="help-desc">Open the command palette — search anything</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">t</kbd></span><span class="help-desc">Toggle day / night theme</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">x</kbd></span><span class="help-desc">Toggle flux animation on the map</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">f</kbd></span><span class="help-desc">Focus mode — hide both side panels</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">[</kbd><kbd class="help-key">]</kbd></span><span class="help-desc">Toggle left / right panel individually</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">?</kbd></span><span class="help-desc">Open this help (Esc to close)</span></div>
@@ -1863,6 +1896,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       </div>
       <button class="btn cases-close" id="cases-close" title="Close (Esc)">Close ✕</button>
     </div>
+    <div id="cases-progress"></div>
     <div class="cases-grid" id="cases-grid"></div>
   </div>
 </div>
@@ -2940,6 +2974,13 @@ function intersectRect(cx, cy, w, h, tx, ty) {
   return { x: cx + dx * s, y: cy + dy * s };
 }
 
+// Flux animation: dots stream along each reaction (speed ∝ enzyme activity).
+// On by default; off under reduced-motion; toggle with 'x'; choice persisted.
+let fluxEnabled = (() => {
+  try { const s = localStorage.getItem('biochem-flux'); if (s !== null) return s === '1'; } catch (e) {}
+  return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+})();
+
 function renderEdges() {
   const g = document.getElementById('edges');
   const labelDrawn = new Set();
@@ -2969,6 +3010,7 @@ function renderEdges() {
     else marker = 'arrow';
 
     const edgeParts = [];
+    let fluxD;
 
     if (edge.curved) {
       const mx = (start.x + end.x) / 2;
@@ -2977,9 +3019,22 @@ function renderEdges() {
       const len = Math.sqrt(dx*dx + dy*dy) || 1;
       const curveAmt = Math.min(50, len * 0.18);
       const ox = -dy / len * curveAmt, oy = dx / len * curveAmt;
-      edgeParts.push(`<path class="${cls}" d="M ${start.x} ${start.y} Q ${mx + ox} ${my + oy} ${end.x} ${end.y}" marker-end="url(#${marker})" stroke-opacity="${edge.cofactor ? 0.45 : 1}"/>`);
+      fluxD = `M ${start.x} ${start.y} Q ${mx + ox} ${my + oy} ${end.x} ${end.y}`;
+      edgeParts.push(`<path class="${cls}" d="${fluxD}" marker-end="url(#${marker})" stroke-opacity="${edge.cofactor ? 0.45 : 1}"/>`);
     } else {
+      fluxD = `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
       edgeParts.push(`<line class="${cls}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" marker-end="url(#${marker})" stroke-opacity="${edge.cofactor ? 0.45 : 1}"/>`);
+    }
+    // Flux: dots stream along the reaction in the drawn arrow's direction, so
+    // gluconeogenesis edges flow the reverse way. Speed/opacity track the enzyme
+    // state — activated = fast + bright, inhibited = near-stopped, reverse edges
+    // idle at rest and light up when their enzyme is switched on.
+    if (fluxEnabled && !edge.cofactor) {
+      let fx = 'flux-flow';
+      if (status === 'activated') fx += ' fast';
+      else if (status === 'inhibited') fx += ' slow';
+      else if (edge.gluconeogenesis) fx += ' idle';
+      edgeParts.push(`<path class="${fx}" d="${fluxD}"/>`);
     }
 
     const labelKey = edge.sharedLabel || null;
@@ -3870,6 +3925,7 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === ']') { layoutEl.classList.toggle('hide-right'); syncToggleButtons(); }
   else if (e.key === 'f' || e.key === 'F') { focusBtn.click(); }
   else if (e.key === 't' || e.key === 'T') { themeBtn.click(); }
+  else if (e.key === 'x' || e.key === 'X') { fluxEnabled = !fluxEnabled; try { localStorage.setItem('biochem-flux', fluxEnabled ? '1' : '0'); } catch (e2) {} renderEdges(); }
   else if (e.key === '?') { e.preventDefault(); openHelp(); }
   else if (e.key === '/') { e.preventDefault(); openCmdPalette(); }
 });
@@ -4028,13 +4084,14 @@ const CaseRunner = {
       alert(`No case available.\n(Tried /cases/${file}.json)`);
       return;
     }
-    this.init(caseData);
+    this.init(caseData, file);
   },
 
-  init(caseData) {
+  init(caseData, file) {
     const now = Date.now();
     this.state = {
       caseData,
+      file: file || caseData.id || caseData.pathway,
       pathway: caseData.pathway,
       phase: 'chat',
       startedAt: now,
@@ -4447,6 +4504,7 @@ const CaseRunner = {
     }
     const w = this.state.caseData.scoring?.weights || { explain: 0.4, pinpoint: 0.3, mcq: 0.3 };
     const composite = Object.keys(w).reduce((s, k) => s + ((this.state.score[k] ?? 0) * (w[k] || 0)), 0);
+    saveCaseResult(this.state.file, this.state.caseData, this.state.score, composite);
     const dt = Math.floor((Date.now() - this.state.startedAt) / 1000);
     const mm = Math.floor(dt / 60), ss = dt % 60;
     const fmt = v => v == null ? '—' : `${Math.round(v * 100)}%`;
@@ -4720,21 +4778,93 @@ const CASES_INDEX = [
   { file: 'polyol',         pathway: 'polyol',        title: 'The diabetic with new cataracts and numb feet',          blurb: 'A sugar trapped where it should not be — osmotic and oxidative damage in the lens, nerve, retina, and kidney.' }
 ];
 
+// ---------------- Learner progress (localStorage) ----------------
+const PROGRESS_KEY = 'biochem-progress';
+function loadProgress() { try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; } catch (e) { return {}; } }
+function saveCaseResult(key, caseData, score, composite) {
+  if (!key) return;
+  try {
+    const all = loadProgress();
+    const prev = all[key];
+    all[key] = {
+      pathway: caseData.pathway,
+      best: Math.max((prev && prev.best) || 0, composite),
+      last: composite,
+      phases: { explain: score.explain, pinpoint: score.pinpoint, mcq: score.mcq },
+      attempts: ((prev && prev.attempts) || 0) + 1,
+      ts: Date.now()
+    };
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(all));
+  } catch (e) {}
+}
+function scoreTier(v) { return v >= 0.8 ? 'strong' : v >= 0.6 ? 'ok' : 'weak'; }
+const pwLabel = pw => (PATHWAY_INFO[pw] && PATHWAY_INFO[pw].label) || pw;
+
+// Dashboard: overall progress, weak pathways, and a recommended next case.
+function renderProgressDashboard() {
+  const host = document.getElementById('cases-progress');
+  if (!host) return;
+  const prog = loadProgress();
+  const total = CASES_INDEX.length;
+  const attempted = CASES_INDEX.filter(c => prog[c.file]);
+  if (attempted.length === 0) { host.innerHTML = ''; return; }
+  const passed = attempted.filter(c => (prog[c.file].best || 0) >= 0.6).length;
+
+  const byPw = {};
+  for (const c of CASES_INDEX) (byPw[c.pathway] = byPw[c.pathway] || []).push(c);
+  const weakPws = [];
+  for (const [pw, cases] of Object.entries(byPw)) {
+    const scores = cases.map(c => prog[c.file]).filter(Boolean).map(p => p.best || 0);
+    if (!scores.length) continue;
+    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+    if (avg < 0.6) weakPws.push({ pw, avg });
+  }
+  weakPws.sort((a, b) => a.avg - b.avg);
+
+  // Recommend, in priority order: an unattempted case in a weak pathway, then a
+  // brand-new pathway, then any unattempted case, then retry the weakest done.
+  const weakSet = new Set(weakPws.map(w => w.pw));
+  const touched = new Set(attempted.map(c => c.pathway));
+  let rec = CASES_INDEX.find(c => !prog[c.file] && weakSet.has(c.pathway)), recLabel = 'Shore up a weak spot';
+  if (!rec) { rec = CASES_INDEX.find(c => !prog[c.file] && !touched.has(c.pathway)); if (rec) recLabel = 'New pathway'; }
+  if (!rec) { rec = CASES_INDEX.find(c => !prog[c.file]); if (rec) recLabel = 'Next case'; }
+  if (!rec) { let worst = null; for (const c of CASES_INDEX) { const b = prog[c.file].best || 0; if (!worst || b < worst.b) worst = { c, b }; } if (worst) { rec = worst.c; recLabel = 'Retry weakest'; } }
+
+  const weakHtml = weakPws.length
+    ? weakPws.slice(0, 4).map(w => `<span class="prog-weak-chip" data-pathway="${escapeAttr(w.pw)}">${escapeText(pwLabel(w.pw))} · ${Math.round(w.avg * 100)}%</span>`).join('')
+    : `<span class="prog-weak-chip empty">No weak spots yet — nice.</span>`;
+  host.innerHTML = `
+    <div class="prog-stats">
+      <div class="prog-stat"><b>${attempted.length}/${total}</b><span>attempted</span></div>
+      <div class="prog-stat"><b>${passed}</b><span>passed &ge;60%</span></div>
+      <div class="prog-stat"><b>${Math.round(passed / total * 100)}%</b><span>of all cases</span></div>
+    </div>
+    <div class="prog-row">
+      <div class="prog-weak"><div class="prog-label">Weak spots</div><div class="prog-chips">${weakHtml}</div></div>
+      ${rec ? `<button class="prog-rec" data-file="${escapeAttr(rec.file)}"><span class="prog-rec-eyebrow">${recLabel} →</span><span class="prog-rec-title">${escapeText(rec.title)}</span><span class="prog-rec-pw">${escapeText(pwLabel(rec.pathway))}</span></button>` : ''}
+    </div>`;
+}
+
 function renderCasesGrid() {
   const grid = document.getElementById('cases-grid');
+  const prog = loadProgress();
   grid.innerHTML = CASES_INDEX.map(c => {
     const info = PATHWAY_INFO[c.pathway];
     const label = (info && info.label) ? info.label : c.pathway;
-    return `<div class="case-card" data-file="${escapeAttr(c.file)}" data-pathway="${escapeAttr(c.pathway)}" style="--pw: var(--pw-${c.pathway})">
+    const p = prog[c.file];
+    const badge = p ? `<span class="case-badge ${scoreTier(p.best || 0)}">${Math.round((p.best || 0) * 100)}%</span>` : '';
+    return `<div class="case-card${p ? ' attempted' : ''}" data-file="${escapeAttr(c.file)}" data-pathway="${escapeAttr(c.pathway)}" style="--pw: var(--pw-${c.pathway})">
+      ${badge}
       <div class="case-card-pw">${escapeText(label)}</div>
       <h3 class="case-card-title">${escapeText(c.title)}</h3>
       <p class="case-card-blurb">${escapeText(c.blurb)}</p>
-      <div class="case-card-cta">Start case →</div>
+      <div class="case-card-cta">${p ? 'Replay case →' : 'Start case →'}</div>
     </div>`;
   }).join('');
 }
 
 function openCasesBrowser() {
+  renderProgressDashboard();
   renderCasesGrid();
   document.getElementById('cases-browser').classList.add('open');
 }
@@ -4747,6 +4877,17 @@ document.getElementById('cases-btn').addEventListener('click', openCasesBrowser)
 document.getElementById('cases-close').addEventListener('click', closeCasesBrowser);
 document.getElementById('cases-browser').addEventListener('click', (e) => {
   if (e.target.id === 'cases-browser') { closeCasesBrowser(); return; }
+  const rec = e.target.closest('.prog-rec');
+  if (rec && rec.dataset.file) { closeCasesBrowser(); CaseRunner.open(rec.dataset.file); return; }
+  const chip = e.target.closest('.prog-weak-chip');
+  if (chip && chip.dataset.pathway) {
+    const prog = loadProgress();
+    const inPw = CASES_INDEX.filter(c => c.pathway === chip.dataset.pathway);
+    let pick = inPw.find(c => !prog[c.file]);
+    if (!pick) pick = inPw.slice().sort((a, b) => ((prog[a.file] && prog[a.file].best) || 0) - ((prog[b.file] && prog[b.file].best) || 0))[0];
+    if (pick) { closeCasesBrowser(); CaseRunner.open(pick.file); }
+    return;
+  }
   const card = e.target.closest('.case-card');
   if (card) {
     closeCasesBrowser();
