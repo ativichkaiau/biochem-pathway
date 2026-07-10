@@ -347,6 +347,8 @@ aside {
 aside.right { border-right: none; border-left: 1px solid var(--glass-brd); }
 .layout.hide-left #perturbations-aside,
 .layout.hide-right aside.right { padding: 0; border: none; }
+/* clear the fixed cell-vitals monitor that floats over the panel's bottom-left */
+@media (min-width: 561px) { #perturbations-aside { padding-bottom: 168px; } }
 aside h2 {
   font-size: 11px;
   text-transform: uppercase;
@@ -1199,6 +1201,7 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
 }
 .pert-quick-chip:hover { transform: translateY(-2px); }
 .pert-quick-chip:active { transform: translateY(0); box-shadow: var(--clay-pressed); }
+.pert-quick-chip.active { background: var(--accent); color: var(--chip); box-shadow: var(--clay-pressed); }
 .pert-active-chip {
   display: inline-flex; align-items: center; gap: 5px;
   font-size: 11px; font-weight: 700;
@@ -1481,6 +1484,46 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   .case-shell, .help-card { border-radius: 18px; }
 }
 
+/* ===== Cell vitals monitor — a live readout of the derived cell state ===== */
+#cell-vitals {
+  position: fixed; bottom: 18px; left: 18px; z-index: 28; width: 208px;
+  padding: 12px 14px 13px; border-radius: 18px;
+  background: var(--clay-surface); box-shadow: var(--clay);
+  display: flex; flex-direction: column; gap: 9px;
+}
+.cv-head { font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-2); display: flex; align-items: center; gap: 7px; }
+.cv-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 7px var(--accent); animation: cv-pulse 2s ease-in-out infinite; }
+@keyframes cv-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.28; } }
+.cv-rows { display: flex; flex-direction: column; gap: 7px; }
+.cv-row { display: grid; grid-template-columns: 58px 1fr 22px; align-items: center; gap: 7px; }
+.cv-label { font-size: 10px; font-weight: 600; color: var(--text-2); font-family: "SF Mono","Menlo",monospace; white-space: nowrap; }
+.cv-track { position: relative; height: 8px; border-radius: 4px; background: var(--clay-pressed, var(--panel-2)); box-shadow: var(--clay-pressed); overflow: hidden; }
+.cv-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px; transform: translateX(-50%); background: var(--text-2); opacity: 0.35; z-index: 1; }
+.cv-fill { position: absolute; top: 0; bottom: 0; width: 50%; border-radius: 3px; transform: scaleX(0);
+  transition: transform 0.5s cubic-bezier(.4,.8,.3,1), background-color 0.3s; }
+.cv-fill.up { background: var(--up); }
+.cv-fill.down { background: var(--down); }
+.cv-delta { font-size: 11px; font-weight: 800; text-align: center; font-family: "SF Mono","Menlo",monospace; }
+.cv-delta.up, .cv-delta.up2 { color: var(--up); }
+.cv-delta.down, .cv-delta.down2 { color: var(--down); }
+.cv-delta.unchanged { color: var(--text-2); opacity: 0.6; }
+.cv-status { font-size: 10px; font-weight: 800; letter-spacing: 0.4px; text-align: center; padding: 4px 8px; border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); transition: background-color 0.3s, color 0.3s; }
+.cv-status.alarm { background: color-mix(in srgb, var(--down) 18%, transparent); color: var(--down); }
+@media (prefers-reduced-motion: reduce) { .cv-fill { transition: none; } .cv-dot { animation: none; } }
+@media (max-width: 900px) { #cell-vitals { bottom: 12px; left: 10px; width: 178px; padding: 10px 12px 11px; } }
+@media (max-width: 560px) { #cell-vitals { display: none; } }
+
+/* ===== Map zoom controls ===== */
+#map-zoom { position: fixed; bottom: 18px; right: 18px; z-index: 28; display: flex; flex-direction: column; gap: 6px; }
+#map-zoom button { width: 36px; height: 36px; border: none; border-radius: 11px; cursor: pointer;
+  background: var(--clay-surface); box-shadow: var(--clay-sm); color: var(--text);
+  font-size: 18px; font-weight: 700; line-height: 1; display: grid; place-items: center; transition: transform 0.12s, color 0.2s; }
+#map-zoom button:hover { color: var(--accent); }
+#map-zoom button:active { transform: scale(0.94); box-shadow: var(--clay-pressed); }
+#zoom-fit { font-size: 15px; }
+@media (max-width: 560px) { #map-zoom { bottom: 12px; right: 10px; } #map-zoom button { width: 40px; height: 40px; } }
+
 </style>
 </head>
 <body>
@@ -1715,6 +1758,12 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   <div class="cell-select-menu" id="cell-select-menu" role="listbox"></div>
 </div>
 <div id="cell-note"></div>
+<div id="cell-vitals" aria-label="Cell vitals monitor"></div>
+<div id="map-zoom" aria-label="Map zoom">
+  <button id="zoom-in" title="Zoom in  ( + )" aria-label="Zoom in">+</button>
+  <button id="zoom-fit" title="Fit whole map" aria-label="Fit map">⤢</button>
+  <button id="zoom-out" title="Zoom out  ( − )" aria-label="Zoom out">−</button>
+</div>
 
 <div class="layout hide-left hide-right">
   <aside id="perturbations-aside">
@@ -1871,6 +1920,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <div class="help-row"><span class="help-keys"><kbd class="help-key">⌘</kbd><kbd class="help-key">K</kbd><span style="margin:0 4px;opacity:0.5">or</span><kbd class="help-key">/</kbd></span><span class="help-desc">Open the command palette — search anything</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">t</kbd></span><span class="help-desc">Toggle day / night theme</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">x</kbd></span><span class="help-desc">Toggle flux animation on the map</span></div>
+      <div class="help-row"><span class="help-keys"><kbd class="help-key">+</kbd><kbd class="help-key">−</kbd><kbd class="help-key">0</kbd></span><span class="help-desc">Zoom in / out / fit the map</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">f</kbd></span><span class="help-desc">Focus mode — hide both side panels</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">[</kbd><kbd class="help-key">]</kbd></span><span class="help-desc">Toggle left / right panel individually</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">?</kbd></span><span class="help-desc">Open this help (Esc to close)</span></div>
@@ -3089,33 +3139,27 @@ const QUICK_PERTS = [
 function renderPertSummary() {
   const el = document.getElementById('pert-summary');
   if (!el) return;
-  if (activePerturbations.size === 0) {
-    const chips = QUICK_PERTS.map(q => `<button class="pert-quick-chip" data-pertid="${escapeAttr(q.id)}" title="Toggle ${escapeAttr(q.label)}">${escapeText(q.label)}</button>`).join('');
-    el.innerHTML = `<div class="pert-summary">
-      <div class="pert-summary-label">Try one to start</div>
-      <div class="pert-chips">${chips}</div>
-    </div>`;
-    return;
-  }
-  const items = [...activePerturbations].map(id => {
-    const p = P.find(x => x.id === id);
-    if (!p) return '';
-    const shortName = p.name.split(/[()]/)[0].trim();
-    return `<span class="pert-active-chip" data-pertid="${escapeAttr(p.id)}">${escapeText(shortName)}<span class="pert-active-chip-x" data-rmpert="${escapeAttr(p.id)}" title="Remove">×</span></span>`;
+  const active = activePerturbations.size;
+  // Every perturbation as a toggle chip; active ones are highlighted.
+  const chips = P.map(p => {
+    const on = activePerturbations.has(p.id);
+    const short = p.name.split(/[()]/)[0].trim();
+    return `<button class="pert-quick-chip${on ? ' active' : ''}" data-pertid="${escapeAttr(p.id)}" aria-pressed="${on}" title="${escapeAttr(p.name)}">${escapeText(short)}</button>`;
   }).join('');
-  const cs = deriveCellState(computeState());
-  const statHtml = cs.rows.map(r => `<span class="cell-stat ${deltaClass(r.d)}">${escapeText(r.label)}&nbsp;${deltaArrow(r.d)}</span>`).join('')
-    + (cs.acidosis ? `<span class="cell-stat warn">${escapeText(cs.acidosis)}</span>` : '');
+  let head, tail = '';
+  if (active) {
+    head = `<span>Active · ${active}</span><button class="pert-clear-btn" id="pert-clear-all">Clear all</button>`;
+    const cs = deriveCellState(computeState());
+    const statHtml = cs.rows.map(r => `<span class="cell-stat ${deltaClass(r.d)}">${escapeText(r.label)}&nbsp;${deltaArrow(r.d)}</span>`).join('')
+      + (cs.acidosis ? `<span class="cell-stat warn">${escapeText(cs.acidosis)}</span>` : '');
+    tail = `<div class="cell-state"><div class="cell-state-label">Predicted cell state</div><div class="cell-state-row">${statHtml}</div></div>`;
+  } else {
+    head = `<span>Toggle any perturbation</span>`;
+  }
   el.innerHTML = `<div class="pert-summary">
-    <div class="pert-summary-label">
-      <span>Active · ${activePerturbations.size}</span>
-      <button class="pert-clear-btn" id="pert-clear-all">Clear all</button>
-    </div>
-    <div class="pert-chips">${items}</div>
-    <div class="cell-state">
-      <div class="cell-state-label">Predicted cell state</div>
-      <div class="cell-state-row">${statHtml}</div>
-    </div>
+    <div class="pert-summary-label">${head}</div>
+    <div class="pert-chips">${chips}</div>
+    ${tail}
   </div>`;
 }
 
@@ -3335,12 +3379,64 @@ function hideNodePopover() {
 }
 function popoverOpen() { return _popEl.classList.contains('open'); }
 
+// ===== Cell vitals monitor — a live readout of the derived cell state =====
+const VITALS = [
+  { key: 'energy',  label: 'Energy' },
+  { key: 'redox',   label: 'NADH:NAD⁺' },
+  { key: 'lactate', label: 'Lactate' },
+  { key: 'ketones', label: 'Ketones' }
+];
+function computeVitals(state) {
+  const g = n => state[n] || 0, cl = v => Math.max(-3, Math.min(3, v));
+  return {
+    energy:  cl(g('ATP') - g('ADP')),
+    redox:   cl(g('NADH') - g('NAD+')),
+    lactate: cl(g('Lactate')),
+    ketones: cl(Math.max(g('Acetoacetate'), g('β-OH-butyrate'))),
+    acidosis: deriveCellState(state).acidosis
+  };
+}
+function buildVitals() {
+  const host = document.getElementById('cell-vitals');
+  if (!host) return;
+  host.innerHTML = `<div class="cv-head"><span class="cv-dot"></span>Cell vitals</div>`
+    + `<div class="cv-rows">` + VITALS.map(v =>
+        `<div class="cv-row" data-vital="${v.key}"><span class="cv-label">${escapeText(v.label)}</span>`
+        + `<span class="cv-track"><span class="cv-fill"></span><span class="cv-zero"></span></span>`
+        + `<span class="cv-delta">=</span></div>`).join('')
+    + `</div><div class="cv-status" id="cv-status">Balanced</div>`;
+}
+function renderVitals(state) {
+  const host = document.getElementById('cell-vitals');
+  if (!host) return;
+  const v = computeVitals(state);
+  for (const spec of VITALS) {
+    const row = host.querySelector(`.cv-row[data-vital="${spec.key}"]`);
+    if (!row) continue;
+    const val = v[spec.key] || 0, mag = Math.min(1, Math.abs(val) / 3);
+    const fill = row.querySelector('.cv-fill'), delta = row.querySelector('.cv-delta');
+    fill.classList.toggle('up', val > 0);
+    fill.classList.toggle('down', val < 0);
+    if (val >= 0) { fill.style.left = '50%'; fill.style.right = 'auto'; fill.style.transformOrigin = 'left center'; }
+    else { fill.style.right = '50%'; fill.style.left = 'auto'; fill.style.transformOrigin = 'right center'; }
+    fill.style.transform = `scaleX(${mag.toFixed(3)})`;
+    delta.textContent = deltaArrow(val);
+    delta.className = 'cv-delta ' + deltaClass(val);
+  }
+  const status = document.getElementById('cv-status');
+  if (status) {
+    if (v.acidosis) { status.textContent = v.acidosis; status.classList.add('alarm'); }
+    else { status.textContent = 'Balanced'; status.classList.remove('alarm'); }
+  }
+}
+
 function renderAll() {
   const state = computeState();
   renderNodes(state);
   renderEdges();
   renderMetaboliteLists(state);
   renderDetail(state);
+  renderVitals(state);
   const count = activePerturbations.size;
   const badge = document.getElementById('active-count');
   badge.textContent = count;
@@ -3629,6 +3725,7 @@ function renderCompartments() {
 renderCompartments();
 renderTransporters();
 renderPerturbationList();
+buildVitals();
 renderAll();
 
 // Cell-type selector (compact dropdown)
@@ -3666,13 +3763,12 @@ document.getElementById('pert-summary').addEventListener('click', (e) => {
     renderAll();
     return;
   }
-  // empty-state quick chip → toggle that perturbation on
+  // perturbation chip → toggle it on/off
   const chip = e.target.closest('[data-pertid]');
   if (chip && chip.classList.contains('pert-quick-chip')) {
     const id = chip.dataset.pertid;
-    activePerturbations.add(id);
-    selectedPerturbation = id;
-    selectedMetabolite = null;
+    if (activePerturbations.has(id)) { activePerturbations.delete(id); selectedPerturbation = null; }
+    else { activePerturbations.add(id); selectedPerturbation = id; selectedMetabolite = null; }
     renderPerturbationList();
     renderAll();
   }
@@ -3926,6 +4022,9 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'f' || e.key === 'F') { focusBtn.click(); }
   else if (e.key === 't' || e.key === 'T') { themeBtn.click(); }
   else if (e.key === 'x' || e.key === 'X') { fluxEnabled = !fluxEnabled; try { localStorage.setItem('biochem-flux', fluxEnabled ? '1' : '0'); } catch (e2) {} renderEdges(); }
+  else if (e.key === '+' || e.key === '=') { applyZoom(mapZoom * 1.2); }
+  else if (e.key === '-' || e.key === '_') { applyZoom(mapZoom / 1.2); }
+  else if (e.key === '0') { zoomFit(); }
   else if (e.key === '?') { e.preventDefault(); openHelp(); }
   else if (e.key === '/') { e.preventDefault(); openCmdPalette(); }
 });
@@ -4583,7 +4682,7 @@ function buildCmdIndex() {
       label: info.label,
       sub: `Pathway · ${info.short || ''}`,
       keywords: (info.label + ' ' + (info.short || '') + ' ' + (info.desc || '') + ' pathway focus dive').toLowerCase(),
-      action: () => enterDive(key)
+      action: () => { enterDive(key); focusPathway(key); }
     });
   }
   for (const [name, m] of Object.entries(M)) {
@@ -4598,6 +4697,7 @@ function buildCmdIndex() {
         selectedMetabolite = name;
         selectedPerturbation = null;
         renderAll();
+        focusNode(name);
       }
     });
   }
@@ -4631,6 +4731,71 @@ function openCmdPalette() {
 }
 function closeCmdPalette() { document.getElementById('cmd-palette').classList.remove('open'); }
 function cmdPaletteOpen() { return document.getElementById('cmd-palette').classList.contains('open'); }
+
+// ===== Map zoom + search-to-focus =====
+// The map renders at natural size inside a scrollable <main> (so panning is just
+// native scroll / a one-finger drag). Zoom scales the SVG's rendered box and
+// keeps the focal point fixed; focus scrolls a node/pathway to centre.
+const MAP_W = 3264, MAP_H = 2624, MAP_VBX = -72, MAP_VBY = -24;
+let mapZoom = 1;
+const mapMain = document.querySelector('main');
+const mapSvg = document.getElementById('pathway-svg');
+function applyZoom(z, focalClientX, focalClientY) {
+  const nz = Math.max(0.32, Math.min(2.2, z));
+  if (!mapMain || !mapSvg || Math.abs(nz - mapZoom) < 0.001) return;
+  const rect = mapMain.getBoundingClientRect();
+  const fx = focalClientX == null ? rect.width / 2 : focalClientX - rect.left;
+  const fy = focalClientY == null ? rect.height / 2 : focalClientY - rect.top;
+  const cx = (mapMain.scrollLeft + fx) / mapZoom, cy = (mapMain.scrollTop + fy) / mapZoom;
+  mapZoom = nz;
+  mapSvg.style.width = (MAP_W * nz) + 'px';
+  mapSvg.style.height = (MAP_H * nz) + 'px';
+  mapSvg.style.minWidth = (MAP_W * nz) + 'px';
+  mapMain.scrollLeft = cx * nz - fx;
+  mapMain.scrollTop = cy * nz - fy;
+}
+function zoomFit() {
+  if (!mapMain) return;
+  const rect = mapMain.getBoundingClientRect();
+  applyZoom(Math.min(rect.width / MAP_W, rect.height / MAP_H) * 0.98);
+  mapMain.scrollLeft = 0; mapMain.scrollTop = 0;
+}
+function scrollMapTo(mx, my) {
+  const px = (mx - MAP_VBX) * mapZoom, py = (my - MAP_VBY) * mapZoom;
+  mapMain.scrollTo({ left: px - mapMain.clientWidth / 2, top: py - mapMain.clientHeight / 2, behavior: REDUCED_MOTION ? 'auto' : 'smooth' });
+}
+function focusNode(name) {
+  const m = M[name];
+  if (!m || !mapMain) return;
+  if (mapZoom < 0.72) applyZoom(0.95);
+  scrollMapTo(m.x, m.y);
+}
+function focusPathway(pw) {
+  const ns = Object.values(M).filter(m => m.pathway === pw);
+  if (!ns.length || !mapMain) return;
+  scrollMapTo(ns.reduce((s, m) => s + m.x, 0) / ns.length, ns.reduce((s, m) => s + m.y, 0) / ns.length);
+}
+if (mapMain) {
+  document.getElementById('zoom-in').addEventListener('click', () => applyZoom(mapZoom * 1.25));
+  document.getElementById('zoom-out').addEventListener('click', () => applyZoom(mapZoom / 1.25));
+  document.getElementById('zoom-fit').addEventListener('click', zoomFit);
+  mapMain.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey) return;      // trackpad pinch / ctrl+wheel zooms; plain wheel scrolls (pans)
+    e.preventDefault();
+    applyZoom(mapZoom * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
+  }, { passive: false });
+  let pinchDist = 0;
+  const tDist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  const tMid = t => ({ x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 });
+  mapMain.addEventListener('touchstart', (e) => { if (e.touches.length === 2) pinchDist = tDist(e.touches); }, { passive: true });
+  mapMain.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 2) return;
+    e.preventDefault();
+    const d = tDist(e.touches), mid = tMid(e.touches);
+    if (pinchDist) applyZoom(mapZoom * d / pinchDist, mid.x, mid.y);
+    pinchDist = d;
+  }, { passive: false });
+}
 
 function renderCmdResults(q) {
   const norm = q.toLowerCase().trim();
