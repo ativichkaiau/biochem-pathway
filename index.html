@@ -1191,6 +1191,20 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
 .cell-stat.up, .cell-stat.up2 { color: var(--up); background: color-mix(in srgb, var(--up) 13%, var(--clay-surface)); }
 .cell-stat.down, .cell-stat.down2 { color: var(--down); background: color-mix(in srgb, var(--down) 13%, var(--clay-surface)); }
 .cell-stat.warn { color: #e3a008; background: color-mix(in srgb, #e3a008 15%, var(--clay-surface)); }
+/* Cell vitals broken down by the perturbation driving each one */
+.vitals-map { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--glass-brd); }
+.vitals-map-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-2); margin-bottom: 9px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.vmap-row { margin-bottom: 9px; }
+.vmap-row:last-child { margin-bottom: 0; }
+.vmap-vital { font-size: 11.5px; font-weight: 800; letter-spacing: 0.2px; margin-bottom: 4px; color: var(--text-2); }
+.vmap-vital.up, .vmap-vital.up2 { color: var(--up); }
+.vmap-vital.down, .vmap-vital.down2 { color: var(--down); }
+.vmap-contribs { display: flex; flex-wrap: wrap; gap: 4px 5px; padding-left: 2px; }
+.vmap-contrib { font-size: 10.5px; font-weight: 600; color: var(--text-2); background: var(--clay-surface); box-shadow: var(--clay-sm); border-radius: 7px; padding: 2px 8px; white-space: nowrap; }
+.vmap-contrib b { font-family: "SF Mono","Menlo",monospace; font-weight: 800; margin-left: 1px; }
+.vmap-contrib.up b { color: var(--up); }
+.vmap-contrib.down b { color: var(--down); }
+.vmap-empty { font-size: 11px; color: var(--text-2); opacity: 0.8; }
 .pert-quick-chip {
   font-family: inherit; font-size: 11px; font-weight: 700;
   padding: 6px 13px; border-radius: 999px;
@@ -3150,18 +3164,23 @@ function renderPertSummary() {
     const shortName = p.name.split(/[()]/)[0].trim();
     return `<span class="pert-active-chip" data-pertid="${escapeAttr(p.id)}">${escapeText(shortName)}<span class="pert-active-chip-x" data-rmpert="${escapeAttr(p.id)}" title="Remove">×</span></span>`;
   }).join('');
-  const cs = deriveCellState(computeState());
-  const statHtml = cs.rows.map(r => `<span class="cell-stat ${deltaClass(r.d)}">${escapeText(r.label)}&nbsp;${deltaArrow(r.d)}</span>`).join('')
-    + (cs.acidosis ? `<span class="cell-stat warn">${escapeText(cs.acidosis)}</span>` : '');
+  const acidosis = deriveCellState(computeState()).acidosis;
+  const rows = vitalsBreakdown();
+  const bd = rows.length ? rows.map(r => `
+      <div class="vmap-row">
+        <div class="vmap-vital ${deltaClass(r.val)}">${escapeText(r.label)}&nbsp;${deltaArrow(r.val)}</div>
+        <div class="vmap-contribs">${r.contribs.map(c => `<span class="vmap-contrib ${c.v > 0 ? 'up' : 'down'}">${escapeText(c.name)}&nbsp;<b>${c.v > 0 ? '+' : ''}${c.v}</b></span>`).join('')}</div>
+      </div>`).join('')
+    : `<div class="vmap-empty">No push on the core vitals.</div>`;
   el.innerHTML = `<div class="pert-summary">
     <div class="pert-summary-label">
       <span>Active · ${activePerturbations.size}</span>
       <button class="pert-clear-btn" id="pert-clear-all">Clear all</button>
     </div>
     <div class="pert-chips">${items}</div>
-    <div class="cell-state">
-      <div class="cell-state-label">Predicted cell state</div>
-      <div class="cell-state-row">${statHtml}</div>
+    <div class="vitals-map">
+      <div class="vitals-map-label">Cell vitals · by perturbation${acidosis ? `<span class="cell-stat warn">${escapeText(acidosis)}</span>` : ''}</div>
+      ${bd}
     </div>
   </div>`;
 }
@@ -3398,6 +3417,44 @@ function computeVitals(state) {
     ketones: cl(Math.max(g('Acetoacetate'), g('β-OH-butyrate'))),
     acidosis: deriveCellState(state).acidosis
   };
+}
+// Same math as computeState() but for an arbitrary set of perturbation ids, so we
+// can score one perturbation in isolation (its solo push on each vital).
+function stateFromPerts(ids) {
+  const state = {}, touched = {};
+  for (const m in M) state[m] = 0;
+  for (const pid of ids) {
+    const p = P.find(x => x.id === pid);
+    if (!p) continue;
+    for (const [m, d] of Object.entries(p.effects || {})) {
+      if (state[m] === undefined) continue;
+      state[m] += d;
+      if (d !== 0) touched[m] = true;
+    }
+  }
+  for (const [a, b] of COFACTOR_PAIRS) {
+    if (state[a] === undefined || state[b] === undefined) continue;
+    if (touched[a] && !touched[b]) state[b] = -state[a];
+    else if (touched[b] && !touched[a]) state[a] = -state[b];
+  }
+  for (const m in state) state[m] = Math.max(-3, Math.min(3, state[m]));
+  return state;
+}
+// For each vital, which active perturbations drive it (their solo contribution).
+function vitalsBreakdown() {
+  const combined = computeVitals(computeState());
+  const rows = [];
+  for (const spec of VITALS) {
+    const contribs = [];
+    for (const pid of activePerturbations) {
+      const solo = computeVitals(stateFromPerts([pid]))[spec.key];
+      if (solo) { const p = P.find(x => x.id === pid); contribs.push({ name: p ? p.name.split(/[()]/)[0].trim() : pid, v: solo }); }
+    }
+    if (!contribs.length && !combined[spec.key]) continue;
+    contribs.sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
+    rows.push({ label: spec.label, val: combined[spec.key], contribs });
+  }
+  return rows;
 }
 function buildVitals() {
   const host = document.getElementById('cell-vitals');
