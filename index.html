@@ -347,8 +347,6 @@ aside {
 aside.right { border-right: none; border-left: 1px solid var(--glass-brd); }
 .layout.hide-left #perturbations-aside,
 .layout.hide-right aside.right { padding: 0; border: none; }
-/* clear the fixed cell-vitals monitor that floats over the panel's bottom-left */
-@media (min-width: 561px) { #perturbations-aside { padding-bottom: 168px; } }
 aside h2 {
   font-size: 11px;
   text-transform: uppercase;
@@ -1201,7 +1199,6 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
 }
 .pert-quick-chip:hover { transform: translateY(-2px); }
 .pert-quick-chip:active { transform: translateY(0); box-shadow: var(--clay-pressed); }
-.pert-quick-chip.active { background: var(--accent); color: var(--chip); box-shadow: var(--clay-pressed); }
 .pert-active-chip {
   display: inline-flex; align-items: center; gap: 5px;
   font-size: 11px; font-weight: 700;
@@ -3139,27 +3136,33 @@ const QUICK_PERTS = [
 function renderPertSummary() {
   const el = document.getElementById('pert-summary');
   if (!el) return;
-  const active = activePerturbations.size;
-  // Every perturbation as a toggle chip; active ones are highlighted.
-  const chips = P.map(p => {
-    const on = activePerturbations.has(p.id);
-    const short = p.name.split(/[()]/)[0].trim();
-    return `<button class="pert-quick-chip${on ? ' active' : ''}" data-pertid="${escapeAttr(p.id)}" aria-pressed="${on}" title="${escapeAttr(p.name)}">${escapeText(short)}</button>`;
-  }).join('');
-  let head, tail = '';
-  if (active) {
-    head = `<span>Active · ${active}</span><button class="pert-clear-btn" id="pert-clear-all">Clear all</button>`;
-    const cs = deriveCellState(computeState());
-    const statHtml = cs.rows.map(r => `<span class="cell-stat ${deltaClass(r.d)}">${escapeText(r.label)}&nbsp;${deltaArrow(r.d)}</span>`).join('')
-      + (cs.acidosis ? `<span class="cell-stat warn">${escapeText(cs.acidosis)}</span>` : '');
-    tail = `<div class="cell-state"><div class="cell-state-label">Predicted cell state</div><div class="cell-state-row">${statHtml}</div></div>`;
-  } else {
-    head = `<span>Toggle any perturbation</span>`;
+  if (activePerturbations.size === 0) {
+    const chips = QUICK_PERTS.map(q => `<button class="pert-quick-chip" data-pertid="${escapeAttr(q.id)}" title="Toggle ${escapeAttr(q.label)}">${escapeText(q.label)}</button>`).join('');
+    el.innerHTML = `<div class="pert-summary">
+      <div class="pert-summary-label">Try one to start</div>
+      <div class="pert-chips">${chips}</div>
+    </div>`;
+    return;
   }
+  const items = [...activePerturbations].map(id => {
+    const p = P.find(x => x.id === id);
+    if (!p) return '';
+    const shortName = p.name.split(/[()]/)[0].trim();
+    return `<span class="pert-active-chip" data-pertid="${escapeAttr(p.id)}">${escapeText(shortName)}<span class="pert-active-chip-x" data-rmpert="${escapeAttr(p.id)}" title="Remove">×</span></span>`;
+  }).join('');
+  const cs = deriveCellState(computeState());
+  const statHtml = cs.rows.map(r => `<span class="cell-stat ${deltaClass(r.d)}">${escapeText(r.label)}&nbsp;${deltaArrow(r.d)}</span>`).join('')
+    + (cs.acidosis ? `<span class="cell-stat warn">${escapeText(cs.acidosis)}</span>` : '');
   el.innerHTML = `<div class="pert-summary">
-    <div class="pert-summary-label">${head}</div>
-    <div class="pert-chips">${chips}</div>
-    ${tail}
+    <div class="pert-summary-label">
+      <span>Active · ${activePerturbations.size}</span>
+      <button class="pert-clear-btn" id="pert-clear-all">Clear all</button>
+    </div>
+    <div class="pert-chips">${items}</div>
+    <div class="cell-state">
+      <div class="cell-state-label">Predicted cell state</div>
+      <div class="cell-state-row">${statHtml}</div>
+    </div>
   </div>`;
 }
 
@@ -3763,12 +3766,13 @@ document.getElementById('pert-summary').addEventListener('click', (e) => {
     renderAll();
     return;
   }
-  // perturbation chip → toggle it on/off
+  // empty-state quick chip → toggle that perturbation on
   const chip = e.target.closest('[data-pertid]');
   if (chip && chip.classList.contains('pert-quick-chip')) {
     const id = chip.dataset.pertid;
-    if (activePerturbations.has(id)) { activePerturbations.delete(id); selectedPerturbation = null; }
-    else { activePerturbations.add(id); selectedPerturbation = id; selectedMetabolite = null; }
+    activePerturbations.add(id);
+    selectedPerturbation = id;
+    selectedMetabolite = null;
     renderPerturbationList();
     renderAll();
   }
