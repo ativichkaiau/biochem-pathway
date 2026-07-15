@@ -1,0 +1,77 @@
+{
+  "id": "tryptophan-pellagra",
+  "pathway": "tryptophan",
+  "title": "The child with a sunburn rash, loose stools, and a wobbly gait",
+  "blurb": "Dermatitis, diarrhea, and neurologic signs in a well-fed child — with a curious aminoaciduria that names the disease and explains the vitamin it mimics.",
+  "patient": {
+    "age": "6 years",
+    "sex": "M",
+    "complaint": "A scaly, photosensitive rash on sun-exposed skin, intermittent diarrhea, and episodes of unsteadiness."
+  },
+  "opening": "A 6-year-old presents with a symmetric, scaly, hyperpigmented rash across the neck and dorsal hands/forearms that flares in sunlight, plus intermittent diarrhea and episodic cerebellar ataxia. His diet is actually adequate and varied. A prior sibling had similar skin findings that 'came and went.' Urine amino acid screen is abnormal. What do you want to ask, examine, or order next?",
+  "history": "Well-nourished, no alcohol exposure, not on isoniazid or 5-FU. Symptoms are episodic and worsen with sun, fever, and poor intake. Consanguineous parents. No carcinoid features. Diet is not maize-heavy.",
+  "exam": "Casal-necklace distribution dermatitis (sun-exposed, sharply demarcated). Intermittent wide-based ataxic gait during a flare. Cognition normal between episodes. No hepatomegaly, no flushing, no murmur.",
+  "labs": [
+    { "name": "Urine amino acids", "value": "Neutral aminoaciduria (Trp, Ala, Ser, others)", "unit": "", "ref": "None", "flag": "high" },
+    { "name": "Urine dibasic / acidic amino acids", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Plasma niacin / NAD", "value": "Low", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "Plasma tryptophan", "value": "Low-normal", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "Serum 5-HIAA", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Zinc, TSH", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis, and what deficiency does it functionally mimic?",
+      "cause": "What is defective, and how does it affect tryptophan?",
+      "mechanism": "Trace how the defect produces a pellagra picture."
+    },
+    "rubric": {
+      "diagnosis": { "weight": 0.4, "accepts": ["hartnup disease", "hartnup disorder", "pellagra from hartnup", "neutral aminoaciduria causing pellagra", "hartnup"] },
+      "cause": { "weight": 0.3, "accepts": ["defective neutral amino acid transporter", "slc6a19", "b0at1", "impaired tryptophan absorption in gut and kidney", "neutral amino acid transport defect"] },
+      "mechanism": { "weight": 0.3, "accepts": ["less tryptophan absorbed so less niacin/nad synthesized", "tryptophan is a niacin precursor", "functional niacin deficiency", "low trp starves de-novo nad"] }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the amino acid whose defective absorption starves the de-novo niacin/NAD⁺ route.",
+    "target": { "type": "node", "name": "Tryptophan" },
+    "correctMsg": "Yes — tryptophan. In Hartnup disease a neutral amino-acid transporter (SLC6A19 / B⁰AT1) in the gut and proximal renal tubule fails, so neutral amino acids — most importantly tryptophan — are malabsorbed and spilled in the urine (the neutral aminoaciduria). Because tryptophan is the precursor for de-novo NAD⁺ (via kynurenine → quinolinate → niacin), less absorbed tryptophan means functional niacin deficiency → a pellagra picture (dermatitis, diarrhea, neurologic signs). Treat with a high-protein diet and niacin/nicotinamide.",
+    "wrongMsg": "Not quite — look for the essential amino acid at the head of this pathway; its malabsorption is what limits niacin synthesis.",
+    "revealMsg": "The answer was the Tryptophan node: the malabsorbed precursor of de-novo NAD⁺."
+  },
+  "mcqs": [
+    {
+      "stem": "How does Hartnup pellagra differ from classic dietary (maize-based) pellagra, yet share a final pathway?",
+      "choices": [
+        "Both are caused by too much niacin",
+        "Dietary pellagra = low niacin AND low tryptophan intake; Hartnup = adequate diet but malabsorbed tryptophan — both end in too little NAD⁺",
+        "Hartnup is caused by a niacin transporter defect",
+        "They are unrelated"
+      ],
+      "correct": 1,
+      "expl": "Corn is low in bioavailable niacin and in tryptophan, so a maize-heavy diet causes pellagra. Hartnup reaches the same NAD⁺ shortfall despite adequate diet because tryptophan can't be absorbed. The common endpoint is inadequate de-novo NAD⁺."
+    },
+    {
+      "stem": "Which other drugs/conditions produce a pellagra-like state through the SAME tryptophan → niacin axis?",
+      "choices": [
+        "Statins and metformin",
+        "Isoniazid (depletes B6 needed for the kynurenine pathway) and carcinoid (diverts tryptophan to serotonin)",
+        "Beta-blockers and ACE inhibitors",
+        "Warfarin and heparin"
+      ],
+      "correct": 1,
+      "expl": "Isoniazid depletes B6, a cofactor in the kynurenine → NAD⁺ route; carcinoid tumors shunt tryptophan into serotonin. Both leave too little tryptophan flux to NAD⁺ — a functional niacin deficiency by a different mechanism."
+    },
+    {
+      "stem": "Why is Hartnup often intermittent and sometimes asymptomatic?",
+      "choices": [
+        "The transporter works on alternate days",
+        "Adequate dietary protein and residual absorption usually supply enough tryptophan; symptoms surface under stress, fever, sun, or low intake",
+        "It resolves at puberty in all cases",
+        "Niacin is stored for years"
+      ],
+      "correct": 1,
+      "expl": "Many with the transporter defect stay well because dietary protein and some residual/other-route absorption cover requirements. Deficiency becomes clinical when demand rises or intake falls — hence the episodic, stress-triggered course."
+    }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

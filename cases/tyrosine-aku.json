@@ -1,0 +1,78 @@
+{
+  "id": "tyrosine-aku",
+  "pathway": "tyrosine",
+  "title": "The man whose diapers turned black — and 40 years later, his joints",
+  "blurb": "Urine that darkens on standing, a lifetime later a bluish ear and a crumbling spine. One missing enzyme, two very different clues decades apart.",
+  "patient": {
+    "age": "48 years",
+    "sex": "M",
+    "complaint": "Progressive low-back and knee pain; his wife noticed dark staining in the toilet and bluish discoloration of his ears."
+  },
+  "opening": "A 48-year-old man presents with years of worsening back and large-joint pain. On exam you notice slate-blue pigment in the cartilage of both ears and a bluish tinge to the sclerae. His mother recalls his infant diapers 'turned black if left overnight.' A fresh urine sample looks normal but darkens to brown-black after sitting out. What do you want to ask, examine, or order next?",
+  "history": "Otherwise healthy; no medications. Family: a brother had 'early arthritis.' Consanguineous grandparents. No liver disease, no neurologic symptoms, normal cognition and development.",
+  "exam": "Bluish-gray pigmentation of ear and nasal cartilage (ochronosis) and sclerae. Restricted, painful lumbar spine; large-joint crepitus. No hepatomegaly. Neuro exam normal.",
+  "labs": [
+    { "name": "Urine (fresh)", "value": "Clear yellow", "unit": "", "ref": "Clear yellow", "flag": "normal" },
+    { "name": "Urine (after standing / alkalinized)", "value": "Darkens to black", "unit": "", "ref": "Stable", "flag": "high" },
+    { "name": "Urine homogentisic acid", "value": "4400", "unit": "mg/day", "ref": "<20", "flag": "high" },
+    { "name": "Plasma tyrosine", "value": 78, "unit": "µmol/L", "ref": "45-90", "flag": "normal" },
+    { "name": "AST / ALT", "value": "Normal", "unit": "U/L", "ref": "<40", "flag": "normal" },
+    { "name": "Ascorbic acid", "value": "Low-normal", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "Spine X-ray", "value": "Calcified intervertebral discs, degenerative changes", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme is deficient, and what accumulates?",
+      "mechanism": "Why the black urine AND the joint disease decades apart?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 0.4, "accepts": ["alkaptonuria", "alcaptonuria", "black urine disease", "ochronosis"] },
+      "cause": { "weight": 0.3, "accepts": ["homogentisate oxidase", "homogentisic acid oxidase", "hgd", "homogentisate 1,2-dioxygenase", "homogentisate accumulates"] },
+      "mechanism": { "weight": 0.3, "accepts": ["homogentisate polymerizes / oxidizes", "pigment deposits in cartilage", "ochronotic pigment", "oxidizes to a dark polymer", "binds connective tissue"] }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the enzyme step that is deficient in this disease.",
+    "target": { "type": "edge", "edgeId": "HGD:Homogentisate->Fumarylacetoacetate" },
+    "correctMsg": "Correct — homogentisate oxidase (HGD). Without it, homogentisic acid backs up, spills into urine (where it oxidizes/polymerizes to a black pigment on standing), and slowly deposits as ochronotic pigment in cartilage and discs → the pigmentation and the destructive arthropathy. It's autosomal recessive and, notably, benign in childhood apart from the dark diapers.",
+    "wrongMsg": "Not quite — the block is in tyrosine DEGRADATION, one step past homogentisate. It's the enzyme whose loss lets homogentisic acid accumulate.",
+    "revealMsg": "The answer was HGD (Homogentisate → Fumarylacetoacetate): homogentisate oxidase."
+  },
+  "mcqs": [
+    {
+      "stem": "Why does the urine only turn black AFTER standing (or when alkalinized), not immediately?",
+      "choices": [
+        "Homogentisic acid must be oxidized and polymerized (favored by air and alkaline pH) to the dark pigment",
+        "Bacteria in the toilet metabolize it",
+        "Bilirubin is co-excreted",
+        "It requires UV light exposure"
+      ],
+      "correct": 0,
+      "expl": "Fresh homogentisic acid is colorless; on exposure to air (and faster at alkaline pH) it oxidizes and polymerizes to a melanin-like black pigment — the classic 'darkens on standing' clue. Historically it also reduces Benedict's reagent, mimicking a reducing sugar."
+    },
+    {
+      "stem": "Contrast alkaptonuria with tyrosinemia type I, the block one step further down (FAH).",
+      "choices": [
+        "Both cause fatal neonatal liver failure",
+        "Alkaptonuria (HGD) is essentially benign apart from late arthritis/pigment; tyrosinemia I (FAH) makes toxic fumarylacetoacetate/succinylacetone → infant liver failure",
+        "Alkaptonuria causes liver failure; tyrosinemia I is benign",
+        "They are the same enzyme"
+      ],
+      "correct": 1,
+      "expl": "The intermediate that accumulates determines severity: homogentisic acid is relatively innocuous (slow pigment deposition), whereas the downstream fumarylacetoacetate and succinylacetone in FAH deficiency are acutely hepatotoxic."
+    },
+    {
+      "stem": "A proposed treatment for alkaptonuria is nitisinone. How would blocking 4-HPPD (upstream) help?",
+      "choices": [
+        "It replaces the missing HGD enzyme",
+        "It reduces production of homogentisate by inhibiting the enzyme just upstream of it, lowering pigment load (at the cost of raising tyrosine)",
+        "It chelates the pigment",
+        "It has no rationale"
+      ],
+      "correct": 1,
+      "expl": "Nitisinone inhibits 4-hydroxyphenylpyruvate dioxygenase, which sits just upstream of homogentisate — so less homogentisic acid is made and less ochronotic pigment deposits. The trade-off is elevated tyrosine, requiring dietary restriction."
+    }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

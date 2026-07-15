@@ -4224,7 +4224,7 @@ document.addEventListener('keydown', (e) => {
 
 // Which pathways have a case JSON shipped today. Add to this list
 // when a new /cases/<pathway>.json drops.
-const AVAILABLE_CASES = ['glycolysis', 'sugar', 'tca', 'etc', 'heme', 'urea', 'onecarbon', 'fa-ketones', 'nucleotide', 'catechol', 'sterol', 'protein', 'ethanol', 'glycogen-ppp', 'creatine', 'sphingo', 'bilirubin', 'polyol'];
+const AVAILABLE_CASES = ['glycolysis', 'sugar', 'tca', 'etc', 'heme', 'urea', 'onecarbon', 'fa-ketones', 'nucleotide', 'catechol', 'sterol', 'protein', 'ethanol', 'glycogen-ppp', 'creatine', 'sphingo', 'bilirubin', 'polyol', 'glutathione', 'eicosanoid', 'tryptophan', 'tyrosine'];
 
 // Mode flag read by the pathway-svg click handler. null | 'pinpoint'.
 let caseMode = null;
@@ -5122,7 +5122,13 @@ const CASES_INDEX = [
   { file: 'sphingo',        pathway: 'sphingo',       title: 'The 8-month-old who startles at every sound',            blurb: 'A bright infant losing milestones, with an exaggerated startle, a cherry-red macula — and a notably soft, normal-sized belly.' },
   { file: 'sphingo-gaucher', pathway: 'sphingo',      title: 'The adult with a huge spleen and unexplained bruising',  blurb: 'The most common lysosomal storage disease — massive hepatosplenomegaly, low counts, and bone crises. Notably treatable.' },
   { file: 'bilirubin',      pathway: 'bilirubin',     title: "The newborn whose jaundice won't quit",                  blurb: 'Unconjugated bilirubin climbing toward the danger zone in a well-appearing term newborn, with phototherapy barely holding the line.' },
-  { file: 'polyol',         pathway: 'polyol',        title: 'The diabetic with new cataracts and numb feet',          blurb: 'A sugar trapped where it should not be — osmotic and oxidative damage in the lens, nerve, retina, and kidney.' }
+  { file: 'polyol',         pathway: 'polyol',        title: 'The diabetic with new cataracts and numb feet',          blurb: 'A sugar trapped where it should not be — osmotic and oxidative damage in the lens, nerve, retina, and kidney.' },
+  { file: 'glutathione-apap',    pathway: 'glutathione', title: 'The college student found down beside an empty bottle',   blurb: 'A staggered acetaminophen ingestion that looked fine for a day — then transaminases into the thousands. The antidote works by feeding one pathway.' },
+  { file: 'eicosanoid-aerd',     pathway: 'eicosanoid',  title: 'The asthmatic whose nose ran and airway closed after one aspirin', blurb: 'Nasal polyps, asthma, and a near-fatal reaction to a common painkiller. Blocking one branch of a lipid pathway forces everything down the other.' },
+  { file: 'tryptophan-carcinoid', pathway: 'tryptophan', title: 'The woman who flushes when she eats — and a right-sided murmur', blurb: 'Episodic flushing, diarrhea, and wheeze, plus a scaly rash. One tumor is quietly hijacking an amino acid that three products depend on.' },
+  { file: 'tryptophan-pellagra', pathway: 'tryptophan',  title: 'The child with a sunburn rash, loose stools, and a wobbly gait', blurb: 'Dermatitis, diarrhea, and neurologic signs in a well-fed child — a curious aminoaciduria names the disease and the vitamin it mimics.' },
+  { file: 'tyrosine-aku',        pathway: 'tyrosine',    title: 'The man whose diapers turned black — and later, his joints', blurb: 'Urine that darkens on standing, decades later a bluish ear and a crumbling spine. One missing enzyme, two very different clues.' },
+  { file: 'tyrosine-t1',         pathway: 'tyrosine',    title: 'The infant with a cabbage smell and a failing liver',      blurb: 'Coagulopathy out of proportion to the transaminases, a boiled-cabbage odor, and a drug that treats it by moving the block higher up.' }
 ];
 
 // ---------------- Learner progress (localStorage) ----------------

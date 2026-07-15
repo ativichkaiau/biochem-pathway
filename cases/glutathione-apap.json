@@ -1,0 +1,80 @@
+{
+  "id": "glutathione-apap",
+  "pathway": "glutathione",
+  "title": "The college student found down beside an empty bottle",
+  "blurb": "A staggered acetaminophen ingestion that looked fine for a day — then transaminases into the thousands. The antidote works by feeding one pathway.",
+  "patient": {
+    "age": "19 years",
+    "sex": "F",
+    "complaint": "Nausea and vague right-upper-quadrant discomfort; roommate found an empty 500-count bottle."
+  },
+  "opening": "A 19-year-old woman is brought in ~28 hours after a breakup, having taken 'a lot of Tylenol over the evening.' She felt only nauseated at first and didn't come in. Now she has RUQ tenderness and vomiting. She also drinks heavily on weekends. Initial labs: AST 3100, ALT 3450, INR 2.1, total bilirubin 3.0, acetaminophen level 42 µg/mL (still detectable a day out). What do you want to ask, examine, or order next?",
+  "history": "Ingestion was staggered over ~6 hours, not a single time point (so the Rumack-Matthew nomogram is unreliable). Chronic heavy alcohol use; poor recent oral intake for two days. No other overdose agents reported. Not pregnant.",
+  "exam": "Afebrile, mild tachycardia. RUQ tenderness without rebound. No asterixis yet, alert and oriented. No stigmata of chronic liver disease. Skin/eyes: early scleral icterus.",
+  "labs": [
+    { "name": "AST", "value": 3100, "unit": "U/L", "ref": "<40", "flag": "high" },
+    { "name": "ALT", "value": 3450, "unit": "U/L", "ref": "<40", "flag": "high" },
+    { "name": "INR", "value": 2.1, "unit": "", "ref": "<1.2", "flag": "high" },
+    { "name": "Total bilirubin", "value": 3.0, "unit": "mg/dL", "ref": "<1.2", "flag": "high" },
+    { "name": "Acetaminophen level", "value": 42, "unit": "µg/dL", "ref": "0", "flag": "high" },
+    { "name": "Creatinine", "value": 1.6, "unit": "mg/dL", "ref": "0.6-1.1", "flag": "high" },
+    { "name": "Lactate", "value": 3.4, "unit": "mmol/L", "ref": "<2", "flag": "high" },
+    { "name": "Arterial pH", "value": 7.31, "unit": "", "ref": "7.35-7.45", "flag": "low" },
+    { "name": "Glucose", "value": 62, "unit": "mg/dL", "ref": "70-100", "flag": "low" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis, and what pattern of injury?",
+      "cause": "What metabolite causes the hepatocyte injury, and why is this patient higher-risk?",
+      "mechanism": "How does N-acetylcysteine rescue the liver?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 0.4, "accepts": ["acetaminophen toxicity", "acetaminophen overdose", "tylenol overdose", "paracetamol hepatotoxicity", "centrilobular necrosis"] },
+      "cause": { "weight": 0.3, "accepts": ["napqi", "n-acetyl-p-benzoquinone imine", "cyp2e1", "glutathione depletion", "gsh depletion", "alcohol induces cyp2e1"] },
+      "mechanism": { "weight": 0.3, "accepts": ["nac replenishes glutathione", "provides cysteine", "restores gsh", "regenerates glutathione", "cysteine for glutathione synthesis"] }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the reaction that generates the toxic metabolite from acetaminophen.",
+    "target": { "type": "edge", "edgeId": "CYP2E1:Acetaminophen->NAPQI" },
+    "correctMsg": "Yes — CYP2E1 oxidizes ~5% of acetaminophen to NAPQI. Normally glutathione conjugates NAPQI and it's excreted; in overdose the conjugation and sulfation routes saturate, more flux is forced through CYP2E1, GSH is exhausted, and free NAPQI binds hepatocyte proteins → centrilobular (zone 3) necrosis. Chronic alcohol INDUCES CYP2E1 and depletes GSH — a double hit.",
+    "wrongMsg": "Not quite — follow acetaminophen forward to the reactive intermediate. The enzyme is a CYP450 (2E1), the same one alcohol induces.",
+    "revealMsg": "The answer was CYP2E1 (Acetaminophen → NAPQI): the P450 step that makes the reactive quinone-imine."
+  },
+  "mcqs": [
+    {
+      "stem": "Why is N-acetylcysteine effective even fairly late, and how does it work?",
+      "choices": [
+        "It replenishes cysteine → glutathione, restoring conjugation of NAPQI (and as a bonus improves microcirculatory O₂ delivery)",
+        "It chelates acetaminophen directly in the gut",
+        "It competitively inhibits CYP2E1",
+        "It induces UGT to speed glucuronidation of NAPQI"
+      ],
+      "correct": 0,
+      "expl": "NAC supplies cysteine — the rate-limiting substrate for glutathione synthesis — so hepatocytes can regenerate GSH and re-conjugate NAPQI. It also has nonspecific antioxidant and hemodynamic benefits, which is why it helps even after the classic 8-hour window."
+    },
+    {
+      "stem": "Which finding most strongly predicts poor outcome / need for transplant referral in acetaminophen liver failure?",
+      "choices": [
+        "Peak transaminase (AST/ALT) value",
+        "Rising INR, acidosis (pH < 7.3), and rising creatinine (King's College criteria)",
+        "The acetaminophen level at presentation",
+        "Degree of nausea"
+      ],
+      "correct": 1,
+      "expl": "Transaminases mark hepatocyte death but not synthetic function. The King's College criteria — pH < 7.3, or the triad of INR > 6.5, creatinine > 3.4, and grade III/IV encephalopathy — track synthetic failure and prognosis."
+    },
+    {
+      "stem": "Why did this staggered ingestion look deceptively mild for the first day?",
+      "choices": [
+        "Acetaminophen is not absorbed when taken with alcohol",
+        "There is a latent period: injury lags the ingestion because GSH must be exhausted before free NAPQI accumulates; the nomogram also fails for staggered timing",
+        "The liver has no acetaminophen metabolism",
+        "Vomiting removed all the drug"
+      ],
+      "correct": 1,
+      "expl": "Phase I is minimal symptoms; hepatic necrosis (phase II-III) appears at 24-72 h once glutathione is depleted. Because ingestion was spread over hours, the single-timepoint Rumack-Matthew nomogram can't be applied — treat empirically."
+    }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

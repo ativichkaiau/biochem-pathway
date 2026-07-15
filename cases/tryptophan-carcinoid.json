@@ -1,0 +1,78 @@
+{
+  "id": "tryptophan-carcinoid",
+  "pathway": "tryptophan",
+  "title": "The woman who flushes when she eats — and a heart murmur on the right",
+  "blurb": "Episodic flushing, diarrhea, and wheeze, plus a scaly rash. One tumor is quietly hijacking an amino acid that three products depend on.",
+  "patient": {
+    "age": "57 years",
+    "sex": "F",
+    "complaint": "Episodes of sudden facial flushing, watery diarrhea, and occasional wheezing; a pellagra-like rash on sun-exposed skin."
+  },
+  "opening": "A 57-year-old woman describes months of dramatic facial flushing (triggered by meals, alcohol, and stress), secretory diarrhea, and intermittent wheeze. She has lost weight. On exam there is a scaly hyperpigmented rash on her forearms and neck, and a new tricuspid regurgitation murmur. A liver edge is palpable and nodular. What do you want to ask, examine, or order next?",
+  "history": "No asthma history; the wheeze is episodic and comes with the flushing. Diet adequate. No new medications. The rash resembles pellagra. Flushing is dry (not sweaty). Symptoms only became florid in the last several months.",
+  "exam": "Intermittent violaceous facial flushing during the visit. Tricuspid regurgitation murmur, prominent v-waves. Firm nodular hepatomegaly. Scaly, hyperpigmented dermatitis on sun-exposed skin (Casal necklace distribution). Wheeze on auscultation during a flush.",
+  "labs": [
+    { "name": "24-h urine 5-HIAA", "value": 88, "unit": "mg/day", "ref": "<6", "flag": "high" },
+    { "name": "Serum serotonin", "value": "Markedly elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Chromogranin A", "value": 640, "unit": "ng/mL", "ref": "<100", "flag": "high" },
+    { "name": "Niacin / NAD status", "value": "Low", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "Plasma tryptophan", "value": "Low", "unit": "", "ref": "Normal", "flag": "low" },
+    { "name": "Liver MRI", "value": "Multiple hypervascular metastases", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Echocardiogram", "value": "Tricuspid regurgitation, thickened right-sided valves", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the unifying diagnosis?",
+      "cause": "What is the tumor overproducing, and from what precursor?",
+      "mechanism": "Why the pellagra-like rash, and why does the heart disease favor the RIGHT side?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 0.4, "accepts": ["carcinoid syndrome", "metastatic carcinoid", "neuroendocrine tumor with carcinoid syndrome", "carcinoid"] },
+      "cause": { "weight": 0.3, "accepts": ["serotonin", "5-ht", "5-hydroxytryptamine", "from tryptophan", "overproduces serotonin from tryptophan"] },
+      "mechanism": { "weight": 0.3, "accepts": ["tryptophan diverted to serotonin so less niacin/nad", "pellagra from tryptophan steal", "serotonin degraded before lungs by mao spares left heart", "liver mets bypass first-pass so serotonin reaches right heart", "niacin deficiency"] }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the committed, rate-limiting step the tumor drives to overproduce its mediator.",
+    "target": { "type": "edge", "edgeId": "Trp hydroxylase:Tryptophan->5-HTP" },
+    "correctMsg": "Yes — tryptophan hydroxylase (Trp → 5-HTP) is the rate-limiting, committed step of serotonin synthesis, and it's driven hard by the tumor. Two consequences follow: (1) so much tryptophan is diverted to serotonin that the tryptophan→niacin/NAD⁺ route is starved → a pellagra-like dermatitis; (2) serotonin drives the flushing, diarrhea, and — once liver metastases let it bypass first-pass MAO — the right-sided (tricuspid/pulmonic) valve fibrosis. The lungs clear it before it reaches the left heart.",
+    "wrongMsg": "Not quite — you want the FIRST committed step of the serotonin branch (the one that makes 5-HTP), which the tumor upregulates.",
+    "revealMsg": "The answer was Trp hydroxylase (Tryptophan → 5-HTP): the rate-limiting step of serotonin synthesis."
+  },
+  "mcqs": [
+    {
+      "stem": "Why does the carcinoid heart disease spare the LEFT heart until late?",
+      "choices": [
+        "The left heart has no serotonin receptors",
+        "Pulmonary vascular endothelium (MAO/monoamine clearance) degrades serotonin before it reaches the left heart; hepatic mets let it hit the right heart first",
+        "Serotonin only forms in the right atrium",
+        "The mitral valve is congenitally protected"
+      ],
+      "correct": 1,
+      "expl": "Serotonin released into the systemic venous/hepatic circulation reaches the right-sided valves (TIPS = Tricuspid Insufficiency, Pulmonic Stenosis). The lungs then inactivate it (MAO), sparing the left heart — unless there is a shunt or bronchial carcinoid."
+    },
+    {
+      "stem": "The best screening test reflects serotonin's breakdown. What is it, and what dietary caveat matters?",
+      "choices": [
+        "Serum tryptophan; avoid protein",
+        "24-hour urinary 5-HIAA (the MAO product of serotonin); avoid serotonin-rich foods (bananas, walnuts, pineapple) before the test",
+        "Plasma niacin; fast overnight",
+        "Urinary VMA; avoid vanilla"
+      ],
+      "correct": 1,
+      "expl": "Serotonin is degraded by MAO to 5-hydroxyindoleacetic acid (5-HIAA), excreted in urine. Serotonin-rich foods and certain drugs cause false positives, so they're withheld before collection."
+    },
+    {
+      "stem": "Why can severe, long-standing carcinoid produce pellagra (dermatitis, diarrhea, dementia)?",
+      "choices": [
+        "Serotonin directly damages skin",
+        "Tumor consumption of tryptophan for serotonin starves the tryptophan → quinolinate → NAD⁺ route, causing functional niacin deficiency",
+        "Carcinoid tumors secrete a dermatotoxin",
+        "It is unrelated coincidence"
+      ],
+      "correct": 1,
+      "expl": "Normally ~1% of tryptophan goes to serotonin; a carcinoid can divert far more, leaving too little for de-novo NAD⁺ synthesis. The result is a niacin-deficiency (pellagra) picture despite adequate diet."
+    }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

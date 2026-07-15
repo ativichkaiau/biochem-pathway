@@ -1,0 +1,79 @@
+{
+  "id": "tyrosine-t1",
+  "pathway": "tyrosine",
+  "title": "The infant with a cabbage smell and a failing liver",
+  "blurb": "A baby with coagulopathy out of proportion to the transaminases, a boiled-cabbage odor, and a drug that treats it by making a block WORSE, higher up.",
+  "patient": {
+    "age": "5 months",
+    "sex": "M",
+    "complaint": "Poor feeding, irritability, abdominal distension, and easy bruising; a peculiar boiled-cabbage odor."
+  },
+  "opening": "A 5-month-old boy presents with failure to thrive, a distended abdomen, and bruising. Parents note a boiled-cabbage / rotten-mushroom odor. Exam shows hepatomegaly and ascites. Labs: INR 2.6 with only modestly elevated transaminases, marked hypoglycemia, and a very high alpha-fetoprotein. A newborn screen flagged elevated tyrosine. What do you want to ask, examine, or order next?",
+  "history": "Symptoms began around 2-3 months. Consanguineous parents. Episodes suggestive of acute peripheral neuropathy (porphyria-like crises). No infection to explain the liver picture. Diet is standard infant formula.",
+  "exam": "Hepatomegaly with ascites, mild jaundice, bruising. Boiled-cabbage odor. Rickets-like changes (renal Fanconi). Irritable; one episode of self-limited limb hypertonia consistent with a neurologic crisis.",
+  "labs": [
+    { "name": "INR", "value": 2.6, "unit": "", "ref": "<1.2", "flag": "high" },
+    { "name": "AST / ALT", "value": "Mildly elevated (120/95)", "unit": "U/L", "ref": "<40", "flag": "high" },
+    { "name": "Alpha-fetoprotein", "value": 92000, "unit": "ng/mL", "ref": "age-dependent, low", "flag": "high" },
+    { "name": "Plasma tyrosine", "value": 410, "unit": "µmol/L", "ref": "45-90", "flag": "high" },
+    { "name": "Urine succinylacetone", "value": "Elevated (diagnostic)", "unit": "", "ref": "Absent", "flag": "high" },
+    { "name": "Glucose", "value": 44, "unit": "mg/dL", "ref": "70-100", "flag": "low" },
+    { "name": "Urine (Fanconi)", "value": "Glucosuria, phosphaturia, aminoaciduria", "unit": "", "ref": "None", "flag": "high" },
+    { "name": "Urine δ-ALA", "value": "Elevated", "unit": "", "ref": "Normal", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is the diagnosis?",
+      "cause": "Which enzyme is deficient, and which toxic metabolite is the tell?",
+      "mechanism": "Why does nitisinone treat it, and what does it do to tyrosine?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 0.4, "accepts": ["tyrosinemia type i", "tyrosinemia type 1", "hepatorenal tyrosinemia", "tyrosinemia"] },
+      "cause": { "weight": 0.3, "accepts": ["fumarylacetoacetate hydrolase", "fah", "succinylacetone", "fumarylacetoacetate accumulates"] },
+      "mechanism": { "weight": 0.3, "accepts": ["nitisinone blocks 4-hppd upstream", "prevents formation of fumarylacetoacetate/succinylacetone", "blocks pathway above the toxic step", "raises tyrosine so needs low-tyrosine diet"] }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the deficient enzyme — the final step of tyrosine degradation.",
+    "target": { "type": "edge", "edgeId": "FAH:Fumarylacetoacetate->Fum + AcAc" },
+    "correctMsg": "Correct — fumarylacetoacetate hydrolase (FAH), the last step of tyrosine degradation. Its loss lets fumarylacetoacetate and maleylacetoacetate accumulate and convert to SUCCINYLACETONE (the diagnostic metabolite), which is hepatotoxic, causes a renal Fanconi syndrome, and inhibits ALA dehydratase → porphyria-like neurologic crises + elevated δ-ALA. Nitisinone treats it by blocking 4-HPPD far UPSTREAM, so these toxic intermediates never form (at the cost of high tyrosine → low-Tyr/Phe diet).",
+    "wrongMsg": "Not quite — the block is the LAST step of tyrosine degradation, the one that would split fumarylacetoacetate into fumarate + acetoacetate.",
+    "revealMsg": "The answer was FAH (Fumarylacetoacetate → Fumarate + acetoacetate)."
+  },
+  "mcqs": [
+    {
+      "stem": "Why does succinylacetone cause porphyria-like crises and a high urinary δ-ALA?",
+      "choices": [
+        "It activates heme oxygenase",
+        "It inhibits ALA dehydratase (porphobilinogen synthase), backing up δ-ALA — a neurotoxic porphyrin precursor",
+        "It blocks ferrochelatase",
+        "It is itself a porphyrin"
+      ],
+      "correct": 1,
+      "expl": "Succinylacetone is a potent inhibitor of ALA dehydratase, so δ-aminolevulinic acid accumulates. Elevated ALA is neurotoxic and produces the acute neurologic (porphyria-like) crises seen in tyrosinemia I — the same enzyme lead poisoning hits."
+    },
+    {
+      "stem": "The newborn screen flags elevated tyrosine, but tyrosine is high in several conditions. What single metabolite confirms type I specifically?",
+      "choices": [
+        "Plasma tyrosine level",
+        "Urinary succinylacetone (specific for FAH deficiency)",
+        "Homogentisic acid",
+        "Phenylalanine"
+      ],
+      "correct": 1,
+      "expl": "Elevated tyrosine is nonspecific (transient neonatal tyrosinemia, type II, liver disease). Succinylacetone is generated only when FAH is deficient, making it the confirmatory marker — and it's now included in expanded newborn screening."
+    },
+    {
+      "stem": "Nitisinone raises plasma tyrosine. Why is that an acceptable trade-off, and what's required alongside it?",
+      "choices": [
+        "High tyrosine is harmless; no diet needed",
+        "It prevents the acutely hepatotoxic downstream metabolites; a low-tyrosine/phenylalanine diet is needed to avoid tyrosine crystal keratopathy and skin lesions",
+        "It cures the enzyme defect",
+        "Tyrosine must be supplemented"
+      ],
+      "correct": 1,
+      "expl": "By blocking upstream, nitisinone trades a dangerous distal accumulation (succinylacetone, liver failure, HCC risk) for a manageable proximal one (tyrosine). Because very high tyrosine causes eye and skin problems, dietary tyrosine/phenylalanine restriction accompanies therapy."
+    }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}

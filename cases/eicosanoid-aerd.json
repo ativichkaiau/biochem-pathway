@@ -1,0 +1,77 @@
+{
+  "id": "eicosanoid-aerd",
+  "pathway": "eicosanoid",
+  "title": "The asthmatic whose nose ran and airway closed after one aspirin",
+  "blurb": "Nasal polyps, asthma, and a near-fatal reaction to a common painkiller. Blocking one branch of a lipid pathway forces everything down the other.",
+  "patient": {
+    "age": "34 years",
+    "sex": "F",
+    "complaint": "Acute wheeze, nasal congestion, and facial flushing 45 minutes after taking aspirin for a headache."
+  },
+  "opening": "A 34-year-old woman with adult-onset asthma and recurrent nasal polyps develops rhinorrhea, periorbital flushing, and severe bronchospasm ~45 minutes after taking aspirin. She has had milder versions of this after ibuprofen. She improves with bronchodilators and reports her asthma has always been 'the hard-to-control kind.' What do you want to ask, examine, or order next?",
+  "history": "Triad of asthma, chronic rhinosinusitis with nasal polyps, and reactions to aspirin/NSAIDs. No reaction to acetaminophen or COX-2-selective agents. No true IgE-mediated urticaria. Symptoms reproducible with any nonselective COX inhibitor.",
+  "exam": "Diffuse expiratory wheeze, prolonged expiration. Nasal exam: pale, boggy mucosa with visible polyps. Periorbital and facial flushing. No urticaria or angioedema of the classic allergic type. O₂ sat 92% during the episode.",
+  "labs": [
+    { "name": "Urinary LTE₄ (leukotriene E₄)", "value": "Markedly elevated", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Eosinophils", "value": 720, "unit": "cells/µL", "ref": "<500", "flag": "high" },
+    { "name": "Total IgE", "value": "Normal", "unit": "", "ref": "Normal", "flag": "normal" },
+    { "name": "Spirometry (during episode)", "value": "Obstructive, reversible with albuterol", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Sinus CT", "value": "Pansinusitis with polyps", "unit": "", "ref": "Normal", "flag": "high" },
+    { "name": "Aspirin challenge (supervised)", "value": "Reproduces symptoms", "unit": "", "ref": "Negative", "flag": "high" }
+  ],
+  "explain": {
+    "prompts": {
+      "diagnosis": "What is this syndrome called?",
+      "cause": "Which enzyme does aspirin block, and what happens to the substrate as a result?",
+      "mechanism": "Why does blocking that enzyme paradoxically make the airway WORSE?"
+    },
+    "rubric": {
+      "diagnosis": { "weight": 0.4, "accepts": ["aspirin-exacerbated respiratory disease", "aerd", "samter's triad", "samter triad", "aspirin-induced asthma", "nsaid-exacerbated respiratory disease"] },
+      "cause": { "weight": 0.3, "accepts": ["cox", "cyclooxygenase", "cox-1", "blocks cox so arachidonate shunts", "inhibits cyclooxygenase"] },
+      "mechanism": { "weight": 0.3, "accepts": ["arachidonate shunts to 5-lox / leukotrienes", "more leukotrienes", "loss of pge2 brake plus leukotriene overproduction", "bronchoconstricting leukotrienes rise"] }
+    }
+  },
+  "pinpoint": {
+    "prompt": "Click the enzyme step aspirin blocks — the block that shunts substrate the other way.",
+    "target": { "type": "edge", "edgeId": "COX:Arachidonate->PGH2" },
+    "correctMsg": "Yes — cyclooxygenase (Arachidonate → PGH₂). Aspirin/NSAIDs block COX, so (1) the bronchoprotective prostaglandin PGE₂ is lost and (2) arachidonate is shunted down 5-lipoxygenase to cysteinyl leukotrienes (LTC₄/D₄/E₄) — potent bronchoconstrictors and mucus secretagogues. In AERD these patients already overproduce leukotrienes, so removing the COX 'brake' triggers a severe reaction. Note acetaminophen and COX-2-selective drugs are usually tolerated.",
+    "wrongMsg": "Not quite — aspirin acetylates the enzyme that makes PGH₂ (prostaglandins/thromboxane). Blocking it pushes arachidonate toward leukotrienes.",
+    "revealMsg": "The answer was COX (Arachidonate → PGH₂): aspirin's target; blocking it shunts arachidonate to leukotrienes."
+  },
+  "mcqs": [
+    {
+      "stem": "Which class of drug most directly addresses the mediator responsible for the bronchospasm here?",
+      "choices": [
+        "Antihistamines",
+        "Leukotriene-pathway drugs — montelukast (LTD₄-receptor antagonist) or zileuton (5-LOX inhibitor)",
+        "Beta-blockers",
+        "Proton-pump inhibitors"
+      ],
+      "correct": 1,
+      "expl": "The cysteinyl leukotrienes drive the airway response, so blocking their receptor (montelukast) or their synthesis (zileuton, a 5-LOX inhibitor) is rational. Aspirin desensitization is also used for the polyps/sinus disease."
+    },
+    {
+      "stem": "Why can these patients usually take acetaminophen and celecoxib safely?",
+      "choices": [
+        "Both are opioids",
+        "Acetaminophen is a weak COX inhibitor (especially peripherally) and celecoxib is COX-2-selective; the reaction is driven by strong COX-1 inhibition",
+        "They both inhibit 5-LOX",
+        "They are antihistamines"
+      ],
+      "correct": 1,
+      "expl": "AERD is a pharmacologic (not IgE-allergic) reaction to COX-1 inhibition. Agents that spare COX-1 — acetaminophen at usual doses, COX-2-selective celecoxib — generally don't provoke it."
+    },
+    {
+      "stem": "How does low-dose aspirin's antiplatelet effect illustrate the same enzyme, differently?",
+      "choices": [
+        "It has nothing to do with COX",
+        "Aspirin irreversibly acetylates platelet COX-1 → no thromboxane A₂; platelets can't resynthesize the enzyme, so the effect lasts the platelet's lifespan (~7-10 days)",
+        "It blocks 5-LOX in platelets",
+        "It inhibits phospholipase A₂"
+      ],
+      "correct": 1,
+      "expl": "Same enzyme (COX), same drug — but here the therapeutic target is platelet thromboxane. Because platelets are anucleate and can't make new COX, a single irreversible acetylation disables them for their whole lifespan, which is why low-dose aspirin is dosed daily."
+    }
+  ],
+  "scoring": { "chatMaxTurns": 20, "weights": { "explain": 0.4, "pinpoint": 0.3, "mcq": 0.3 }, "passingScore": 0.6 }
+}
