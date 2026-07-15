@@ -2860,8 +2860,9 @@ const P = [
     effects: { 'THF': -2, '5,10-Methylene-THF': -2, 'dTMP': -2, 'IMP': -1 } },
 
   { id: 'acetaminophen-od', name: 'Acetaminophen overdose', cat: 'Toxin / disease',
-    desc: 'Excess NAPQI depletes hepatic glutathione (made from cysteine) → centrilobular necrosis. Antidote N-acetylcysteine replenishes cysteine/glutathione.',
-    effects: { 'Cysteine': -2, 'NADPH': -1 } },
+    desc: 'Saturated conjugation shunts more drug through CYP2E1 → NAPQI, which exhausts hepatic glutathione and then binds hepatocytes → centrilobular necrosis (worse with alcohol / CYP2E1 induction). Antidote: N-acetylcysteine (replenishes cysteine → GSH).',
+    activates: ['CYP2E1'],
+    effects: { 'NAPQI': 3, 'GSH': -3, 'GSSG': 1, 'Cysteine': -2, 'NADPH': -1 } },
 
   // ---- CATECHOLAMINE / NEURO ----
   { id: 'pku', name: 'Phenylketonuria (PAH)', cat: 'Genetic / disease',
@@ -2875,8 +2876,38 @@ const P = [
     effects: { 'L-DOPA': 3, 'Dopamine': 3, 'Norepinephrine': 1, 'Epinephrine': 1 } },
 
   { id: 'maoi', name: 'MAO inhibitor', cat: 'Drug',
-    desc: 'Blocks monoamine oxidase → less catecholamine/serotonin breakdown → ↑dopamine, NE, epinephrine. Depression, Parkinson’s. Risk: hypertensive crisis with tyramine ("cheese reaction").',
-    effects: { 'Dopamine': 2, 'Norepinephrine': 2, 'Epinephrine': 2 } },
+    desc: 'Blocks monoamine oxidase → less catecholamine/serotonin breakdown → ↑dopamine, NE, epinephrine, serotonin. Depression, Parkinson’s. Risks: hypertensive crisis with tyramine ("cheese reaction"), serotonin syndrome with SSRIs.',
+    effects: { 'Dopamine': 2, 'Norepinephrine': 2, 'Epinephrine': 2, 'Serotonin': 2 } },
+
+  // ---- NEW-PATHWAY DRUGS (serotonin · eicosanoids · glutathione · tyrosine) ----
+  { id: 'ssri', name: 'SSRI (fluoxetine)', cat: 'Drug',
+    desc: 'Blocks presynaptic serotonin reuptake (SERT) → more synaptic 5-HT. With an MAOI or excess precursor → serotonin syndrome (clonus, hyperthermia, autonomic instability).',
+    effects: { 'Serotonin': 2 } },
+
+  { id: 'glucocorticoid', name: 'Glucocorticoid (dexamethasone)', cat: 'Hormonal',
+    desc: 'Induces annexin-1 → inhibits phospholipase A₂, choking off ALL eicosanoids (prostaglandins + leukotrienes) — the broad anti-inflammatory effect. Also drives gluconeogenesis + proteolysis.',
+    inhibits: ['PLA2'],
+    effects: { 'Arachidonate': -2, 'PGH2': -2, 'Prostaglandins': -2, 'Thromboxane': -1, 'Leukotrienes': -2 } },
+
+  { id: 'nsaid', name: 'NSAID (ibuprofen)', cat: 'Drug',
+    desc: 'Reversibly inhibits COX-1/COX-2 → fewer prostaglandins (analgesia, antipyresis) + thromboxane; loss of gastric PGE₂ → ulcers. Arachidonate can shunt to leukotrienes (aspirin-exacerbated respiratory disease).',
+    inhibits: ['COX'],
+    effects: { 'PGH2': -2, 'Prostaglandins': -3, 'Thromboxane': -2, 'Leukotrienes': 1 } },
+
+  { id: 'zileuton', name: 'Zileuton (5-LOX inhibitor)', cat: 'Drug',
+    desc: 'Blocks 5-lipoxygenase → fewer leukotrienes → less bronchoconstriction in asthma. (Montelukast instead blocks the LTD₄ receptor downstream, without changing levels.)',
+    inhibits: ['5-LOX'],
+    effects: { 'Leukotrienes': -3 } },
+
+  { id: 'isoniazid', name: 'Isoniazid (→ B6 depletion)', cat: 'Drug',
+    desc: 'Anti-TB drug that depletes pyridoxine (B6). B6-dependent steps fail: kynurenine → niacin (pellagra-like), AADC (serotonin), and δ-ALA synthase (sideroblastic anemia) + peripheral neuropathy. Co-prescribe B6.',
+    inhibits: ['AADC (B6)'],
+    effects: { 'Niacin': -2, 'Serotonin': -1, 'Kynurenine': 1 } },
+
+  { id: 'nitisinone', name: 'Nitisinone (NTBC)', cat: 'Drug',
+    desc: 'Inhibits 4-hydroxyphenylpyruvate dioxygenase (4-HPPD) — the treatment for tyrosinemia type I: blocks the pathway UPSTREAM of FAH so no toxic fumarylacetoacetate / succinylacetone forms. Tyrosine rises (needs a low-Tyr diet).',
+    inhibits: ['4-HPPD'],
+    effects: { 'Homogentisate': -3, 'Fumarylacetoacetate': -3, 'Fum + AcAc': -2, 'Tyrosine': 1, '4-OH-phenylpyruvate': 1 } },
 ];
 
 // ============================================
@@ -3699,21 +3730,21 @@ const CELL_TYPES = [
     note: 'Every pathway is shown. Pick a cell type to see which reactions it actually runs.' },
   { id: 'liver', tab: 'Liver', label: 'HEPATOCYTE', absent: ['catechol', 'polyol'],
     note: 'The metabolic hub — the only cell with a full urea cycle, gluconeogenesis (glucose-6-phosphatase) and ketogenesis; also handles cholesterol, bile acids, bilirubin conjugation and ethanol.' },
-  { id: 'muscle', tab: 'Muscle', label: 'MYOCYTE', absent: ['urea', 'sterol', 'sugar', 'ethanol', 'bilirubin', 'catechol', 'polyol'],
+  { id: 'muscle', tab: 'Muscle', label: 'MYOCYTE', absent: ['urea', 'sterol', 'sugar', 'ethanol', 'bilirubin', 'catechol', 'polyol', 'tryptophan', 'tyrosine'],
     note: 'Skeletal muscle: glycolysis, its own glycogen (no glucose export — lacks G6Pase), TCA/ETC, β-oxidation, BCAA catabolism and creatine phosphate. No urea cycle or gluconeogenesis.' },
-  { id: 'cardiac', tab: 'Cardiac', label: 'CARDIOMYOCYTE', absent: ['urea', 'sterol', 'sugar', 'ethanol', 'bilirubin', 'catechol', 'polyol'],
+  { id: 'cardiac', tab: 'Cardiac', label: 'CARDIOMYOCYTE', absent: ['urea', 'sterol', 'sugar', 'ethanol', 'bilirubin', 'catechol', 'polyol', 'tryptophan', 'tyrosine'],
     note: 'Heart muscle: oxidises fatty acids as its main fuel (also ketones and lactate), is packed with mitochondria and buffers ATP with creatine phosphate. No gluconeogenesis or urea cycle.' },
-  { id: 'brain', tab: 'Neuron', label: 'NEURON', absent: ['urea', 'fa-ketones', 'sugar', 'ethanol', 'bilirubin'],
+  { id: 'brain', tab: 'Neuron', label: 'NEURON', absent: ['urea', 'fa-ketones', 'sugar', 'ethanol', 'bilirubin', 'tyrosine'],
     note: 'Glucose-dependent (uses ketone bodies in starvation). Makes neurotransmitters, synthesises its own cholesterol for myelin and runs the polyol pathway; cannot β-oxidise fatty acids.' },
-  { id: 'adipo', tab: 'Adipose', label: 'ADIPOCYTE', absent: ['urea', 'sterol', 'bilirubin', 'catechol', 'creatine', 'ethanol', 'polyol'],
+  { id: 'adipo', tab: 'Adipose', label: 'ADIPOCYTE', absent: ['urea', 'sterol', 'bilirubin', 'catechol', 'creatine', 'ethanol', 'polyol', 'tryptophan', 'tyrosine'],
     note: 'Fat storage: lipogenesis (triglyceride synthesis) and lipolysis, with PPP-derived NADPH; takes up glucose via GLUT4.' },
   { id: 'kidney', tab: 'Kidney', label: 'RENAL TUBULE', absent: ['urea', 'sugar', 'ethanol', 'bilirubin', 'catechol'],
     note: 'The second gluconeogenic organ. Excretes ammonia (glutamine → NH₄⁺) for acid–base balance, runs the polyol pathway, starts creatine synthesis (AGAT) and activates vitamin D.' },
-  { id: 'adrenal', tab: 'Adrenal', label: 'ADRENAL CELL', absent: ['urea', 'ethanol', 'bilirubin', 'creatine', 'polyol', 'sugar'],
+  { id: 'adrenal', tab: 'Adrenal', label: 'ADRENAL CELL', absent: ['urea', 'ethanol', 'bilirubin', 'creatine', 'polyol', 'sugar', 'tryptophan', 'tyrosine'],
     note: 'Steroidogenic cortex (cortisol, aldosterone and androgens from cholesterol, using PPP-derived NADPH) plus a catecholamine-making medulla — the only tissue with PNMT → epinephrine.' },
-  { id: 'intestine', tab: 'Intestine', label: 'ENTEROCYTE', absent: ['urea', 'sterol', 'ethanol', 'bilirubin', 'catechol', 'creatine', 'polyol'],
+  { id: 'intestine', tab: 'Intestine', label: 'ENTEROCYTE', absent: ['urea', 'sterol', 'ethanol', 'bilirubin', 'catechol', 'creatine', 'polyol', 'tyrosine'],
     note: 'Absorbs dietary sugars (fructose, galactose); burns glutamine as its main fuel; re-esterifies fat into chylomicrons and turns over rapidly (active nucleotide synthesis).' },
-  { id: 'rbc', tab: 'RBC', label: 'ERYTHROCYTE', absent: ['tca', 'etc', 'fa-ketones', 'urea', 'protein', 'sterol', 'heme', 'nucleotide', 'sugar', 'ethanol', 'onecarbon', 'catechol', 'creatine', 'bilirubin', 'sphingo'],
+  { id: 'rbc', tab: 'RBC', label: 'ERYTHROCYTE', absent: ['tca', 'etc', 'fa-ketones', 'urea', 'protein', 'sterol', 'heme', 'nucleotide', 'sugar', 'ethanol', 'onecarbon', 'catechol', 'creatine', 'bilirubin', 'sphingo', 'tryptophan', 'eicosanoid', 'tyrosine'],
     note: 'No mitochondria or nucleus: only anaerobic glycolysis (→ lactate), the pentose-phosphate pathway (NADPH for glutathione), 2,3-BPG and the polyol pathway.' }
 ];
 let selectedCell = 'all';
