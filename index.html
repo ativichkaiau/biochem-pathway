@@ -1543,6 +1543,27 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 #zoom-fit { font-size: 15px; }
 @media (max-width: 560px) { #map-zoom { bottom: 12px; right: 10px; } #map-zoom button { width: 40px; height: 40px; } }
 
+/* ===== Metabolic timeline / scenario HUD (bottom-centre) ===== */
+#metabolic-timeline {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 27;
+  width: 360px; padding: 11px 15px 12px; border-radius: 18px;
+  background: var(--clay-surface); box-shadow: var(--clay);
+}
+.mt-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.mt-eyebrow { font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-2); }
+.mt-now { font-size: 11px; font-weight: 800; color: var(--accent); }
+#mt-slider { width: 100%; margin: 2px 0 4px; accent-color: var(--accent); cursor: pointer; }
+.mt-labels { display: flex; justify-content: space-between; font-size: 8.5px; color: var(--text-2); font-weight: 600; margin-bottom: 9px; }
+.mt-scenarios { display: flex; gap: 6px; }
+.mt-chip { flex: 1; font-family: inherit; font-size: 10.5px; font-weight: 700; padding: 5px 6px; border-radius: 9px; cursor: pointer;
+  background: var(--clay-surface); box-shadow: var(--clay-sm); color: var(--text-2); border: none; transition: transform 0.12s, color 0.16s; }
+.mt-chip:hover { transform: translateY(-2px); color: var(--accent); }
+.mt-chip.active { color: var(--accent); box-shadow: var(--clay-pressed); }
+.mt-reset { color: var(--down); }
+@media (prefers-reduced-motion: reduce) { .mt-chip { transition: none; } }
+@media (max-width: 900px) { #metabolic-timeline { width: 300px; bottom: 12px; } }
+@media (max-width: 640px) { #metabolic-timeline { display: none; } }
+
 </style>
 </head>
 <body>
@@ -1782,6 +1803,18 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   <button id="zoom-in" title="Zoom in  ( + )" aria-label="Zoom in">+</button>
   <button id="zoom-fit" title="Fit whole map" aria-label="Fit map">⤢</button>
   <button id="zoom-out" title="Zoom out  ( − )" aria-label="Zoom out">−</button>
+</div>
+
+<div id="metabolic-timeline" aria-label="Metabolic state timeline">
+  <div class="mt-head"><span class="mt-eyebrow">Metabolic state</span><span class="mt-now" id="mt-now">Baseline</span></div>
+  <input type="range" id="mt-slider" min="0" max="4" step="1" value="0" aria-label="Fed to fasted timeline">
+  <div class="mt-labels"><span>Fed</span><span>Overnight</span><span>Fasting</span><span>3-day</span><span>Refed</span></div>
+  <div class="mt-scenarios">
+    <button class="mt-chip" data-scenario="dka">DKA</button>
+    <button class="mt-chip" data-scenario="exercise">Exercise</button>
+    <button class="mt-chip" data-scenario="alcohol">Alcohol</button>
+    <button class="mt-chip mt-reset" data-scenario="reset">Reset</button>
+  </div>
 </div>
 
 <div class="layout hide-left hide-right">
@@ -4095,6 +4128,54 @@ function applyTheme(light) {
 }
 themeBtn.addEventListener('click', () => applyTheme(!document.body.classList.contains('light')));
 (function initTheme(){ let saved=null; try { saved = localStorage.getItem('biochem-theme'); } catch(e){} applyTheme(saved === 'light'); })();
+
+// ===== Metabolic timeline / scenario HUD =====
+// One-click states + a fed→fasted→refed slider; each applies a bundle of
+// perturbations and re-renders, so the flux and vitals morph in real time.
+const SCENARIOS = {
+  fed:        { label: 'Fed', perts: ['insulin', 'lipogenesis'] },
+  overnight:  { label: 'Overnight fast', perts: ['glucagon'] },
+  fasting:    { label: 'Fasting (~24h)', perts: ['glucagon', 'starvation'] },
+  starvation: { label: 'Starvation (3-day)', perts: ['fasting-ketosis', 'glucagon'] },
+  refed:      { label: 'Refed', perts: ['insulin', 'lipogenesis'] },
+  dka:        { label: 'DKA', perts: ['dka'] },
+  exercise:   { label: 'Sprint / exercise', perts: ['exercise'] },
+  alcohol:    { label: 'Alcohol', perts: ['alcohol'] }
+};
+const MT_TIMELINE = ['fed', 'overnight', 'fasting', 'starvation', 'refed'];
+function applyScenario(key) {
+  const sc = SCENARIOS[key];
+  activePerturbations.clear();
+  if (sc) for (const id of sc.perts) activePerturbations.add(id);
+  selectedPerturbation = (sc && sc.perts.length) ? sc.perts[0] : null;
+  selectedMetabolite = null;
+  const now = document.getElementById('mt-now');
+  if (now) now.textContent = sc ? sc.label : 'Baseline';
+  document.querySelectorAll('#metabolic-timeline .mt-chip').forEach(c => c.classList.toggle('active', c.dataset.scenario === key));
+  const ti = MT_TIMELINE.indexOf(key), slider = document.getElementById('mt-slider');
+  if (ti >= 0 && slider) slider.value = ti;
+  renderPerturbationList();
+  renderAll();
+}
+(function initTimeline() {
+  const slider = document.getElementById('mt-slider');
+  if (!slider) return;
+  slider.addEventListener('input', () => applyScenario(MT_TIMELINE[parseInt(slider.value, 10)] || 'fed'));
+  document.querySelectorAll('#metabolic-timeline .mt-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (chip.dataset.scenario === 'reset') {
+        activePerturbations.clear();
+        selectedPerturbation = null;
+        const now = document.getElementById('mt-now'); if (now) now.textContent = 'Baseline';
+        document.querySelectorAll('#metabolic-timeline .mt-chip').forEach(c => c.classList.remove('active'));
+        renderPerturbationList();
+        renderAll();
+        return;
+      }
+      applyScenario(chip.dataset.scenario);
+    });
+  });
+})();
 
 // ---- Intro: 3-step lab walkthrough (reappears every reload) ----
 const intro = document.getElementById('intro');
