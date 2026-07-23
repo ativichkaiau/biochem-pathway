@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Biochem Met · VESTRIPPN3.0</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Biochem Met · VESTRIPPN</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -201,27 +202,14 @@ header {
 }
 .brand { display: flex; align-items: center; gap: 13px; }
 .brand-mark {
-  width: 46px; height: 46px; border-radius: 15px; flex-shrink: 0;
-  display: grid; place-items: center; position: relative; overflow: hidden;
-  background: linear-gradient(147deg, #6fe9d7 0%, #37cebf 48%, #1fb2b4 100%);
-  color: #fff;
-  border: 1px solid rgba(180,240,232,0.45);
-  box-shadow:
-    0 10px 22px -8px rgba(53,214,192,0.72),
-    inset 2px 3px 6px rgba(255,255,255,0.52),
-    inset -3px -5px 9px rgba(30,80,150,0.46);
+  width: 42px; height: 46px; flex-shrink: 0; display: block;
+  filter: drop-shadow(0 6px 12px rgba(53,214,192,0.34));
 }
-.brand-mark span {
-  position: relative; z-index: 1;
-  font-size: 27px; line-height: 1;
-  font-weight: 950; letter-spacing: -1.5px;
-  text-shadow: 0 2px 3px rgba(22,82,69,0.38);
-}
-.brand-mark::after {
-  content: ""; position: absolute; top: 3px; left: 4px; right: 8px; height: 42%;
-  border-radius: 12px 12px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
-  pointer-events: none;
-}
+.logo3 { width: 100%; height: 100%; display: block; overflow: visible; }
+.l3-face  { fill: #46e0b6; stroke: #1f5e6a; stroke-width: 5; stroke-linejoin: round; }
+.l3-depth { fill: #2bbd97; stroke: #1f5e6a; stroke-width: 5; stroke-linejoin: round; }
+body.light .l3-face { fill: #3ed3a8; }
+body.light .l3-depth { fill: #24b892; }
 .vestrippn-wordmark {
   color: var(--text);
   font-size: 20px;
@@ -817,13 +805,8 @@ body.light #intro {
   color: var(--text-2);
 }
 .intro-brand-mark {
-  width: 30px; height: 30px; display: inline-grid; place-items: center;
-  border-radius: 10px; color: #fff;
-  font-size: 18px; font-weight: 950; letter-spacing: -1px;
-  background: linear-gradient(147deg, #6fe9d7 0%, #37cebf 48%, #1fb2b4 100%);
-  border: 1px solid rgba(180,240,232,0.45);
-  box-shadow: 0 7px 16px -7px rgba(53,214,192,0.8), inset 1px 2px 4px rgba(255,255,255,0.5);
-  text-shadow: 0 1px 2px rgba(20,70,110,0.35);
+  width: 24px; height: 27px; display: inline-block; vertical-align: -7px;
+  filter: drop-shadow(0 4px 8px rgba(53,214,192,0.34));
 }
 .intro-eyebrow .vestrippn-wordmark { font-size: 13px; letter-spacing: -0.15px; }
 .intro-eyebrow .branch-divider { color: var(--text-2); opacity: 0.55; margin: 0 3px; }
@@ -1622,8 +1605,10 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
   <div class="intro-card">
     <div class="intro-eyebrow">
-      <span class="intro-brand-mark" aria-hidden="true">V</span>
-      <span class="vestrippn-wordmark">VESTRIPPN<span class="brand-version">3.0</span></span>
+      <span class="intro-brand-mark" aria-hidden="true">
+        <svg class="logo3" viewBox="0 0 112 128"><path class="l3-depth" d="M24,21 H102 V117 H24 V95 H80 V80 H24 V58 H80 V43 H24 Z"/><path class="l3-face" d="M8,8 H86 V104 H8 V82 H64 V67 H8 V45 H64 V30 H8 Z"/></svg>
+      </span>
+      <span class="vestrippn-wordmark">VESTRIPPN</span>
       <span class="branch-divider">/</span>
       <span class="branch-label">BIOCHEMISTRY BRANCH</span>
     </div>
@@ -1773,8 +1758,10 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 
 <header>
   <div class="brand">
-    <div class="brand-mark" aria-hidden="true"><span>V</span></div>
-    <div class="vestrippn-wordmark">VESTRIPPN<span class="brand-version">3.0</span><sup class="brand-edition">W11</sup></div>
+    <div class="brand-mark" aria-hidden="true">
+      <svg class="logo3" viewBox="0 0 112 128"><path class="l3-depth" d="M24,21 H102 V117 H24 V95 H80 V80 H24 V58 H80 V43 H24 Z"/><path class="l3-face" d="M8,8 H86 V104 H8 V82 H64 V67 H8 V45 H64 V30 H8 Z"/></svg>
+    </div>
+    <div class="vestrippn-wordmark">VESTRIPPN</div>
   </div>
   <div class="header-actions">
     <div class="header-btns">
@@ -1960,7 +1947,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     <div class="help-card-head">
       <div>
         <div class="help-card-eyebrow">? HELP &amp; SHORTCUTS</div>
-        <h2 class="help-card-title" id="help-title">VESTRIPPN3.0 · Biochem Met</h2>
+        <h2 class="help-card-title" id="help-title">VESTRIPPN · Biochem Met</h2>
       </div>
       <button class="btn" id="help-close">Close ✕</button>
     </div>
