@@ -202,14 +202,10 @@ header {
 }
 .brand { display: flex; align-items: center; gap: 13px; }
 .brand-mark {
-  width: 42px; height: 46px; flex-shrink: 0; display: block;
-  filter: drop-shadow(0 6px 12px rgba(53,214,192,0.34));
+  height: 44px; width: auto; flex-shrink: 0; display: flex; align-items: center;
+  filter: drop-shadow(0 5px 11px rgba(53,214,192,0.3));
 }
-.logo3 { width: 100%; height: 100%; display: block; overflow: visible; }
-.l3-face  { fill: #46e0b6; stroke: #1f5e6a; stroke-width: 5; stroke-linejoin: round; }
-.l3-depth { fill: #2bbd97; stroke: #1f5e6a; stroke-width: 5; stroke-linejoin: round; }
-body.light .l3-face { fill: #3ed3a8; }
-body.light .l3-depth { fill: #24b892; }
+.brand-logo { height: 100%; width: auto; display: block; }
 .vestrippn-wordmark {
   color: var(--text);
   font-size: 20px;
@@ -805,8 +801,8 @@ body.light #intro {
   color: var(--text-2);
 }
 .intro-brand-mark {
-  width: 24px; height: 27px; display: inline-block; vertical-align: -7px;
-  filter: drop-shadow(0 4px 8px rgba(53,214,192,0.34));
+  height: 26px; width: auto; display: inline-flex; align-items: center; vertical-align: -8px;
+  filter: drop-shadow(0 4px 8px rgba(53,214,192,0.3));
 }
 .intro-eyebrow .vestrippn-wordmark { font-size: 13px; letter-spacing: -0.15px; }
 .intro-eyebrow .branch-divider { color: var(--text-2); opacity: 0.55; margin: 0 3px; }
@@ -1605,9 +1601,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
   <div class="intro-card">
     <div class="intro-eyebrow">
-      <span class="intro-brand-mark" aria-hidden="true">
-        <svg class="logo3" viewBox="0 0 112 128"><path class="l3-depth" d="M24,21 H102 V117 H24 V95 H80 V80 H24 V58 H80 V43 H24 Z"/><path class="l3-face" d="M8,8 H86 V104 H8 V82 H64 V67 H8 V45 H64 V30 H8 Z"/></svg>
-      </span>
+      <span class="intro-brand-mark"><img src="logo.png" alt="VESTRIPPN" class="brand-logo"></span>
       <span class="vestrippn-wordmark">VESTRIPPN</span>
       <span class="branch-divider">/</span>
       <span class="branch-label">BIOCHEMISTRY BRANCH</span>
@@ -1758,9 +1752,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 
 <header>
   <div class="brand">
-    <div class="brand-mark" aria-hidden="true">
-      <svg class="logo3" viewBox="0 0 112 128"><path class="l3-depth" d="M24,21 H102 V117 H24 V95 H80 V80 H24 V58 H80 V43 H24 Z"/><path class="l3-face" d="M8,8 H86 V104 H8 V82 H64 V67 H8 V45 H64 V30 H8 Z"/></svg>
-    </div>
+    <div class="brand-mark"><img src="logo.png" alt="VESTRIPPN" class="brand-logo"></div>
     <div class="vestrippn-wordmark">VESTRIPPN</div>
   </div>
   <div class="header-actions">
