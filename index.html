@@ -1710,8 +1710,77 @@ header .btn:hover, header .mode-toggle:hover { border-color: var(--border); back
 .coenzyme-step small { color: var(--text-2); overflow-wrap: anywhere; }
 .coenzyme-source { display: inline-block; color: var(--accent); margin-top: 18px; line-height: 1.5; }
 .coenzyme-highlight-btn { min-height: 44px; margin: 10px 0 4px; }
-.edge-group.coenzyme-linked .edge { stroke-width: 4; filter: drop-shadow(0 0 4px var(--purple)); }
-.edge-group.coenzyme-linked .elabel-bg { stroke: var(--purple); stroke-width: 1.6; }
+/* A coenzyme spotlight keeps activity colours while isolating the linked network. */
+body[data-coenzyme]:not(.case-open) #edges .edge-group:not(.coenzyme-linked) { opacity: .09; }
+body[data-coenzyme]:not(.case-open) #nodes .node:not(.coenzyme-linked):not(.selected) { opacity: .2; }
+body[data-coenzyme]:not(.case-open) .pathway-label { opacity: .25; }
+.coenzyme-halo { fill: none; stroke: var(--purple); stroke-width: 12; opacity: .24; pointer-events: none; }
+.edge-group.coenzyme-linked .edge { stroke-width: 3.5; stroke-opacity: 1; }
+.edge-group.coenzyme-linked .elabel-bg { stroke: var(--purple); stroke-width: 2; }
+.node.coenzyme-linked rect { stroke: var(--purple); stroke-width: 2.5; filter: drop-shadow(0 0 5px color-mix(in srgb,var(--purple) 50%,transparent)); }
+.electron-map-track { fill: none; stroke: var(--electron); stroke-width: 2.5; opacity: .65; pointer-events: none; }
+.electron-map-track.stalled { stroke: var(--text-2); stroke-dasharray: 4 6; }
+.electron-map-flow { fill: none; stroke: var(--electron); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1 20; pointer-events: none; animation: electron-map-march 2s linear infinite; }
+.electron-map-stop { fill: var(--down); font-size: 20px; font-weight: 800; paint-order: stroke; stroke: var(--bg); stroke-width: 4px; }
+@keyframes electron-map-march { to { stroke-dashoffset: -21; } }
+:root { --electron: #ffd166; }
+body.light { --electron: #9b5b00; }
+#coenzyme-map-status strong { display: block; font-size: 13px; }
+#coenzyme-map-status small { color: var(--text-2); }
+#electron-map-open[hidden] { display: none; }
+#electron-flow-open { margin-top: 12px; min-height: 44px; }
+#electron-flow-modal { position: fixed; inset: 0; z-index: 80; display: none; overflow: auto; padding: 24px; background: color-mix(in srgb,var(--bg) 90%,transparent); backdrop-filter: blur(12px); }
+#electron-flow-modal.open { display: block; }
+.electron-shell { max-width: 1060px; margin: 0 auto; padding: 28px; border: 1px solid var(--border); border-radius: 24px; background: var(--panel); box-shadow: var(--clay-card); }
+.electron-heading { position: sticky; top: 0; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-block: 10px; margin-top: -10px; background: var(--panel); }
+.electron-heading h2 { margin: 4px 0; font-size: 26px; }
+.electron-intro, .electron-caption, #electron-status { color: var(--text-2); line-height: 1.65; font-size: 13px; }
+.electron-controls, .electron-condition-buttons { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.electron-controls { margin-top: 20px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-2); }
+.electron-controls label { display: flex; gap: 8px; min-height: 44px; align-items: center; font-size: 13px; }
+.electron-controls input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent); }
+.electron-controls .oxygen-control { flex-wrap: wrap; }
+#electron-oxygen { width: 130px; height: 32px; accent-color: var(--accent); }
+.electron-controls .btn, .electron-condition-buttons .btn { min-height: 44px; }
+.electron-condition-buttons { margin-block: 12px; }
+.electron-condition-buttons .btn { font-size: 12px; border: 1px solid var(--border); box-shadow: none; }
+.electron-condition-buttons [aria-pressed="true"] { border-color: var(--down); color: var(--down); background: color-mix(in srgb,var(--down) 10%,var(--panel)); }
+#electron-diagram { margin-top: 14px; border: 1px solid var(--border); border-radius: 18px; background: var(--panel-2); }
+#electron-diagram svg { display: block; width: 100%; height: auto; }
+#electron-diagram.electron-vertical svg { max-width: 440px; margin-inline: auto; }
+.electron-track { fill: none; stroke: var(--electron); stroke-width: 2; opacity: .65; }
+#electron-arrow path { fill: var(--electron); }
+.electron-dot { fill: var(--electron); filter: drop-shadow(0 0 3px var(--electron)); animation: electron-travel 2s linear infinite; offset-distance: 0%; }
+@keyframes electron-travel { to { offset-distance: 100%; } }
+.electron-carrier rect { fill: var(--panel); stroke: var(--border); stroke-width: 1.5; }
+.electron-carrier.carrier-selected rect { stroke: var(--purple); stroke-width: 3; }
+.electron-carrier text { fill: var(--text); font: 600 12px -apple-system,BlinkMacSystemFont,sans-serif; }
+.electron-carrier .electron-sub { fill: var(--text-2); font-size: 10px; font-weight: 400; }
+.electron-stop { display: none; fill: var(--down); font-size: 24px; font-weight: 800; paint-order: stroke; stroke: var(--panel-2); stroke-width: 5px; }
+.route-blocked .electron-stop { display: block; }
+.route-blocked .electron-track { stroke: var(--down); stroke-dasharray: 4 4; }
+.route-idle .electron-dot, .route-blocked .electron-dot { visibility: hidden; }
+.electron-paused .electron-dot { animation-play-state: paused; }
+.electron-no-mito #electron-diagram { opacity: .4; }
+.electron-meters { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; margin-block: 20px; }
+.electron-meter { min-width: 0; font-size: 12px; }
+.electron-meter > div { height: 8px; margin-block: 8px; border-radius: 5px; background: var(--panel-2); overflow: hidden; }
+.electron-meter span { display: block; height: 100%; background: var(--purple); }
+.electron-meter output { color: var(--text-2); }
+.electron-rates { display: flex; gap: 24px; flex-wrap: wrap; font-size: 13px; }
+.electron-rates output { font-size: 23px; font-weight: 700; margin-left: 8px; color: var(--electron); }
+#electron-status { border-left: 3px solid var(--accent); padding: 10px 14px; background: var(--panel-2); border-radius: 0 8px 8px 0; }
+.electron-reference { color: var(--accent); font-size: 12px; }
+@media (max-width: 620px) {
+  #electron-flow-modal { padding: 12px; }
+  .electron-shell { padding: 16px; border-radius: 16px; }
+  .electron-heading h2 { font-size: 21px; }
+  .electron-meters { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .electron-dot { display: none; }
+  .electron-map-flow { animation: none; stroke-dasharray: 4 10; }
+}
 #coenzyme-map-status { position: fixed; z-index: 26; left: 16px; bottom: 245px; max-width: 300px; padding: 12px; display: grid; gap: 8px; border: 1px solid var(--purple); border-radius: 14px; background: var(--panel); font-size: 12px; }
 #coenzyme-map-status[hidden], body.case-open #coenzyme-map-status { display: none; }
 #clear-coenzyme { min-height: 44px; }
@@ -1996,7 +2065,7 @@ summary:focus-visible, select:focus-visible, input:focus-visible { outline: 2px 
   <div class="cell-select-menu" id="cell-select-menu" role="listbox" aria-label="Cell type"></div>
 </div>
 <div id="cell-note"></div>
-<div id="coenzyme-map-status" hidden><span role="status"></span><button class="btn" id="clear-coenzyme">Clear highlight ✕</button></div>
+<div id="coenzyme-map-status" hidden><span role="status"></span><small>Purple outlines show linked reactions. Gold tracks trace electrons to oxygen.</small><button class="btn" id="electron-map-open" hidden>Explore electron flow →</button><button class="btn" id="clear-coenzyme">Clear highlight ✕</button></div>
 <div id="cell-vitals" aria-label="Cell vitals monitor"></div>
 <div id="map-zoom" aria-label="Map zoom">
   <button id="zoom-in" title="Zoom in  ( + )" aria-label="Zoom in">+</button>
@@ -2030,6 +2099,7 @@ summary:focus-visible, select:focus-visible, input:focus-visible { outline: 2px 
         <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
           <polygon id="mk-arrow" points="0 0, 10 5, 0 10" fill="#4d5560" />
         </marker>
+        <marker id="arrow-electron" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 10 5, 0 10" style="fill:var(--electron)"/></marker>
         <marker id="arrow-down" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
           <polygon points="0 0, 10 5, 0 10" fill="#f85149" />
         </marker>
@@ -2309,9 +2379,39 @@ summary:focus-visible, select:focus-visible, input:focus-visible { outline: 2px 
   <section class="coenzyme-shell" role="dialog" aria-modal="true" aria-labelledby="coenzyme-title">
     <div class="coenzyme-heading"><div><p class="coenzyme-eyebrow">REACTION COMPANIONS</p><h2 id="coenzyme-title">Coenzymes & cofactors</h2></div><div class="case-tools"><button class="btn" data-language-toggle data-no-i18n>EN</button><button class="btn" id="coenzymes-close">Close ✕</button></div></div>
     <p class="coenzyme-intro">Connect each carrier to its vitamin, job, and reaction steps.</p>
+    <button class="btn" id="electron-flow-open">Explore respiratory electron flow →</button>
     <label class="coenzyme-search-label" for="coenzyme-search">Find a coenzyme, vitamin, or enzyme</label>
     <input id="coenzyme-search" type="search" placeholder="Try B1, PLP, NADPH, or PDH…" autocomplete="off">
     <div class="coenzyme-layout"><div id="coenzyme-list" aria-label="Coenzyme list"></div><article id="coenzyme-detail" aria-live="polite"></article></div>
+  </section>
+</div>
+<div id="electron-flow-modal" aria-hidden="true">
+  <section class="electron-shell" role="dialog" aria-modal="true" aria-labelledby="electron-title">
+    <div class="electron-heading"><div><p class="coenzyme-eyebrow">REDOX IN MOTION</p><h2 id="electron-title">Follow the electrons</h2></div><div class="case-tools"><button class="btn" data-language-toggle data-no-i18n>EN</button><button class="btn" id="electron-close">Close ✕</button></div></div>
+    <p class="electron-intro">NADH enters through Complex I; succinate uses enzyme-bound FAD in Complex II. Both routes meet at CoQ and end at oxygen.</p>
+    <p class="electron-caption"><span>Cell</span>: <strong id="electron-cell"></strong> · <span>Inhibitor buttons also update the map; supply controls affect this flow model.</span></p>
+    <div class="electron-controls">
+      <label><input type="checkbox" data-electron-source="nadh" checked><span>NADH supply</span></label>
+      <label><input type="checkbox" data-electron-source="succinate" checked><span>Succinate supply</span></label>
+      <label class="oxygen-control" for="electron-oxygen"><span>Oxygen supply</span><input id="electron-oxygen" type="range" min="0" max="100" value="100"><output id="electron-oxygen-value" for="electron-oxygen">100%</output></label>
+      <button class="btn" id="electron-pause" aria-pressed="false">Pause model</button><button class="btn" id="electron-restart">Restart carriers</button>
+    </div>
+    <div class="electron-condition-buttons" aria-label="Respiratory inhibitors and uncoupler">
+      <button class="btn" data-electron-pert="rotenone" aria-pressed="false">Rotenone · I</button><button class="btn" data-electron-pert="malonate" aria-pressed="false">Malonate · II</button><button class="btn" data-electron-pert="antimycin" aria-pressed="false">Antimycin · III</button><button class="btn" data-electron-pert="cyanide" aria-pressed="false">Cyanide · IV</button><button class="btn" data-electron-pert="oligomycin" aria-pressed="false">Oligomycin · V</button><button class="btn" data-electron-pert="dnp" aria-pressed="false">DNP / FCCP</button><button class="btn" data-electron-pert="hypoxia" aria-pressed="false">No O₂</button>
+    </div>
+    <div id="electron-diagram"></div>
+    <p class="electron-caption">Gold particles show electron direction. Cytochrome c carries one electron; the Q cycle is summarized. H⁺ counts are per electron pair.</p>
+    <div class="electron-meters">
+      <div class="electron-meter" data-electron-meter="nadh"><strong>NADH / NAD pool</strong><div><span></span></div><output aria-live="off"></output></div>
+      <div class="electron-meter" data-electron-meter="q"><strong>QH₂ / Q pool</strong><div><span></span></div><output aria-live="off"></output></div>
+      <div class="electron-meter" data-electron-meter="cyt"><strong>Reduced cytochrome c</strong><div><span></span></div><output aria-live="off"></output></div>
+      <div class="electron-meter" data-electron-meter="gradient"><strong>H⁺ gradient</strong><div><span></span></div><output aria-live="off"></output></div>
+    </div>
+    <p class="electron-caption">Relative rates</p>
+    <div class="electron-rates"><div><span>O₂ consumption</span><output id="electron-oxygen-rate" aria-live="off"></output></div><div><span>Oxidative ATP production</span><output id="electron-atp-rate" aria-live="off"></output></div></div>
+    <p id="electron-status" role="status"></p>
+    <p class="electron-caption">Illustrative relative rates and carrier pools, not measured concentrations or real-time molecular speeds. Forward electron transfer, finite acceptor pools and proton backpressure determine flow. NADPH and non-redox coenzymes do not enter this respiratory model.</p>
+    <a class="electron-reference" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3143121/" target="_blank" rel="noopener noreferrer">Respiratory coupling and inhibitor experiments ↗</a>
   </section>
 </div>
 <div id="case-load-status" hidden><span role="status">Loading case…</span><button class="btn" id="case-load-cancel" type="button">Cancel</button></div>
@@ -2319,9 +2419,12 @@ summary:focus-visible, select:focus-visible, input:focus-visible { outline: 2px 
 <script src="locales/th.js"></script>
 <script src="locales/th-study.js"></script>
 <script src="locales/th-labs.js"></script>
+<script src="locales/th-electron-flow.js"></script>
 <script src="locales/cases-th.js"></script>
 <script src="locales/i18n.js"></script>
 <script src="data/coenzymes.js"></script>
+<script src="data/electron-flow.js"></script>
+<script src="scripts/electron-flow-ui.js"></script>
 
 <script>
 
@@ -3481,12 +3584,13 @@ function nodeWidth(name) {
 const NODE_H = 32;
 
 function renderNodes(state) {
+  const linkedNodes = new Set(coenzymeMapEdges(selectedCoenzymeId).flatMap(edge => [edge.from,edge.to]));
   const g = document.getElementById('nodes');
   const items = [];
   for (const [name, m] of Object.entries(M)) {
     const w = nodeWidth(name);
     const d = state[name] || 0;
-    const cls = `node ${deltaClass(d)}${m.cofactor ? ' cofactor' : ''}${selectedMetabolite === name ? ' selected' : ''}${selectedPathway && m.pathway === selectedPathway ? ' pw-active' : ''}`;
+    const cls = `node ${deltaClass(d)}${m.cofactor ? ' cofactor' : ''}${linkedNodes.has(name) ? ' coenzyme-linked' : ''}${selectedMetabolite === name ? ' selected' : ''}${selectedPathway && m.pathway === selectedPathway ? ' pw-active' : ''}`;
     items.push(
       `<g class="${cls}" transform="translate(${m.x},${m.y})" data-name="${escapeAttr(name)}" data-pw="${m.pathway}" style="--pw: var(--pw-${m.pathway})">` +
         `<rect x="${-w/2}" y="${-NODE_H/2}" width="${w}" height="${NODE_H}" rx="6"/>` +
@@ -3536,6 +3640,9 @@ function renderEdges() {
   const g = document.getElementById('edges');
   const labelDrawn = new Set();
   const items = [];
+  if (selectedCoenzymeId) document.body.dataset.coenzyme = selectedCoenzymeId; else delete document.body.dataset.coenzyme;
+  const redoxFocus = ElectronFlowUI.isRedox(selectedCoenzymeId);
+  const electronRates = redoxFocus ? ElectronFlowUI.mapRates() : null;
 
   for (const edge of E) {
     const src = M[edge.from], tgt = M[edge.to];
@@ -3545,7 +3652,9 @@ function renderEdges() {
     const start = intersectRect(src.x, src.y, srcW + 2, NODE_H + 2, tgt.x, tgt.y);
     const end = intersectRect(tgt.x, tgt.y, tgtW + 12, NODE_H + 12, src.x, src.y);
 
-    const status = getEdgeEnzymeStatus(edge.e);
+    const electronKey = redoxFocus && ElectronFlowUI.edgeKey(edge);
+    const linked = selectedCoenzymeId && (BIOCHEM_COENZYMES.find(c => c.id === selectedCoenzymeId)?.enzymes.includes(edge.e) || electronKey);
+    const status = getEdgeEnzymeStatus(electronKey ? {I:'Complex I',II:'Complex II',III:'Complex III',IV:'Complex IV'}[electronKey] : edge.e);
     const rateNote = getRateLimitingNote(edge.e);
     let classes = ['edge'];
     if (rateNote) classes.push('rate-limiting');
@@ -3576,11 +3685,18 @@ function renderEdges() {
       fluxD = `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
       edgeParts.push(`<line class="${cls}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" marker-end="url(#${marker})" stroke-opacity="${edge.cofactor ? 0.45 : 1}"/>`);
     }
+    if (linked) edgeParts.unshift(`<path class="coenzyme-halo" d="${fluxD}"/>`);
+    if (electronKey) {
+      const rate = electronRates[electronKey];
+      edgeParts.push(`<path class="electron-map-track${rate <= .015 ? ' stalled' : ''}" d="${fluxD}" marker-end="url(#${rate > .015 ? 'arrow-electron' : 'arrow'})"/>`);
+      if (rate > .015 && fluxEnabled) edgeParts.push(`<path class="electron-map-flow" d="${fluxD}" style="animation-duration:${Math.max(.65,3/rate)}s"/>`);
+      if (rate <= .015) edgeParts.push(`<text class="electron-map-stop" x="${(start.x+end.x)/2}" y="${(start.y+end.y)/2+5}" text-anchor="middle">×</text>`);
+    }
     // Flux: dots stream along the reaction in the drawn arrow's direction, so
     // gluconeogenesis edges flow the reverse way. Speed/opacity track the enzyme
     // state — activated = fast + bright, inhibited = near-stopped, reverse edges
     // idle at rest and light up when their enzyme is switched on.
-    if (fluxEnabled && !edge.cofactor) {
+    if (fluxEnabled && !edge.cofactor && !electronKey) {
       let fx = 'flux-flow';
       if (status === 'activated') fx += ' fast';
       else if (status === 'inhibited') fx += ' slow';
@@ -3619,7 +3735,7 @@ function renderEdges() {
     const edgeId = `${edge.e}:${edge.from}->${edge.to}`;
     const linkedCoenzymes = BIOCHEM_COENZYMES.filter(c => c.enzymes.includes(edge.e));
     const title = `<title>${escapeText(edge.e)}${rateNote ? ' — rate-limiting: ' + escapeText(rateNote) : ''}${linkedCoenzymes.length ? '\nCoenzymes / โคเอนไซม์: ' + linkedCoenzymes.map(c => escapeText(c.name)).join(', ') : ''}</title>`;
-    const coenzymeLinked = selectedCoenzymeId && BIOCHEM_COENZYMES.find(c => c.id === selectedCoenzymeId)?.enzymes.includes(edge.e);
+    const coenzymeLinked = linked;
     items.push(`<g class="edge-group${pwActive ? ' pw-active' : ''}${coenzymeLinked ? ' coenzyme-linked' : ''}" data-from-pw="${fromPw}" data-to-pw="${toPw}" data-edge-id="${escapeAttr(edgeId)}">${title}${edgeParts.join('')}</g>`);
   }
   g.innerHTML = items.join('');
@@ -4173,6 +4289,7 @@ function selectCell(id) {
   renderCompartments();        // refresh the plasma-membrane label
   const note = document.getElementById('cell-note');
   if (note) note.textContent = id === 'all' ? '' : currentCell().note;
+  if (selectedCoenzymeId) renderEdges();
 }
 
 // BioRender-style organelle artwork (gradient-shaded, layered) drawn behind the compartment boxes.
@@ -4471,6 +4588,7 @@ document.getElementById('reset-btn').addEventListener('click', resetSimulation);
 // ---- Pathway deep-dive ----
 function enterDive(pw) {
   if (!PATHWAY_INFO[pw]) return;
+  clearCoenzymeHighlight();
   selectedPathway = pw;
   selectedMetabolite = null;
   selectedPerturbation = null;
@@ -4537,6 +4655,8 @@ function syncScenarioDisplay() {
   }
 }
 function resetSimulation() {
+  ElectronFlowUI.resetSupplies();
+  clearCoenzymeHighlight();
   activePerturbations.clear();
   preferredScenario = null;
   selectedMetabolite = null;
@@ -4721,7 +4841,7 @@ document.addEventListener('keydown', (e) => {
   const tag = (e.target.tagName || '').toLowerCase();
   if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable || e.metaKey || e.ctrlKey || e.altKey) return;
   // Don't let single-key shortcuts leak through any open overlay.
-  if (introOpen() || casesBrowserOpen() || helpOpen() || cmdPaletteOpen() || coenzymesOpen() || CaseRunner.state) return;
+  if (introOpen() || casesBrowserOpen() || helpOpen() || cmdPaletteOpen() || coenzymesOpen() || ElectronFlowUI.isOpen() || CaseRunner.state) return;
   if (e.key === 'Escape' && popoverOpen()) { hideNodePopover(); return; }
   if (e.key === 'Escape' && selectedPathway) { exitDive(); return; }
   if (e.key === '[') { tlBtn.click(); }
@@ -4948,6 +5068,7 @@ const CaseRunner = {
 
   init(caseData, file) {
     if (this.state) this.close();
+    if (selectedCoenzymeId) { clearCoenzymeHighlight(); renderNodes(computeState()); renderEdges(); }
     const thai = BIOCHEM_CASES_TH[file] || Object.values(BIOCHEM_CASES_TH).find(item => item.id === caseData.id);
     I18N.register(caseData, thai);
     caseData.mcqs.forEach((q, i) => I18N.register(q.explanation || q.expl, thai?.mcqs[i]?.explanation));
@@ -5534,6 +5655,7 @@ const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (pendingCaseOpen) { e.preventDefault(); e.stopPropagation(); cancelPendingCaseOpen(true); return; }
+  if (ElectronFlowUI.isOpen()) { e.preventDefault(); e.stopPropagation(); ElectronFlowUI.close(); return; }
   if (coenzymesOpen()) { e.preventDefault(); e.stopPropagation(); closeCoenzymes(); return; }
   if (document.getElementById('header-more').open && !activeModal) { e.preventDefault(); e.stopPropagation(); document.getElementById('header-more').open = false; document.querySelector('#header-more summary').focus(); return; }
   if (cmdPaletteOpen())   { e.preventDefault(); e.stopPropagation(); closeCmdPalette(); return; }
@@ -5806,7 +5928,7 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     if (cmdPaletteOpen()) { closeCmdPalette(); return; }
     // Don't stack the palette on top of another modal / the intro / a case.
-    if (introOpen() || casesBrowserOpen() || helpOpen() || coenzymesOpen() || CaseRunner.state) return;
+    if (introOpen() || casesBrowserOpen() || helpOpen() || coenzymesOpen() || ElectronFlowUI.isOpen() || CaseRunner.state) return;
     openCmdPalette();
   }
 }, true);
@@ -6038,6 +6160,16 @@ function coenzymeEdges(id) {
   const item = BIOCHEM_COENZYMES.find(c => c.id === id);
   return item ? E.filter(edge => item.enzymes.includes(edge.e)) : [];
 }
+function coenzymeMapEdges(id) {
+  if (!id) return [];
+  const reactions = coenzymeEdges(id);
+  return ElectronFlowUI.isRedox(id) ? E.filter(edge => reactions.includes(edge) || ElectronFlowUI.edgeKey(edge)) : reactions;
+}
+function clearCoenzymeHighlight() {
+  selectedCoenzymeId = null;
+  delete document.body.dataset.coenzyme;
+  document.getElementById('coenzyme-map-status').hidden = true;
+}
 function renderCoenzymes() {
   const query = normalizeStudySearch(document.getElementById('coenzyme-search').value);
   const focused = document.activeElement?.dataset.coenzyme;
@@ -6063,6 +6195,18 @@ function closeCoenzymes() {
   root.classList.remove('open'); root.setAttribute('aria-hidden','true');
   endModal(root);
 }
+function fitCoenzyme(id) {
+  const names = [...new Set(coenzymeMapEdges(id).flatMap(edge => [edge.from,edge.to]))];
+  if (!names.length) return;
+  const points = names.map(name => M[name]);
+  const minX = Math.min(...names.map(name => M[name].x-nodeWidth(name)/2))-35;
+  const maxX = Math.max(...names.map(name => M[name].x+nodeWidth(name)/2))+35;
+  const minY = Math.min(...points.map(m => m.y))-50, maxY = Math.max(...points.map(m => m.y))+50;
+  const compact = isMobileLayout(), left = compact ? 16 : 330, bottom = compact ? 270 : 160;
+  applyZoom(Math.min(1.35, Math.max(120,mapMain.clientWidth-left-32)/(maxX-minX), Math.max(160,mapMain.clientHeight-bottom-50)/(maxY-minY)));
+  mapMain.scrollTo({left:((minX+maxX)/2-MAP_VBX)*mapZoom-(mapMain.clientWidth+left)/2,
+    top:((minY+maxY)/2-MAP_VBY)*mapZoom-(mapMain.clientHeight-bottom)/2, behavior:REDUCED_MOTION?'auto':'smooth'});
+}
 function highlightCoenzyme(id, edgeId) {
   closeCoenzymes();
   if (selectedPathway) exitDive();
@@ -6071,10 +6215,12 @@ function highlightCoenzyme(id, edgeId) {
   const status = document.getElementById('coenzyme-map-status');
   status.hidden = false;
   status.querySelector('span').textContent = BIOCHEM_COENZYMES.find(c => c.id === id).name + ' · Linked reactions highlighted';
+  status.querySelector('small').textContent = ElectronFlowUI.isRedox(id) ? 'Purple outlines show linked reactions. Gold tracks trace electrons to oxygen.' : 'Outlined reactions use this coenzyme. Other reactions are dimmed.';
+  document.getElementById('electron-map-open').hidden = !ElectronFlowUI.isRedox(id);
   if (edgeId) {
     const edge = E.find(e => `${e.e}:${e.from}->${e.to}` === edgeId);
     if (edge) { if (mapZoom < .72) applyZoom(.95); scrollMapTo((M[edge.from].x + M[edge.to].x)/2, (M[edge.from].y + M[edge.to].y)/2); }
-  } else zoomFit();
+  } else fitCoenzyme(id);
 }
 document.getElementById('coenzymes-btn').addEventListener('click', () => openCoenzymes());
 document.getElementById('coenzymes-close').addEventListener('click', closeCoenzymes);
@@ -6086,7 +6232,7 @@ document.getElementById('coenzyme-detail').addEventListener('click', e => {
   const step = e.target.closest('[data-coenzyme-edge]');
   if (highlight || step) highlightCoenzyme(coenzymeDetailId, step?.dataset.coenzymeEdge);
 });
-document.getElementById('clear-coenzyme').addEventListener('click', () => { selectedCoenzymeId = null; document.getElementById('coenzyme-map-status').hidden = true; renderEdges(); document.getElementById('coenzymes-btn').focus(); });
+document.getElementById('clear-coenzyme').addEventListener('click', () => { clearCoenzymeHighlight(); renderNodes(computeState()); renderEdges(); document.getElementById('coenzymes-btn').focus(); });
 document.getElementById('search-btn').addEventListener('click', () => openCmdPalette());
 document.addEventListener('click', e => { if (!e.target.closest('#header-more')) document.getElementById('header-more').open = false; });
 document.querySelector('.header-menu').addEventListener('click', e => {
@@ -6113,6 +6259,7 @@ document.addEventListener('languagechange', () => {
   if (coenzymesOpen()) renderCoenzymes();
 });
 I18N.start();
+ElectronFlowUI.init();
 
 beginModal(document.getElementById('intro'), '#skip-intro');
 </script>
