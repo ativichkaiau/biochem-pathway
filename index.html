@@ -1068,6 +1068,7 @@ body.light #case-overlay {
   font-size: 12.5px; line-height: 1.55; color: var(--text);
 }
 
+.grading-note { color: var(--text-2); font-size: 12px; line-height: 1.5; margin: 8px 0; }
 .request-error { margin: 12px 0; color: var(--text-2); font-size: 13px; line-height: 1.5; }
 .request-error .btn { min-height: 44px; margin-top: 6px; }
 
@@ -1680,7 +1681,7 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
 
 <div id="intro">
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
-  <div class="intro-card">
+  <div class="intro-card" role="dialog" aria-modal="true" aria-label="Welcome to Biochem Met">
     <div class="intro-eyebrow">
       <span class="intro-brand-mark"><img src="logo.png" alt="VESTRIPPN" class="brand-logo"></span>
       <span class="vestrippn-wordmark">VESTRIPPN</span>
@@ -2007,6 +2008,16 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
     <div class="sub-header" data-pw="sphingo" style="--pw: var(--pw-sphingo)">Sphingolipids</div>
     <div id="list-sphingo"></div>
 
+    <div class="organelle-header" style="--org:var(--accent)"><span class="org-ico">◌</span>Other pathways</div>
+    <div class="sub-header" data-pw="tryptophan" style="--pw: var(--pw-tryptophan)">Tryptophan</div>
+    <div id="list-tryptophan"></div>
+    <div class="sub-header" data-pw="glutathione" style="--pw: var(--pw-glutathione)">Glutathione</div>
+    <div id="list-glutathione"></div>
+    <div class="sub-header" data-pw="eicosanoid" style="--pw: var(--pw-eicosanoid)">Eicosanoids</div>
+    <div id="list-eicosanoid"></div>
+    <div class="sub-header" data-pw="tyrosine" style="--pw: var(--pw-tyrosine)">Tyrosine degradation</div>
+    <div id="list-tyrosine"></div>
+
     <div class="sub-header" style="margin-top:18px">Detail</div>
     <div id="detail" class="detail-box">
       <p class="muted">Select a metabolite in the structure or list, or any perturbation, to inspect it.</p>
@@ -2016,7 +2027,7 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
 <div id="panel-scrim"></div>
 
 <div id="cmd-palette" aria-hidden="true">
-  <div class="cmd-box" role="dialog" aria-label="Search cases and pathways">
+  <div class="cmd-box" aria-modal="true" role="dialog" aria-label="Search cases and pathways">
     <button class="btn" id="cmd-close" aria-label="Close search">Close ✕</button>
     <input id="cmd-input" class="cmd-input" type="text" placeholder="Find a case, pathway, metabolite, or perturbation…" autocomplete="off" spellcheck="false">
     <div id="cmd-results" class="cmd-results"></div>
@@ -2069,11 +2080,11 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
 
 
 <div id="cases-browser" aria-hidden="true">
-  <div class="cases-shell">
+  <div class="cases-shell" role="dialog" aria-modal="true" aria-labelledby="cases-browser-title">
     <div class="cases-head">
       <div>
         <div class="cases-head-eyebrow">📋 CLINICAL CASES</div>
-        <h2 class="cases-head-title">Pick a <span>case</span></h2>
+        <h2 class="cases-head-title" id="cases-browser-title">Pick a <span>case</span></h2>
         <p class="cases-head-sub">Choose a teaching case to start the case loop.</p>
       </div>
       <button class="btn cases-close" id="cases-close" title="Close (Esc)">Close ✕</button>
@@ -2160,6 +2171,69 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
 </div>
 
 <script>
+
+// Modal focus is shared across the intro, search, Help, Cases and case workup.
+let activeModal = null;
+const MODAL_FOCUSABLE = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+function modalFocusable() {
+  if (!activeModal) return [];
+  return [activeModal.root, ...activeModal.allowed].flatMap(root => [...root.querySelectorAll(MODAL_FOCUSABLE)])
+    .filter(el => !el.closest('[inert]') && !el.closest('[hidden]') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden')
+    .sort((a, b) => a === b ? 0 : a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
+}
+function restoreModalBackground() {
+  for (const [el, inert] of activeModal.inertBefore) el.inert = inert;
+  activeModal.inertBefore.clear();
+}
+function updateModalAccess(root, allowed = []) {
+  if (activeModal?.root !== root) return;
+  restoreModalBackground();
+  activeModal.allowed = allowed;
+  const keep = [root, ...allowed];
+  const walk = parent => {
+    for (const el of parent.children) {
+      const retained = keep.includes(el);
+      const branch = keep.some(node => el.contains(node));
+      activeModal.inertBefore.set(el, el.inert);
+      el.inert = !retained && !branch;
+      if (!retained && branch) walk(el);
+    }
+  };
+  walk(document.body);
+  root.querySelector('[role="dialog"]')?.setAttribute('aria-modal', String(!allowed.length));
+}
+function beginModal(root, initialFocus) {
+  if (activeModal?.root === root) return;
+  if (activeModal) endModal(activeModal.root);
+  activeModal = { root, allowed: [], inertBefore: new Map(), returnFocus: document.activeElement };
+  updateModalAccess(root);
+  const target = root.querySelector(initialFocus) || modalFocusable()[0];
+  target?.focus({ preventScroll: true });
+}
+function endModal(root) {
+  if (activeModal?.root !== root) return;
+  const returnFocus = activeModal.returnFocus;
+  restoreModalBackground();
+  activeModal = null;
+  if (returnFocus?.isConnected && !returnFocus.closest('[inert]')) returnFocus.focus({ preventScroll: true });
+}
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Tab' || !activeModal) return;
+  const items = modalFocusable();
+  const first = items[0], last = items.at(-1);
+  if (!first) { e.preventDefault(); return; }
+  if (!items.includes(document.activeElement) || (e.shiftKey && document.activeElement === first)) {
+    e.preventDefault(); (e.shiftKey ? last : first).focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault(); first.focus();
+  }
+}, true);
+document.addEventListener('focusin', e => {
+  if (!activeModal) return;
+  if ([activeModal.root, ...activeModal.allowed].some(root => root.contains(e.target))) return;
+  modalFocusable()[0]?.focus({ preventScroll: true });
+});
+
 // ============================================
 // METABOLITES — positions and metadata
 // ============================================
@@ -3447,32 +3521,12 @@ function renderPerturbationList() {
 }
 
 function renderMetaboliteLists(state) {
-  const groups = { glycolysis: [], 'glycogen-ppp': [], tca: [], 'fa-ketones': [], protein: [], urea: [], sterol: [], heme: [], nucleotide: [], sugar: [], ethanol: [], onecarbon: [], catechol: [], creatine: [], polyol: [], bilirubin: [], sphingo: [], etc: [] };
+  const groups = {};
   for (const [name, m] of Object.entries(M)) {
-    if (groups[m.pathway]) groups[m.pathway].push(name);
+    (groups[m.pathway] = groups[m.pathway] || []).push(name);
   }
-  const ids = {
-    glycolysis: 'list-glycolysis',
-    'glycogen-ppp': 'list-glycogen-ppp',
-    tca: 'list-tca',
-    'fa-ketones': 'list-fa-ketones',
-    protein: 'list-protein',
-    urea: 'list-urea',
-    sterol: 'list-sterol',
-    heme: 'list-heme',
-    nucleotide: 'list-nucleotide',
-    sugar: 'list-sugar',
-    ethanol: 'list-ethanol',
-    onecarbon: 'list-onecarbon',
-    catechol: 'list-catechol',
-    creatine: 'list-creatine',
-    polyol: 'list-polyol',
-    bilirubin: 'list-bilirubin',
-    sphingo: 'list-sphingo',
-    etc: 'list-etc'
-  };
   for (const pathway of Object.keys(groups)) {
-    const ul = document.getElementById(ids[pathway]);
+    const ul = document.getElementById('list-' + pathway);
     if (!ul) continue;
     ul.innerHTML = groups[pathway].map(n => {
       const d = state[n] || 0;
@@ -4298,7 +4352,7 @@ function introAdvance() {
   else setIntroStep(introStep + 1);
 }
 function introRetreat() { if (introStep > 0) setIntroStep(introStep - 1); }
-function dismissIntro() { intro.classList.add('hidden'); }
+function dismissIntro() { intro.classList.add('hidden'); endModal(intro); }
 function introOpen()    { return !intro.classList.contains('hidden'); }
 
 document.getElementById('skip-intro').addEventListener('click', dismissIntro);
@@ -4307,6 +4361,7 @@ _backBtn.addEventListener('click', introRetreat);
 _dots.forEach(d => d.addEventListener('click', () => setIntroStep(parseInt(d.dataset.i, 10))));
 document.addEventListener('keydown', (e) => {
   if (!introOpen()) return;
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('button')) return;
   if (e.key === 'Escape') { e.preventDefault(); dismissIntro(); }
   else if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); introAdvance(); }
   else if (e.key === 'ArrowLeft') { e.preventDefault(); introRetreat(); }
@@ -4503,6 +4558,23 @@ function mockChatReply(payload) {
   return 'Noted. Ask another question or move on to labs when you’re ready.';
 }
 
+// Accepted phrases must be asserted; required mechanism terms remain a coverage check.
+function hasAffirmativeKeyword(answer, keyword) {
+  const text = answer.toLowerCase().replace(/’/g, "'");
+  const term = keyword.toLowerCase().trim().replace(/’/g, "'");
+  if (!term) return false;
+  const word = c => !!c && /[\p{L}\p{N}]/u.test(c);
+  for (let i = text.indexOf(term); i !== -1; i = text.indexOf(term, i + term.length)) {
+    if ((word(term[0]) && word(text[i - 1])) || (word(term.at(-1)) && word(text[i + term.length]))) continue;
+    const before = text.slice(0, i).split(/[.!?;,\n]|\b(?:but|however|instead|rather)\b/u).pop().replace(/\bnot only\b/g, '');
+    const denied = /\b(?:no|not|never|without|neither|nor|denies|denied|exclude[ds]?|ruled? out|isn't|wasn't|doesn't|can't|cannot)\b/.test(before);
+    const after = text.slice(i + term.length);
+    const rejected = /^\s*(?:(?:is|was|seems?)\s+)?(?:not|isn't|wasn't|unlikely|excluded|ruled out)\b/.test(after);
+    if (!denied && !rejected) return true;
+  }
+  return false;
+}
+
 function mockGrade(payload) {
   const c = payload.caseData;
   const ans = payload.answers || {};
@@ -4512,7 +4584,7 @@ function mockGrade(payload) {
     const a = (ans[k] || '').toLowerCase().trim();
     let correct = false, note = '';
     if (r.accepts) {
-      correct = r.accepts.some(s => a.includes(s.toLowerCase()));
+      correct = r.accepts.some(s => hasAffirmativeKeyword(a, s));
       if (!correct) note = `Expected something like: ${r.accepts.slice(0, 2).join(' / ')}.`;
     } else if (r.mustMention) {
       const hits = r.mustMention.filter(s => a.includes(s.toLowerCase())).length;
@@ -4524,6 +4596,7 @@ function mockGrade(payload) {
   const total = Object.values(out).reduce((s, x) => s + (x.correct ? x.weight : 0), 0);
   const max = Object.values(out).reduce((s, x) => s + x.weight, 0);
   out._score = max ? total / max : 0;
+  out._source = 'offline-keywords';
   return out;
 }
 
@@ -4636,6 +4709,18 @@ const CaseRunner = {
 
     this.tickTimer();
     this.goTo('chat');
+    beginModal(this.els.overlay, '#case-close');
+  },
+
+  requestClose() {
+    if (!this.state) return true;
+    if (this.state.phase === 'explain') this.captureExplainAnswers();
+    const finished = this.state.phase === 'summary' && this.state.resultSaved;
+    const hasWork = this.state.phase !== 'chat' || this.state.chatTurns > 0 ||
+      Object.values(this.state.explainAnswers).some(v => v.trim());
+    if (!finished && hasWork && !confirm('Close case? Your unfinished attempt will be discarded.')) return false;
+    this.close();
+    return true;
   },
 
   close() {
@@ -4646,6 +4731,7 @@ const CaseRunner = {
     this.els.overlay.classList.remove('open');
     this.els.overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('case-open', 'case-pinpoint');
+    endModal(this.els.overlay);
     caseMode = null;
     document.getElementById('pathway-svg').classList.remove('case-mode');
     // Clear any pinpoint feedback marks on the SVG
@@ -4672,6 +4758,7 @@ const CaseRunner = {
       document.body.classList.remove('case-pinpoint');
     }
 
+    updateModalAccess(this.els.overlay, phase === 'pinpoint' ? [document.querySelector('main'), document.getElementById('map-zoom')] : []);
     this.render();
   },
 
@@ -4916,11 +5003,12 @@ const CaseRunner = {
   renderFeedbackCard() {
     const fb = this.state.explainFeedback;
     if (!fb) return;
-    const keys = Object.keys(fb).filter(k => k !== '_score');
+    const offline = fb._source === 'offline-keywords';
+    const keys = Object.keys(this.state.caseData.explain.rubric).filter(k => fb[k]);
     const rows = keys.map(k => {
       const r = fb[k];
       const cls = r.correct ? 'correct' : 'incorrect';
-      const mark = r.correct ? '✓' : '✗';
+      const mark = offline ? (r.correct ? 'Matched' : 'Review') : (r.correct ? '✓' : '✗');
       const expected = this.state.caseData.explain.prompts[k];
       const note = r.note ? `<span class="fb-note">${escapeText(r.note)}</span>` : '';
       return `<div class="feedback-row ${cls}">
@@ -4933,8 +5021,9 @@ const CaseRunner = {
     this.els.feedbackCard.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <strong style="font-size:13px">Feedback</strong>
-        <span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-2);font-weight:700">Score · <span style="color:var(--text);font-size:14px">${pct}%</span></span>
+        <span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-2);font-weight:700">${offline ? 'Keyword match' : 'Score'} · <span style="color:var(--text);font-size:14px">${pct}%</span></span>
       </div>
+      ${offline ? '<p class="grading-note">Offline keyword check: approximate feedback. Keyword coverage does not assess the full reasoning.</p>' : ''}
       ${rows}
     `;
   },
@@ -5064,7 +5153,7 @@ const CaseRunner = {
     }
     const w = this.state.caseData.scoring?.weights || { explain: 0.4, pinpoint: 0.3, mcq: 0.3 };
     const composite = Object.keys(w).reduce((s, k) => s + ((this.state.score[k] ?? 0) * (w[k] || 0)), 0);
-    saveCaseResult(this.state.file, this.state.caseData, this.state.score, composite, !this.state.resultSaved);
+    saveCaseResult(this.state.file, this.state.caseData, this.state.score, composite, !this.state.resultSaved, this.state.explainFeedback?._source || 'api');
     this.state.resultSaved = true;
     const dt = Math.floor((Date.now() - this.state.startedAt) / 1000);
     const mm = Math.floor(dt / 60), ss = dt % 60;
@@ -5077,6 +5166,7 @@ const CaseRunner = {
     `;
     const got = this.state.mcqAnswers.filter(a => a && a.correct).length;
     this.els.summaryRecap.innerHTML = `
+      ${this.state.explainFeedback?._source === 'offline-keywords' ? '<p class="grading-note">Explain used an approximate offline keyword check.</p>' : ''}
       <p><strong>Time:</strong> ${mm}:${String(ss).padStart(2,'0')} · <strong>Chat turns:</strong> ${this.state.chatTurns} · <strong>MCQs:</strong> ${got} / ${this.state.caseData.mcqs.length}</p>
       <p><strong>Pinpoint:</strong> ${this.state.pinpointResolved ? (this.state.pinpointWasRight ? 'Correct on attempt ' + this.state.pinpointAttempts : 'Revealed after ' + this.state.pinpointAttempts + ' tries') : 'Not resolved'}.</p>
       <p style="color:var(--text-2)">This case loop is a teaching scaffold. Stack the perturbations panel after closing to model the disorder on the live map: choose a perturbation relevant to this case in the left sidebar.</p>
@@ -5089,7 +5179,7 @@ const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).
 
 // ---------------- Wire up event listeners ----------------
 (function bindCaseEvents() {
-  document.getElementById('case-close').addEventListener('click', () => CaseRunner.close());
+  document.getElementById('case-close').addEventListener('click', () => CaseRunner.requestClose());
   document.getElementById('case-back').addEventListener('click', () => CaseRunner.back());
   document.getElementById('case-next').addEventListener('click', () => {
     if (!CaseRunner.state) return;
@@ -5112,11 +5202,12 @@ const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).
 // ESC closes the topmost overlay
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (cmdPaletteOpen())   { e.preventDefault(); closeCmdPalette(); return; }
-  if (helpOpen())         { e.preventDefault(); closeHelp(); return; }
-  if (casesBrowserOpen()) { e.preventDefault(); closeCasesBrowser(); return; }
+  if (cmdPaletteOpen())   { e.preventDefault(); e.stopPropagation(); closeCmdPalette(); return; }
+  if (helpOpen())         { e.preventDefault(); e.stopPropagation(); closeHelp(); return; }
+  if (casesBrowserOpen()) { e.preventDefault(); e.stopPropagation(); closeCasesBrowser(); return; }
   if (CaseRunner.state) {
-    if (confirm('Close case? Progress will be lost.')) CaseRunner.close();
+    e.preventDefault(); e.stopPropagation();
+    CaseRunner.requestClose();
   }
 }, true);
 
@@ -5185,10 +5276,8 @@ function buildCmdIndex() {
 }
 
 let cmdDefaultType = 'case';
-let cmdReturnFocus = null;
 function openCmdPalette(defaultType = 'case') {
   cmdDefaultType = defaultType;
-  cmdReturnFocus = document.activeElement;
   if (!cmdIndex) cmdIndex = buildCmdIndex();
   const input = document.getElementById('cmd-input');
   input.value = '';
@@ -5196,12 +5285,12 @@ function openCmdPalette(defaultType = 'case') {
   renderCmdResults('');
   document.getElementById('cmd-palette').classList.add('open');
   document.getElementById('cmd-palette').setAttribute('aria-hidden', 'false');
-  input.focus();
+  beginModal(document.getElementById('cmd-palette'), '#cmd-input');
 }
 function closeCmdPalette() {
   document.getElementById('cmd-palette').classList.remove('open');
   document.getElementById('cmd-palette').setAttribute('aria-hidden', 'true');
-  if (cmdReturnFocus?.isConnected) cmdReturnFocus.focus();
+  endModal(document.getElementById('cmd-palette'));
 }
 document.getElementById('cmd-close').addEventListener('click', closeCmdPalette);
 function cmdPaletteOpen() { return document.getElementById('cmd-palette').classList.contains('open'); }
@@ -5313,7 +5402,7 @@ function renderCmdResults(q) {
       const bx = bL === norm ? 0 : (bL.startsWith(norm) ? 1 : 2);
       if (ax !== bx) return ax - bx;
       const tp = { case: 0, pathway: 1, perturbation: 2, metabolite: 3 };
-      return (tp[a.type] || 9) - (tp[b.type] || 9);
+      return (tp[a.type] ?? 9) - (tp[b.type] ?? 9);
     });
     cmdResults = cmdResults.slice(0, 60);
   }
@@ -5321,6 +5410,7 @@ function renderCmdResults(q) {
   const grouped = {};
   for (const r of cmdResults) (grouped[r.type] = grouped[r.type] || []).push(r);
   const order = ['case', 'pathway', 'perturbation', 'metabolite'];
+  cmdResults = order.flatMap(type => grouped[type] || []);
   const groupLabels = { case: 'Cases', pathway: 'Pathways · click to focus', perturbation: 'Perturbations · click to toggle', metabolite: 'Metabolites' };
   const html = [];
   let globalIdx = 0;
@@ -5384,8 +5474,8 @@ document.addEventListener('keydown', (e) => {
 }, true);
 
 // ---------------- Help modal (header "?" button) ----------------
-function openHelp() { document.getElementById('help-modal').classList.add('open'); document.getElementById('help-modal').setAttribute('aria-hidden', 'false'); }
-function closeHelp() { document.getElementById('help-modal').classList.remove('open'); document.getElementById('help-modal').setAttribute('aria-hidden', 'true'); }
+function openHelp() { document.getElementById('help-modal').classList.add('open'); document.getElementById('help-modal').setAttribute('aria-hidden', 'false'); beginModal(document.getElementById('help-modal'), '#help-close'); }
+function closeHelp() { document.getElementById('help-modal').classList.remove('open'); document.getElementById('help-modal').setAttribute('aria-hidden', 'true'); endModal(document.getElementById('help-modal')); }
 function helpOpen()  { return document.getElementById('help-modal').classList.contains('open'); }
 
 document.getElementById('help-btn').addEventListener('click', openHelp);
@@ -5397,6 +5487,7 @@ document.getElementById('help-replay-intro').addEventListener('click', () => {
   closeHelp();
   if (typeof setIntroStep === 'function') setIntroStep(0);
   document.getElementById('intro').classList.remove('hidden');
+  beginModal(document.getElementById('intro'), '#skip-intro');
 });
 document.getElementById('help-browse-cases').addEventListener('click', () => {
   closeHelp();
@@ -5455,13 +5546,14 @@ const CASES_INDEX = [
 // ---------------- Learner progress (localStorage) ----------------
 const PROGRESS_KEY = 'biochem-progress';
 function loadProgress() { try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; } catch (e) { return {}; } }
-function saveCaseResult(key, caseData, score, composite, newAttempt = true) {
+function saveCaseResult(key, caseData, score, composite, newAttempt = true, explainSource = null) {
   if (!key) return;
   try {
     const all = loadProgress();
     const prev = all[key];
     all[key] = {
       pathway: caseData.pathway,
+      explainSource,
       best: Math.max((prev && prev.best) || 0, composite),
       last: composite,
       phases: { explain: score.explain, pinpoint: score.pinpoint, mcq: score.mcq },
@@ -5532,6 +5624,7 @@ function renderCasesGrid() {
       <div class="case-card-pw">${escapeText(label)}</div>
       <h3 class="case-card-title">${escapeText(c.title)}</h3>
       <p class="case-card-blurb">${escapeText(c.blurb)}</p>
+      ${p?.explainSource === 'offline-keywords' ? '<p class="grading-note">Latest Explain: offline keyword check</p>' : ''}
       <div class="case-card-cta">${p ? 'Replay case →' : 'Start case →'}</div>
     </div>`;
   }).join('');
@@ -5543,10 +5636,12 @@ function openCasesBrowser() {
   renderCasesGrid();
   document.getElementById('cases-browser').classList.add('open');
   document.getElementById('cases-browser').setAttribute('aria-hidden', 'false');
+  beginModal(document.getElementById('cases-browser'), '#cases-close');
 }
 function closeCasesBrowser() {
   document.getElementById('cases-browser').classList.remove('open');
   document.getElementById('cases-browser').setAttribute('aria-hidden', 'true');
+  endModal(document.getElementById('cases-browser'));
 }
 function casesBrowserOpen() { return document.getElementById('cases-browser').classList.contains('open'); }
 
@@ -5599,6 +5694,7 @@ document.getElementById('cases-browser').addEventListener('click', (e) => {
     h.appendChild(btn);
   });
 })();
+beginModal(document.getElementById('intro'), '#skip-intro');
 </script>
 </body>
 </html>
