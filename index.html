@@ -1625,6 +1625,23 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
   #touch-nav button, aside, #panel-scrim { transition: none; }
 }
 
+
+/* Sidebar actions use native buttons so Tab, Enter and Space work consistently. */
+button.category-header, button.metabolite-row, button.collapse-chev, .pathway-focus {
+  border: 0; background: transparent; font-family: inherit; text-align: left;
+}
+button.category-header, button.metabolite-row { width: 100%; }
+button.perturbation { width: 100%; background: transparent; color: inherit; font-family: inherit; text-align: left; }
+.perturbation .info, .perturbation .info .name, .perturbation .info .desc { display: block; }
+button.metabolite-row { color: inherit; }
+.pathway-focus { flex: 1; min-width: 0; padding: 5px 0; color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; cursor: pointer; }
+button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
+.detail-overview { margin-bottom: 10px; min-height: 44px; }
+@media (max-width: 1100px), (hover: none) and (pointer: coarse) {
+  .pathway-focus, button.pert-active-chip-x { min-height: 44px; }
+  button.pert-active-chip-x { min-width: 44px; }
+}
+
 </style>
 </head>
 <body>
@@ -3206,6 +3223,19 @@ const ORGANELLE_OF = {
 // STATE
 // ============================================
 
+const SCENARIOS = {
+  fed:        { label: 'Fed', perts: ['insulin', 'lipogenesis'] },
+  overnight:  { label: 'Overnight fast', perts: ['glucagon'] },
+  fasting:    { label: 'Fasting (~24h)', perts: ['glucagon', 'starvation'] },
+  starvation: { label: 'Starvation (3-day)', perts: ['fasting-ketosis', 'glucagon'] },
+  refed:      { label: 'Refed', perts: ['insulin', 'lipogenesis'] },
+  dka:        { label: 'DKA', perts: ['dka'] },
+  exercise:   { label: 'Sprint / exercise', perts: ['exercise'] },
+  alcohol:    { label: 'Alcohol', perts: ['alcohol'] }
+};
+const MT_TIMELINE = ['fed', 'overnight', 'fasting', 'starvation', 'refed'];
+let preferredScenario = null;
+
 const activePerturbations = new Set();
 let selectedMetabolite = null;
 let selectedPerturbation = null;
@@ -3468,7 +3498,7 @@ function renderPertSummary() {
     const p = P.find(x => x.id === id);
     if (!p) return '';
     const shortName = p.name.split(/[()]/)[0].trim();
-    return `<span class="pert-active-chip" data-pertid="${escapeAttr(p.id)}">${escapeText(shortName)}<span class="pert-active-chip-x" data-rmpert="${escapeAttr(p.id)}" title="Remove">×</span></span>`;
+    return `<span class="pert-active-chip" data-pertid="${escapeAttr(p.id)}">${escapeText(shortName)}<button type="button" class="pert-active-chip-x" data-rmpert="${escapeAttr(p.id)}" aria-label="Remove ${escapeAttr(shortName)}">×</button></span>`;
   }).join('');
   const acidosis = deriveCellState(computeState()).acidosis;
   const rows = vitalsBreakdown();
@@ -3494,30 +3524,38 @@ function renderPertSummary() {
 function renderPerturbationList() {
   renderPertSummary();
   const list = document.getElementById('perturbations-list');
+  const focused = list.contains(document.activeElement) ? document.activeElement : null;
+  const focusId = focused?.dataset.id, focusCat = focused?.dataset.cat;
   const grouped = {};
   for (const p of P) {
     (grouped[p.cat] = grouped[p.cat] || []).push(p);
   }
   const html = [];
+  let categoryIndex = 0;
   for (const cat of Object.keys(grouped)) {
     const collapsed = _pertCollapsed.has(cat);
-    html.push(`<div class="category-header${collapsed ? ' collapsed' : ''}" data-cat="${escapeAttr(cat)}"><div class="category-dot"></div>${escapeText(cat)}<span class="collapse-chev">▼</span></div>`);
-    html.push('<div class="pert-cat-body">');
+    const bodyId = 'pert-category-' + categoryIndex++;
+    html.push(`<button type="button" class="category-header${collapsed ? ' collapsed' : ''}" data-cat="${escapeAttr(cat)}" aria-expanded="${!collapsed}" aria-controls="${bodyId}"><span class="category-dot" aria-hidden="true"></span>${escapeText(cat)}<span class="collapse-chev" aria-hidden="true">▼</span></button>`);
+    html.push(`<div class="pert-cat-body" id="${bodyId}">`);
     for (const p of grouped[cat]) {
       const isActive = activePerturbations.has(p.id);
       html.push(
-        `<div class="perturbation ${isActive ? 'active' : ''}" data-id="${escapeAttr(p.id)}">` +
-          `<div class="checkbox"></div>` +
-          `<div class="info">` +
-            `<div class="name">${escapeText(p.name)}</div>` +
-            `<div class="desc">${escapeText(p.desc)}</div>` +
-          `</div>` +
-        `</div>`
+        `<button type="button" class="perturbation ${isActive ? 'active' : ''}" data-id="${escapeAttr(p.id)}" aria-pressed="${isActive}" aria-labelledby="pert-name-${escapeAttr(p.id)}" aria-describedby="pert-desc-${escapeAttr(p.id)}">` +
+          `<span class="checkbox" aria-hidden="true"></span>` +
+          `<span class="info">` +
+            `<span class="name" id="pert-name-${escapeAttr(p.id)}">${escapeText(p.name)}</span>` +
+            `<span class="desc" id="pert-desc-${escapeAttr(p.id)}">${escapeText(p.desc)}</span>` +
+          `</span>` +
+        `</button>`
       );
     }
     html.push('</div>');
   }
   list.innerHTML = html.join('');
+  if (focused) {
+    const target = [...list.querySelectorAll('button')].find(el => focusId ? el.dataset.id === focusId : el.dataset.cat === focusCat);
+    target?.focus({ preventScroll: true });
+  }
 }
 
 function renderMetaboliteLists(state) {
@@ -3532,10 +3570,10 @@ function renderMetaboliteLists(state) {
       const d = state[n] || 0;
       const cls = deltaClass(d);
       const selectedCls = selectedMetabolite === n ? ' selected' : '';
-      return `<div class="metabolite-row${selectedCls}" data-name="${escapeAttr(n)}">
+      return `<button type="button" class="metabolite-row${selectedCls}" data-name="${escapeAttr(n)}" aria-current="${selectedMetabolite === n}">
         <span class="name">${escapeText(n)}</span>
         <span class="change ${cls}">${deltaArrow(d)}</span>
-      </div>`;
+      </button>`;
     }).join('');
   }
 }
@@ -3551,7 +3589,21 @@ function renderKeyEnzymes(enzymeNames) {
 
 function renderDetail(state) {
   const d = document.getElementById('detail');
-  if (selectedPathway && PATHWAY_INFO[selectedPathway]) {
+  const addOverviewButton = () => {
+    if (!selectedPathway) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn detail-overview';
+    button.textContent = 'Back to ' + PATHWAY_INFO[selectedPathway].label;
+    button.addEventListener('click', () => {
+      selectedMetabolite = null;
+      selectedPerturbation = null;
+      renderAll();
+      document.getElementById('exit-dive')?.focus({ preventScroll: true });
+    });
+    d.prepend(button);
+  };
+  if (selectedPathway && !selectedMetabolite && !selectedPerturbation && PATHWAY_INFO[selectedPathway]) {
     const info = PATHWAY_INFO[selectedPathway];
     const members = Object.entries(M).filter(([_, m]) => m.pathway === selectedPathway).map(([n, _]) => n);
     const activeHere = [];
@@ -3564,7 +3616,7 @@ function renderDetail(state) {
     }
     const memberRows = members.map(n => {
       const v = state[n] || 0;
-      return `<div class="metabolite-row" data-name="${escapeAttr(n)}"><span class="name">${escapeText(n)}</span><span class="change ${deltaClass(v)}">${deltaArrow(v)}</span></div>`;
+      return `<button type="button" class="metabolite-row" data-name="${escapeAttr(n)}"><span class="name">${escapeText(n)}</span><span class="change ${deltaClass(v)}">${deltaArrow(v)}</span></button>`;
     }).join('');
     d.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:10px">
@@ -3613,6 +3665,7 @@ function renderDetail(state) {
             ).join('')}
           </div>` : ''}
       `;
+      addOverviewButton();
       return;
     }
   }
@@ -3620,6 +3673,7 @@ function renderDetail(state) {
     const m = M[selectedMetabolite];
     if (m) {
       d.innerHTML = `<h4>${escapeText(selectedMetabolite)}</h4>` + metaboliteBodyHTML(selectedMetabolite, state);
+      addOverviewButton();
       return;
     }
   }
@@ -3777,16 +3831,25 @@ function renderVitals(state) {
 }
 
 function renderAll() {
+  const focusedRow = document.activeElement?.closest('.metabolite-row');
+  const rowName = focusedRow?.dataset.name;
+  const fromDetail = !!focusedRow?.closest('#detail');
   const state = computeState();
   renderNodes(state);
   renderEdges();
   renderMetaboliteLists(state);
   renderDetail(state);
   renderVitals(state);
+  syncScenarioDisplay();
   const count = activePerturbations.size;
   const badge = document.getElementById('active-count');
   badge.textContent = count;
   badge.classList.toggle('zero', count === 0);
+  if (rowName) {
+    const target = fromDetail ? document.querySelector('#detail .detail-overview') :
+      [...document.querySelectorAll('#metabolites-aside > div .metabolite-row')].find(el => el.dataset.name === rowName);
+    target?.focus({ preventScroll: true });
+  }
 }
 
 function escapeText(s) {
@@ -4095,18 +4158,22 @@ document.getElementById('pert-summary').addEventListener('click', (e) => {
   // remove an active perturbation via the × pill
   const rm = e.target.closest('[data-rmpert]');
   if (rm) {
+    const restoreFocus = rm === document.activeElement;
     activePerturbations.delete(rm.dataset.rmpert);
     selectedPerturbation = null;
     renderPerturbationList();
     renderAll();
+    if (restoreFocus) document.querySelector('#pert-summary button')?.focus({ preventScroll: true });
     return;
   }
   // "Clear all" button
   if (e.target.id === 'pert-clear-all') {
+    const restoreFocus = e.target === document.activeElement;
     activePerturbations.clear();
     selectedPerturbation = null;
     renderPerturbationList();
     renderAll();
+    if (restoreFocus) document.querySelector('#pert-summary button')?.focus({ preventScroll: true });
     return;
   }
   // empty-state quick chip → toggle that perturbation on
@@ -4184,7 +4251,9 @@ document.querySelector('aside.right').addEventListener('click', (e) => {
   const chev = e.target.closest('.collapse-chev');
   const head = e.target.closest('.sub-header[data-pw]');
   if (chev && head) {
-    head.classList.toggle('collapsed');
+    const expanded = !head.classList.toggle('collapsed');
+    chev.setAttribute('aria-expanded', String(expanded));
+    chev.setAttribute('aria-label', (expanded ? 'Collapse ' : 'Expand ') + head.querySelector('.pathway-focus').textContent);
     return;
   }
   if (head) { openPathway(head.dataset.pw, { shift: e.shiftKey }); return; }
@@ -4202,22 +4271,27 @@ document.querySelector('aside.right').addEventListener('click', (e) => {
   document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
     h.classList.add('collapsed');
     if (h.querySelector('.collapse-chev')) return;
-    const chev = document.createElement('span');
+    const label = h.textContent.trim();
+    const focus = document.createElement('button');
+    focus.type = 'button';
+    focus.className = 'pathway-focus';
+    focus.textContent = label;
+    focus.setAttribute('aria-pressed', 'false');
+    h.textContent = '';
+    h.appendChild(focus);
+    const chev = document.createElement('button');
+    chev.type = 'button';
     chev.className = 'collapse-chev';
+    chev.setAttribute('aria-label', 'Expand ' + label);
+    chev.setAttribute('aria-expanded', 'false');
+    chev.setAttribute('aria-controls', h.nextElementSibling.id);
     chev.title = 'Collapse / expand this group';
     chev.textContent = '▼';
     h.appendChild(chev);
   });
 })();
 
-document.getElementById('reset-btn').addEventListener('click', () => {
-  activePerturbations.clear();
-  selectedMetabolite = null;
-  selectedPerturbation = null;
-  exitDive();
-  renderPerturbationList();
-  renderAll();
-});
+document.getElementById('reset-btn').addEventListener('click', resetSimulation);
 
 // ---- Pathway deep-dive ----
 function enterDive(pw) {
@@ -4226,14 +4300,20 @@ function enterDive(pw) {
   selectedMetabolite = null;
   selectedPerturbation = null;
   document.body.dataset.dive = pw;
-  document.querySelectorAll('.sub-header[data-pw]').forEach(h => h.classList.toggle('dive-active', h.dataset.pw === pw));
+  document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
+    h.classList.toggle('dive-active', h.dataset.pw === pw);
+    h.querySelector('.pathway-focus')?.setAttribute('aria-pressed', String(h.dataset.pw === pw));
+  });
   renderAll();
 }
 function exitDive() {
   if (!selectedPathway) return;
   selectedPathway = null;
   delete document.body.dataset.dive;
-  document.querySelectorAll('.sub-header[data-pw]').forEach(h => h.classList.remove('dive-active'));
+  document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
+    h.classList.remove('dive-active');
+    h.querySelector('.pathway-focus')?.setAttribute('aria-pressed', 'false');
+  });
   renderAll();
 }
 
@@ -4249,7 +4329,7 @@ function openPathway(pw, opts) {
     return;
   }
   enterDive(pw);
-  if (isMobileLayout()) { closePanels(); focusPathway(pw); }
+  if (isMobileLayout()) { closePanels(); focusPathway(pw); document.getElementById('nav-map').focus({ preventScroll: true }); }
 }
 
 // ---- Day / night theme ----
@@ -4266,28 +4346,37 @@ themeBtn.addEventListener('click', () => applyTheme(!document.body.classList.con
 // ===== Metabolic timeline / scenario HUD =====
 // One-click states + a fed→fasted→refed slider; each applies a bundle of
 // perturbations and re-renders, so the flux and vitals morph in real time.
-const SCENARIOS = {
-  fed:        { label: 'Fed', perts: ['insulin', 'lipogenesis'] },
-  overnight:  { label: 'Overnight fast', perts: ['glucagon'] },
-  fasting:    { label: 'Fasting (~24h)', perts: ['glucagon', 'starvation'] },
-  starvation: { label: 'Starvation (3-day)', perts: ['fasting-ketosis', 'glucagon'] },
-  refed:      { label: 'Refed', perts: ['insulin', 'lipogenesis'] },
-  dka:        { label: 'DKA', perts: ['dka'] },
-  exercise:   { label: 'Sprint / exercise', perts: ['exercise'] },
-  alcohol:    { label: 'Alcohol', perts: ['alcohol'] }
-};
-const MT_TIMELINE = ['fed', 'overnight', 'fasting', 'starvation', 'refed'];
+
+function syncScenarioDisplay() {
+  const matches = key => SCENARIOS[key] && SCENARIOS[key].perts.length === activePerturbations.size &&
+    SCENARIOS[key].perts.every(id => activePerturbations.has(id));
+  const key = matches(preferredScenario) ? preferredScenario : Object.keys(SCENARIOS).find(matches);
+  const label = key ? SCENARIOS[key].label : activePerturbations.size ? 'Custom' : 'Baseline';
+  const now = document.getElementById('mt-now');
+  if (now) now.textContent = label;
+  document.querySelectorAll('#metabolic-timeline .mt-chip').forEach(c => c.classList.toggle('active', c.dataset.scenario === key));
+  const slider = document.getElementById('mt-slider');
+  if (slider) {
+    slider.value = Math.max(0, MT_TIMELINE.indexOf(key));
+    slider.setAttribute('aria-valuetext', label);
+  }
+}
+function resetSimulation() {
+  activePerturbations.clear();
+  preferredScenario = null;
+  selectedMetabolite = null;
+  selectedPerturbation = null;
+  exitDive();
+  renderPerturbationList();
+  renderAll();
+}
 function applyScenario(key) {
   const sc = SCENARIOS[key];
   activePerturbations.clear();
+  preferredScenario = sc ? key : null;
   if (sc) for (const id of sc.perts) activePerturbations.add(id);
-  selectedPerturbation = (sc && sc.perts.length) ? sc.perts[0] : null;
+  selectedPerturbation = sc?.perts[0] || null;
   selectedMetabolite = null;
-  const now = document.getElementById('mt-now');
-  if (now) now.textContent = sc ? sc.label : 'Baseline';
-  document.querySelectorAll('#metabolic-timeline .mt-chip').forEach(c => c.classList.toggle('active', c.dataset.scenario === key));
-  const ti = MT_TIMELINE.indexOf(key), slider = document.getElementById('mt-slider');
-  if (ti >= 0 && slider) slider.value = ti;
   renderPerturbationList();
   renderAll();
 }
@@ -4298,12 +4387,7 @@ function applyScenario(key) {
   document.querySelectorAll('#metabolic-timeline .mt-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       if (chip.dataset.scenario === 'reset') {
-        activePerturbations.clear();
-        selectedPerturbation = null;
-        const now = document.getElementById('mt-now'); if (now) now.textContent = 'Baseline';
-        document.querySelectorAll('#metabolic-timeline .mt-chip').forEach(c => c.classList.remove('active'));
-        renderPerturbationList();
-        renderAll();
+        resetSimulation();
         return;
       }
       applyScenario(chip.dataset.scenario);
@@ -4456,8 +4540,8 @@ document.addEventListener('keydown', (e) => {
   if (introOpen() || casesBrowserOpen() || helpOpen() || cmdPaletteOpen() || CaseRunner.state) return;
   if (e.key === 'Escape' && popoverOpen()) { hideNodePopover(); return; }
   if (e.key === 'Escape' && selectedPathway) { exitDive(); return; }
-  if (e.key === '[') { layoutEl.classList.toggle('hide-left'); syncToggleButtons(); }
-  else if (e.key === ']') { layoutEl.classList.toggle('hide-right'); syncToggleButtons(); }
+  if (e.key === '[') { tlBtn.click(); }
+  else if (e.key === ']') { trBtn.click(); }
   else if (e.key === 'f' || e.key === 'F') { focusBtn.click(); }
   else if (e.key === 't' || e.key === 'T') { themeBtn.click(); }
   else if (e.key === 'x' || e.key === 'X') { fluxEnabled = !fluxEnabled; try { localStorage.setItem('biochem-flux', fluxEnabled ? '1' : '0'); } catch (e2) {} renderEdges(); }
@@ -4543,18 +4627,18 @@ function mockChatReply(payload) {
   const u = (payload.message || '').toLowerCase();
   const c = payload.caseData || {};
   if (!u) return 'Tell me what you’re thinking — start with a differential.';
-  if (u.match(/age|how old|year/)) return `Patient is ${c.patient?.age || 'unknown'}.`;
-  if (u.match(/sex|gender|boy|girl/)) return `Sex: ${c.patient?.sex || 'unknown'}.`;
-  if (u.match(/history|past|prior|sibling|family/)) return c.history || 'History unremarkable.';
-  if (u.match(/exam|vital|hr|rr|temp|liver|abdomen/)) return c.exam || 'Exam unremarkable.';
-  if (u.match(/glucose|sugar|hypoglyc/)) {
+  if (u.match(/\b(?:age|how\s+old|years?\s+old)\b/)) return `Patient is ${c.patient?.age || 'unknown'}.`;
+  if (u.match(/\b(?:sex|gender|boy|girl)\b/)) return `Sex: ${c.patient?.sex || 'unknown'}.`;
+  if (u.match(/\b(?:history|past|prior|siblings?|family)\b/)) return c.history || 'History unremarkable.';
+  if (u.match(/\b(?:exam(?:ination)?|vitals?|hr|rr|temp(?:erature)?|liver|abdomen|pulse|blood pressure|heart rate|respiratory rate)\b/)) return c.exam || 'Exam unremarkable.';
+  if (u.match(/\b(?:glucose|sugar|hypoglyc\w*)\b/)) {
     const glucose = (c.labs || []).find(l => /glucose/i.test(l.name));
     return glucose
       ? `${glucose.name}: ${glucose.value} ${glucose.unit || ''}. Continue to labs for the full panel.`
       : 'No glucose result is provided in this case. Continue to labs for the available results.';
   }
-  if (u.match(/lab|cbc|lytes|chem|panel/)) return 'Hit Continue → to see the full lab panel.';
-  if (u.match(/differen|think|suspect|likely/)) return 'Which findings in this case support your differential? Connect them to the affected pathway.';
+  if (u.match(/\b(?:labs?|cbc|lytes|chem(?:istry)?|panels?)\b/)) return 'Hit Continue → to see the full lab panel.';
+  if (u.match(/\b(?:differen\w*|think|suspect\w*|likely)\b/)) return 'Which findings in this case support your differential? Connect them to the affected pathway.';
   return 'Noted. Ask another question or move on to labs when you’re ready.';
 }
 
@@ -4695,6 +4779,7 @@ const CaseRunner = {
       this.state.chatMessages.push({ role: 'assistant', content: caseData.opening });
     }
     this.els.chatMax.textContent = caseData.scoring?.chatMaxTurns || 20;
+    this.els.chatText.value = '';
 
     // Explain form
     this.buildExplainForm();
@@ -4715,8 +4800,9 @@ const CaseRunner = {
   requestClose() {
     if (!this.state) return true;
     if (this.state.phase === 'explain') this.captureExplainAnswers();
-    const finished = this.state.phase === 'summary' && this.state.resultSaved;
-    const hasWork = this.state.phase !== 'chat' || this.state.chatTurns > 0 ||
+    const hasChatDraft = !!this.els.chatText.value.trim();
+    const finished = this.state.phase === 'summary' && this.state.resultSaved && !hasChatDraft;
+    const hasWork = hasChatDraft || this.state.phase !== 'chat' || this.state.chatTurns > 0 ||
       Object.values(this.state.explainAnswers).some(v => v.trim());
     if (!finished && hasWork && !confirm('Close case? Your unfinished attempt will be discarded.')) return false;
     this.close();
@@ -4728,6 +4814,7 @@ const CaseRunner = {
     if (this.state?.timerHandle) clearInterval(this.state.timerHandle);
     this.state?.chatRequest?.abort();
     this.state?.explainRequest?.abort();
+    this.els.chatText.value = '';
     this.els.overlay.classList.remove('open');
     this.els.overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('case-open', 'case-pinpoint');
