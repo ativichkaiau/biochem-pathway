@@ -1651,6 +1651,101 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
 }
 
 </style>
+<style>
+/* Study toolbar: primary navigation stays separate from display and utility tools. */
+header { gap: 16px; padding-inline: 20px; z-index: 50; }
+#intro { z-index: 100; }
+.brand { gap: 9px; flex-shrink: 0; }
+.brand-mark { height: 34px; filter: none; }
+.brand-copy { display: grid; gap: 3px; }
+.brand-copy > span { font-size: 8px; font-weight: 700; letter-spacing: 1.7px; color: var(--text-2); }
+.brand-copy strong { font-size: 17px; letter-spacing: -.4px; white-space: nowrap; }
+.header-actions, .header-btns, .header-utilities { display: flex; align-items: center; gap: 8px; }
+.header-actions { min-width: 0; }
+.header-utilities { border-left: 1px solid var(--border); padding-left: 12px; }
+header .btn, header .mode-toggle { min-height: 40px; padding: 8px 12px; box-shadow: none; border: 1px solid transparent; background: transparent; border-radius: 10px; white-space: nowrap; }
+header .btn:hover, header .mode-toggle:hover { border-color: var(--border); background: var(--panel-2); transform: none; }
+#search-btn { background: var(--panel-2); border-color: var(--border); gap: 10px; }
+#search-btn kbd { color: var(--text-2); font-size: 10px; font-family: inherit; }
+#coenzymes-btn { color: var(--accent); }
+.coenzyme-icon { font-weight: 800; font-size: 11px; letter-spacing: -.5px; }
+#theme-btn { width: 40px; justify-content: center; }
+#theme-btn .lbl { display: none; }
+#language-btn { min-width: 46px; font-weight: 700; }
+#header-more { position: relative; }
+#header-more > summary { display: flex; width: 40px; justify-content: center; list-style: none; font-weight: 700; letter-spacing: 1px; }
+#header-more > summary::-webkit-details-marker { display: none; }
+.header-menu { position: absolute; right: 0; top: calc(100% + 9px); width: 236px; padding: 8px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); box-shadow: var(--clay-card); z-index: 90; }
+.header-menu .btn { width: 100%; min-height: 44px; justify-content: flex-start; gap: 12px; text-align: left; }
+.header-menu .count-badge { margin-left: auto; }
+.header-menu #focus-btn { display: flex; }
+#toggle-right .lbl::after { content: none; }
+#toggle-right .lbl { font-size: 12px; }
+#coenzymes-modal { position: fixed; inset: 0; z-index: 80; display: none; overflow: auto; padding: 28px; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(12px); }
+#coenzymes-modal.open { display: block; }
+.coenzyme-shell { width: min(1040px, 100%); margin: 0 auto; padding: 28px; background: var(--panel); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--clay-card); }
+.coenzyme-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; position: sticky; top: 0; z-index: 2; background: var(--panel); padding-block: 10px; margin-top: -10px; }
+.coenzyme-heading h2 { font-size: clamp(22px, 3vw, 30px); letter-spacing: -.7px; margin: 5px 0 8px; }
+.coenzyme-heading p { color: var(--text-2); line-height: 1.6; }
+.coenzyme-intro { color: var(--text-2); line-height: 1.6; margin-top: 4px; }
+.coenzyme-eyebrow { font-size: 10px; letter-spacing: 1.8px; font-weight: 700; color: var(--accent) !important; }
+#coenzymes-close { min-height: 44px; flex-shrink: 0; }
+.coenzyme-search-label { display: block; margin: 24px 0 8px; color: var(--text-2); font-size: 12px; }
+.case-tools { display: flex; gap: 6px; align-items: flex-start; flex-wrap: wrap; flex-shrink: 0; }
+.case-tools [data-language-toggle] { min-height: 44px; min-width: 44px; font-weight: 700; }
+.intro-language { position: fixed; top: 16px; left: 16px; z-index: 1; min-height: 44px; }
+#coenzyme-search { width: 100%; min-height: 46px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 16px; }
+.coenzyme-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; margin-top: 20px; align-items: start; }
+#coenzyme-list { display: grid; gap: 6px; max-height: 60vh; overflow: auto; padding: 3px; }
+.coenzyme-card { width: 100%; display: grid; gap: 5px; padding: 13px 14px; text-align: left; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 12px; font: inherit; cursor: pointer; }
+.coenzyme-card span { color: var(--text-2); font-size: 11px; }
+.coenzyme-card[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--panel)); }
+#coenzyme-detail { min-width: 0; padding: 8px 0; }
+#coenzyme-detail h3 { font-size: 24px; margin: 4px 0 8px; }
+#coenzyme-detail h4 { margin: 22px 0 8px; font-size: 12px; color: var(--text-2); }
+#coenzyme-detail p { line-height: 1.75; margin: 10px 0; }
+.coenzyme-vitamin { color: var(--accent); font-size: 13px; }
+.coenzyme-step-list { display: grid; gap: 6px; }
+.coenzyme-step { min-height: 44px; display: grid; gap: 4px; padding: 10px 12px; text-align: left; border: 1px solid var(--border); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; cursor: pointer; }
+.coenzyme-step small { color: var(--text-2); overflow-wrap: anywhere; }
+.coenzyme-source { display: inline-block; color: var(--accent); margin-top: 18px; line-height: 1.5; }
+.coenzyme-highlight-btn { min-height: 44px; margin: 10px 0 4px; }
+.edge-group.coenzyme-linked .edge { stroke-width: 4; filter: drop-shadow(0 0 4px var(--purple)); }
+.edge-group.coenzyme-linked .elabel-bg { stroke: var(--purple); stroke-width: 1.6; }
+#coenzyme-map-status { position: fixed; z-index: 26; left: 16px; bottom: 245px; max-width: 300px; padding: 12px; display: grid; gap: 8px; border: 1px solid var(--purple); border-radius: 14px; background: var(--panel); font-size: 12px; }
+#coenzyme-map-status[hidden], body.case-open #coenzyme-map-status { display: none; }
+#clear-coenzyme { min-height: 44px; }
+html[lang="th"] body { font-family: -apple-system, BlinkMacSystemFont, "Noto Sans Thai", "Leelawadee UI", "Thonburi", "Segoe UI", sans-serif; line-height: 1.6; }
+html[lang="th"] :is(h2,h3,h4,.category-header,.pathway-focus,.step-kind,.mt-eyebrow,.case-eyebrow,.case-phase-chip,.coenzyme-eyebrow,.fb-key) { letter-spacing: normal; }
+html[lang="th"] .case-phase-chip { font-size: 11px; }
+summary:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 1100px), (hover: none) and (pointer: coarse) {
+  header { padding-inline: 12px; gap: 8px; }
+  .brand-mark { height: 28px; }
+  .brand-copy strong { font-size: 14px; }
+  .brand-copy > span { font-size: 7px; letter-spacing: 1px; }
+  .header-actions { flex: 0 0 auto; gap: 4px; overflow: visible; }
+  .header-btns, .header-utilities { gap: 4px; }
+  .header-utilities { padding-left: 0; border: 0; }
+  header .btn, header .mode-toggle, #header-more > summary { min-width: 44px; min-height: 44px; padding: 8px; }
+  #theme-btn { width: 44px; }
+  #coenzymes-btn .lbl, #search-btn, #cases-btn, #toggle-left { display: none; }
+  .header-menu #toggle-right { display: flex; }
+  .header-menu #toggle-right .lbl { font-size: 12px; }
+  #coenzymes-modal { padding: 14px; }
+  .coenzyme-shell { padding: 20px; border-radius: 18px; }
+  #coenzyme-map-status { left: 12px; bottom: calc(var(--touch-bottom) + 12px); max-width: calc(100vw - 84px); }
+}
+@media (max-width: 620px) {
+  .coenzyme-layout { grid-template-columns: minmax(0,1fr); gap: 12px; }
+  #coenzyme-list { max-height: 230px; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .coenzyme-card { padding: 11px; overflow-wrap: anywhere; }
+  .coenzyme-heading { gap: 10px; }
+  .coenzyme-heading h2 { font-size: 22px; }
+  .coenzyme-shell { padding: 16px; }
+  .header-menu { width: min(236px, calc(100vw - 24px)); }
+}
+</style>
 </head>
 <body>
 <div id="atmos" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
@@ -1705,6 +1800,7 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
 </div>
 
 <div id="intro">
+  <button class="btn intro-language" data-language-toggle data-no-i18n>EN</button>
   <button class="intro-skip" id="skip-intro">SKIP INTRO</button>
   <div class="intro-card" role="dialog" aria-modal="true" aria-label="Welcome to Biochem Met">
     <div class="intro-eyebrow">
@@ -1858,23 +1954,30 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
 </div>
 
 <header>
-  <div class="brand">
+  <div class="brand" data-no-i18n>
     <div class="brand-mark"><img src="logo.png" alt="VESTRIPPN" class="brand-logo"></div>
-    <div class="vestrippn-wordmark">VESTRIPPN</div>
+    <div class="brand-copy"><span>VESTRIPPN</span><strong>Biochem Met</strong></div>
   </div>
   <div class="header-actions">
     <div class="header-btns">
+      <button class="btn" id="search-btn" aria-label="Search the map and cases"><span aria-hidden="true">⌕</span><span class="lbl">Search</span><kbd>⌘K</kbd></button>
+      <button class="btn" id="coenzymes-btn" aria-label="Explore coenzymes"><span class="coenzyme-icon" aria-hidden="true">CoA</span><span class="lbl">Coenzymes</span></button>
       <button class="btn" id="cases-btn" title="Browse all clinical cases"><span class="ico">📋</span><span class="lbl">Cases</span></button>
-      <button class="btn" id="help-btn" aria-label="Help and navigation tips" title="Help &amp; shortcuts  ( ? )"><span class="ico">?</span><span class="lbl">Help</span></button>
-      <button class="btn toggle-btn" id="toggle-left" title="Show / hide perturbations panel  ( [ )"><span class="ico">◧</span><span class="lbl">Perturbations</span></button>
-      <button class="btn toggle-btn" id="toggle-right" aria-label="Metabolite details" aria-controls="metabolites-aside" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Metabolites</span><span class="ico">◨</span></button>
-      <button class="btn" id="focus-btn" title="Focus mode — hide both panels  ( f )"><span class="ico">⤢</span><span class="lbl">Focus</span></button>
-      <button class="btn" id="reset-btn">Reset <span class="count-badge zero" id="active-count">0</span></button>
+      <button class="btn toggle-btn" id="toggle-left" title="Show / hide perturbations panel  ( [ )"><span class="ico">±</span><span class="lbl">Changes</span></button>
+      <span id="header-details-home"></span><button class="btn toggle-btn" id="toggle-right" aria-label="Metabolite details" aria-controls="metabolites-aside" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Details</span><span class="ico">◨</span></button>
     </div>
-    <div class="branch-identity">Biochem Met</div>
-    <div class="mode-cluster">
-      <span class="mode-label">Mode</span>
+    <div class="header-utilities">
+      <button class="btn" id="language-btn" data-no-i18n aria-label="เปลี่ยนเป็นภาษาไทย">EN</button>
       <button class="mode-toggle" id="theme-btn" aria-label="Switch color theme" title="Toggle day / night mode  ( t )"><span class="ico">☀️</span><span class="lbl">Day</span></button>
+      <details id="header-more">
+        <summary class="btn" aria-label="More tools" title="More tools">•••</summary>
+        <div class="header-menu">
+          <div id="mobile-details-home"></div>
+          <button class="btn" id="help-btn" aria-label="Help and navigation tips"><span aria-hidden="true">?</span><span>Help & shortcuts</span></button>
+          <button class="btn" id="focus-btn" title="Focus mode — hide both panels  ( f )"><span aria-hidden="true">⤢</span><span>Focus map</span></button>
+          <button class="btn" id="reset-btn"><span>Reset simulation</span><span class="count-badge zero" id="active-count">0</span></button>
+        </div>
+      </details>
     </div>
   </div>
 </header>
@@ -1893,6 +1996,7 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
   <div class="cell-select-menu" id="cell-select-menu" role="listbox" aria-label="Cell type"></div>
 </div>
 <div id="cell-note"></div>
+<div id="coenzyme-map-status" hidden><span role="status"></span><button class="btn" id="clear-coenzyme">Clear highlight ✕</button></div>
 <div id="cell-vitals" aria-label="Cell vitals monitor"></div>
 <div id="map-zoom" aria-label="Map zoom">
   <button id="zoom-in" title="Zoom in  ( + )" aria-label="Zoom in">+</button>
@@ -2081,7 +2185,7 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
     </div>
     <div class="help-card-section">
       <h4>Phone &amp; iPad</h4>
-      <p class="help-desc">Use the bottom bar to jump to a pathway, search the map, change conditions, or browse cases. Drag with one finger to pan; pinch or use + / − to zoom. The Details button opens metabolite information. Changes also contains cell vitals and the metabolic-state timeline. Tap Back to map to close a panel.</p>
+      <p class="help-desc">Use the bottom bar to jump to a pathway, search the map, change conditions, or browse cases. Drag with one finger to pan; pinch or use + / − to zoom. Open ••• for Details, Help, Focus, or Reset. Changes also contains cell vitals and the metabolic-state timeline. Tap Back to map to close a panel.</p>
     </div>
     <div class="help-card-section">
       <h4>Keyboard</h4>
@@ -2127,7 +2231,7 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
         <h2 class="case-title" id="case-title">Resolving structure…</h2>
         <div class="case-blurb" id="case-blurb"></div>
       </div>
-      <button class="btn case-close" id="case-close" title="Close case (Esc)">Close ✕</button>
+      <div class="case-tools"><button class="btn" data-language-toggle data-no-i18n>EN</button><button class="btn case-close" id="case-close" title="Close case (Esc)">Close ✕</button></div>
     </div>
 
     <div class="case-strip" id="case-strip">
@@ -2201,7 +2305,23 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
   </div>
 </div>
 
+<div id="coenzymes-modal" aria-hidden="true">
+  <section class="coenzyme-shell" role="dialog" aria-modal="true" aria-labelledby="coenzyme-title">
+    <div class="coenzyme-heading"><div><p class="coenzyme-eyebrow">REACTION COMPANIONS</p><h2 id="coenzyme-title">Coenzymes & cofactors</h2></div><div class="case-tools"><button class="btn" data-language-toggle data-no-i18n>EN</button><button class="btn" id="coenzymes-close">Close ✕</button></div></div>
+    <p class="coenzyme-intro">Connect each carrier to its vitamin, job, and reaction steps.</p>
+    <label class="coenzyme-search-label" for="coenzyme-search">Find a coenzyme, vitamin, or enzyme</label>
+    <input id="coenzyme-search" type="search" placeholder="Try B1, PLP, NADPH, or PDH…" autocomplete="off">
+    <div class="coenzyme-layout"><div id="coenzyme-list" aria-label="Coenzyme list"></div><article id="coenzyme-detail" aria-live="polite"></article></div>
+  </section>
+</div>
 <div id="case-load-status" hidden><span role="status">Loading case…</span><button class="btn" id="case-load-cancel" type="button">Cancel</button></div>
+
+<script src="locales/th.js"></script>
+<script src="locales/th-study.js"></script>
+<script src="locales/th-labs.js"></script>
+<script src="locales/cases-th.js"></script>
+<script src="locales/i18n.js"></script>
+<script src="data/coenzymes.js"></script>
 
 <script>
 
@@ -2247,6 +2367,11 @@ function updateModalAccess(root, allowed = []) {
 }
 function beginModal(root, initialFocus) {
   cancelPendingCaseOpen();
+  const more = document.getElementById('header-more');
+  if (more?.open) {
+    if (more.contains(document.activeElement)) more.querySelector('summary').focus();
+    more.open = false;
+  }
   if (activeModal?.root === root) return;
   if (activeModal) endModal(activeModal.root);
   activeModal = { root, allowed: [], inertBefore: new Map(), returnFocus: document.activeElement };
@@ -3033,8 +3158,8 @@ const P = [
     effects: { 'Isocitrate': 2, 'α-KG': -2, 'Succinyl-CoA': -1, 'Succinate': -1, 'NADPH': -2, 'NADP+': 1 } },
 
   { id: 'b6-deficiency', name: 'Vitamin B6 deficiency', cat: 'Toxin / disease',
-    desc: 'B6 (PLP) is the cofactor for transaminases (ALT, AST), GDH, glycogen phos., and ALA synthase. Causes: isoniazid, alcoholism. → sideroblastic anemia, neuropathy.',
-    inhibits: ['ALT', 'AST', 'GDH', 'ALA synthase'],
+    desc: 'B6 (PLP) is the cofactor for transaminases (ALT, AST), glycogen phos., ALA synthase, and amino-acid decarboxylases. Causes: isoniazid, alcoholism. → sideroblastic anemia, neuropathy.',
+    inhibits: ['ALT', 'AST', 'ALA synthase'],
     effects: { 'Alanine': 1, 'Glutamate': -1, 'Aspartate': -1, 'α-KG': -1, 'δ-ALA': -2, 'PBG': -1, 'Heme': -2, 'Urea': -1 } },
 
   // ---- DIETARY SUGAR DISORDERS ----
@@ -3267,6 +3392,8 @@ const activePerturbations = new Set();
 let selectedMetabolite = null;
 let selectedPerturbation = null;
 let selectedPathway = null;
+let selectedCoenzymeId = null;
+let coenzymeDetailId = 'tpp';
 
 // Conserved cofactor / energy pools — the two members move in opposite
 // directions (a reduced↔oxidised or charged↔discharged couple).
@@ -3490,8 +3617,10 @@ function renderEdges() {
     const fromPw = src.pathway, toPw = tgt.pathway;
     const pwActive = selectedPathway && (fromPw === selectedPathway || toPw === selectedPathway);
     const edgeId = `${edge.e}:${edge.from}->${edge.to}`;
-    const title = rateNote ? `<title>${escapeText(edge.e)} — rate-limiting: ${escapeText(rateNote)}</title>` : '';
-    items.push(`<g class="edge-group${pwActive ? ' pw-active' : ''}" data-from-pw="${fromPw}" data-to-pw="${toPw}" data-edge-id="${escapeAttr(edgeId)}">${title}${edgeParts.join('')}</g>`);
+    const linkedCoenzymes = BIOCHEM_COENZYMES.filter(c => c.enzymes.includes(edge.e));
+    const title = `<title>${escapeText(edge.e)}${rateNote ? ' — rate-limiting: ' + escapeText(rateNote) : ''}${linkedCoenzymes.length ? '\nCoenzymes / โคเอนไซม์: ' + linkedCoenzymes.map(c => escapeText(c.name)).join(', ') : ''}</title>`;
+    const coenzymeLinked = selectedCoenzymeId && BIOCHEM_COENZYMES.find(c => c.id === selectedCoenzymeId)?.enzymes.includes(edge.e);
+    items.push(`<g class="edge-group${pwActive ? ' pw-active' : ''}${coenzymeLinked ? ' coenzyme-linked' : ''}" data-from-pw="${fromPw}" data-to-pw="${toPw}" data-edge-id="${escapeAttr(edgeId)}">${title}${edgeParts.join('')}</g>`);
   }
   g.innerHTML = items.join('');
 }
@@ -4298,7 +4427,7 @@ document.querySelector('aside.right').addEventListener('click', (e) => {
   if (chev && head) {
     const expanded = !head.classList.toggle('collapsed');
     chev.setAttribute('aria-expanded', String(expanded));
-    chev.setAttribute('aria-label', (expanded ? 'Collapse ' : 'Expand ') + head.querySelector('.pathway-focus').textContent);
+    chev.setAttribute('aria-label', (expanded ? 'Collapse ' : 'Expand ') + head.dataset.label);
     return;
   }
   if (head) { openPathway(head.dataset.pw, { shift: e.shiftKey }); return; }
@@ -4317,6 +4446,7 @@ document.querySelector('aside.right').addEventListener('click', (e) => {
     h.classList.add('collapsed');
     if (h.querySelector('.collapse-chev')) return;
     const label = h.textContent.trim();
+    h.dataset.label = label;
     const focus = document.createElement('button');
     focus.type = 'button';
     focus.className = 'pathway-focus';
@@ -4529,6 +4659,8 @@ const touchTools = ['cell-vitals', 'metabolic-timeline'].map(id => {
   return { el, home };
 });
 function placeTouchTools() {
+  const detailsHome = document.getElementById(isMobileLayout() ? 'mobile-details-home' : 'header-details-home');
+  detailsHome.after(trBtn);
   for (const { el, home } of touchTools) {
     if (isMobileLayout()) document.getElementById('perturbations-list').before(el);
     else home.after(el);
@@ -4558,7 +4690,8 @@ function closePanels() {
   syncToggleButtons();
 }
 document.querySelectorAll('[data-close-panel]').forEach(btn => btn.addEventListener('click', () => {
-  const trigger = btn.closest('aside').id === 'perturbations-aside' ? document.getElementById('nav-changes') : trBtn;
+  const trigger = btn.closest('aside').id === 'perturbations-aside' ? document.getElementById('nav-changes') :
+    isMobileLayout() ? document.querySelector('#header-more summary') : trBtn;
   closePanels();
   trigger.focus();
 }));
@@ -4577,6 +4710,7 @@ document.getElementById('nav-cases').addEventListener('click', () => { closePane
 // Both panels start collapsed by default — reflect that on the header buttons.
 syncToggleButtons();
 focusBtn.addEventListener('click', () => {
+  if (isMobileLayout()) { closePanels(); return; }
   const anyShown = !layoutEl.classList.contains('hide-left') || !layoutEl.classList.contains('hide-right');
   layoutEl.classList.toggle('hide-left', anyShown);
   layoutEl.classList.toggle('hide-right', anyShown);
@@ -4587,7 +4721,7 @@ document.addEventListener('keydown', (e) => {
   const tag = (e.target.tagName || '').toLowerCase();
   if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable || e.metaKey || e.ctrlKey || e.altKey) return;
   // Don't let single-key shortcuts leak through any open overlay.
-  if (introOpen() || casesBrowserOpen() || helpOpen() || cmdPaletteOpen() || CaseRunner.state) return;
+  if (introOpen() || casesBrowserOpen() || helpOpen() || cmdPaletteOpen() || coenzymesOpen() || CaseRunner.state) return;
   if (e.key === 'Escape' && popoverOpen()) { hideNodePopover(); return; }
   if (e.key === 'Escape' && selectedPathway) { exitDive(); return; }
   if (e.key === '[') { tlBtn.click(); }
@@ -4651,7 +4785,7 @@ async function requestCaseApi(path, payload, format, signal) {
 
 async function caseApiChat(payload, signal) {
   try {
-    return await requestCaseApi('/api/case/chat', payload, 'text', signal);
+    return await requestCaseApi('/api/case/chat', {...payload, language:I18N.language}, 'text', signal);
   } catch (e) {
     if (signal?.aborted || e.name === 'TimeoutError') throw e;
     return mockChatReply(payload);
@@ -4660,7 +4794,7 @@ async function caseApiChat(payload, signal) {
 
 async function caseApiGrade(payload, signal) {
   try {
-    const fb = await requestCaseApi('/api/case/grade', payload, 'json', signal);
+    const fb = await requestCaseApi('/api/case/grade', {...payload, language:I18N.language}, 'json', signal);
     const keys = Object.keys(payload.caseData.explain.rubric);
     if (!fb || !Number.isFinite(fb._score) || fb._score < 0 || fb._score > 1 ||
         keys.some(k => typeof fb[k]?.correct !== 'boolean' || (fb[k].note != null && typeof fb[k].note !== 'string'))) {
@@ -4677,9 +4811,16 @@ function mockChatReply(payload) {
   const u = (payload.message || '').toLowerCase();
   const c = payload.caseData || {};
   if (!u) return 'Tell me what you’re thinking — start with a differential.';
-  if (u.match(/\b(?:age|how\s+old|years?\s+old)\b/)) return `Patient is ${c.patient?.age || 'unknown'}.`;
-  if (u.match(/\b(?:sex|gender|boy|girl)\b/)) return `Sex: ${c.patient?.sex || 'unknown'}.`;
-  if (u.match(/\b(?:history|past|prior|siblings?|family)\b/)) return c.history || 'History unremarkable.';
+  if (/อายุ|กี่เดือน|กี่ปี/.test(u) || u.match(/\b(?:age|how\s+old|years?\s+old)\b/)) return `Patient is ${c.patient?.age || 'unknown'}.`;
+  if (/เพศ/.test(u) || u.match(/\b(?:sex|gender|boy|girl)\b/)) return `Sex: ${c.patient?.sex || 'unknown'}.`;
+  if (/ประวัติ|ครอบครัว|พี่น้อง/.test(u) || u.match(/\b(?:history|past|prior|siblings?|family)\b/)) return c.history || 'History unremarkable.';
+  if (/น้ำตาล|กลูโคส/.test(u)) {
+    const glucose = (c.labs || []).find(l => /glucose/i.test(l.name));
+    return glucose ? `${glucose.name}: ${glucose.value} ${glucose.unit || ''}. Continue to labs for the full panel.` : 'No glucose result is provided in this case. Continue to labs for the available results.';
+  }
+  if (/ผลเลือด|ผลตรวจ|ห้องปฏิบัติการ/.test(u)) return 'Hit Continue → to see the full lab panel.';
+  if (/ตรวจร่างกาย|สัญญาณชีพ|ชีพจร|หายใจ|ตับ|ท้อง|อุณหภูมิ/.test(u)) return c.exam || 'Exam unremarkable.';
+  if (/วินิจฉัย|สงสัย|คิดว่า/.test(u)) return 'Which findings in this case support your differential? Connect them to the affected pathway.';
   if (u.match(/\b(?:exam(?:ination)?|vitals?|hr|rr|temp(?:erature)?|liver|abdomen|pulse|blood pressure|heart rate|respiratory rate)\b/)) return c.exam || 'Exam unremarkable.';
   if (u.match(/\b(?:glucose|sugar|hypoglyc\w*)\b/)) {
     const glucose = (c.labs || []).find(l => /glucose/i.test(l.name));
@@ -4697,20 +4838,22 @@ function hasAffirmativeKeyword(answer, keyword) {
   const text = answer.toLowerCase().replace(/’/g, "'");
   const term = keyword.toLowerCase().trim().replace(/’/g, "'");
   if (!term) return false;
-  const word = c => !!c && /[\p{L}\p{N}]/u.test(c);
+  const word = c => !!c && /[a-z0-9]/i.test(c);
   for (let i = text.indexOf(term); i !== -1; i = text.indexOf(term, i + term.length)) {
     if ((word(term[0]) && word(text[i - 1])) || (word(term.at(-1)) && word(text[i + term.length]))) continue;
-    const before = text.slice(0, i).split(/[.!?;,\n]|\b(?:but|however|instead|rather)\b/u).pop().replace(/\bnot only\b/g, '');
+    const before = text.slice(0, i).split(/[.!?;,\n]|\b(?:but|however|instead|rather)\b|แต่|อย่างไรก็ตาม/u).pop().replace(/\bnot only\b/g, '');
     const denied = /\b(?:no|not|never|without|neither|nor|denies|denied|exclude[ds]?|ruled? out|isn't|wasn't|doesn't|can't|cannot)\b/.test(before);
     const after = text.slice(i + term.length);
     const rejected = /^\s*(?:(?:is|was|seems?)\s+)?(?:not|isn't|wasn't|unlikely|excluded|ruled out)\b/.test(after);
-    if (!denied && !rejected) return true;
+    const thaiDenied = /ไม่ใช่|ไม่ได้เป็น|ไม่เป็น|ไม่มี|ไม่พบ|ไม่น่าเป็น|ตัดออก/.test(before) || /^\s*(?:ไม่ใช่|ไม่น่าใช่|ถูกตัดออก)/.test(after);
+    if (!denied && !rejected && !thaiDenied) return true;
   }
   return false;
 }
 
 function mockGrade(payload) {
   const c = payload.caseData;
+  const thai = Object.values(BIOCHEM_CASES_TH).find(item => item.id === c.id)?.grade || {};
   const ans = payload.answers || {};
   const out = {};
   for (const k of Object.keys(c.explain.rubric)) {
@@ -4718,10 +4861,10 @@ function mockGrade(payload) {
     const a = (ans[k] || '').toLowerCase().trim();
     let correct = false, note = '';
     if (r.accepts) {
-      correct = r.accepts.some(s => hasAffirmativeKeyword(a, s));
+      correct = [...r.accepts, ...(thai[k] || [])].some(s => hasAffirmativeKeyword(a, s));
       if (!correct) note = `Expected something like: ${r.accepts.slice(0, 2).join(' / ')}.`;
     } else if (r.mustMention) {
-      const hits = r.mustMention.filter(s => a.includes(s.toLowerCase())).length;
+      const hits = r.mustMention.filter(s => [s, ...(thai.terms?.[s] || [])].some(term => a.includes(term.toLowerCase()))).length;
       correct = hits >= (r.minHits || r.mustMention.length);
       if (!correct) note = `Mention at least ${r.minHits || r.mustMention.length} of: ${r.mustMention.join(', ')}.`;
     }
@@ -4790,7 +4933,7 @@ const CaseRunner = {
       caseData = await res.json();
     } catch (e) {
       if (requestId !== this.openRequestId || pendingCaseOpen !== request) return;
-      alert(request.controller.signal.reason?.name === 'TimeoutError' ? 'Case loading timed out. Please select the case again to retry.' : `No case available.\n(Tried /cases/${file}.json)`);
+      alert(I18N.t(request.controller.signal.reason?.name === 'TimeoutError' ? 'Case loading timed out. Please select the case again to retry.' : 'No case available. Please try again.'));
       return;
     } finally {
       clearTimeout(timer);
@@ -4805,6 +4948,10 @@ const CaseRunner = {
 
   init(caseData, file) {
     if (this.state) this.close();
+    const thai = BIOCHEM_CASES_TH[file] || Object.values(BIOCHEM_CASES_TH).find(item => item.id === caseData.id);
+    I18N.register(caseData, thai);
+    caseData.mcqs.forEach((q, i) => I18N.register(q.explanation || q.expl, thai?.mcqs[i]?.explanation));
+    for (const [en, th] of Object.entries(thai?.labText || {})) I18N.register(en, th);
     const now = Date.now();
     this.state = {
       caseData,
@@ -4872,7 +5019,7 @@ const CaseRunner = {
     const finished = this.state.phase === 'summary' && this.state.resultSaved && !hasChatDraft;
     const hasWork = hasChatDraft || this.state.phase !== 'chat' || this.state.chatTurns > 0 ||
       Object.values(this.state.explainAnswers).some(v => v.trim());
-    if (!finished && hasWork && !confirm('Close case? Your unfinished attempt will be discarded.')) return false;
+    if (!finished && hasWork && !confirm(I18N.t('Close case? Your unfinished attempt will be discarded.'))) return false;
     this.close();
     return true;
   },
@@ -4987,6 +5134,7 @@ const CaseRunner = {
     for (const m of this.state.chatMessages) {
       const div = document.createElement('div');
       div.className = `chat-msg ${m.role}`;
+      if (m.role === 'user') div.dataset.userContent = '';
       div.textContent = m.content;
       log.appendChild(div);
     }
@@ -5031,15 +5179,16 @@ const CaseRunner = {
       const reply = await caseApiChat(session.chatRetry, controller.signal);
       if (this.state !== session) return;
       if (!REDUCED_MOTION) {
+        const displayReply = I18N.t(reply);
         await new Promise(resolve => {
           let i = 0;
-          const chunk = Math.max(1, Math.ceil(reply.length / 60));
+          const chunk = Math.max(1, Math.ceil(displayReply.length / 60));
           const step = () => {
             if (this.state !== session) { resolve(); return; }
             i += chunk;
-            placeholder.textContent = reply.slice(0, i);
+            placeholder.textContent = displayReply.slice(0, i);
             this.els.chatLog.scrollTop = this.els.chatLog.scrollHeight;
-            if (i < reply.length) requestAnimationFrame(() => setTimeout(step, 18));
+            if (i < displayReply.length) requestAnimationFrame(() => setTimeout(step, 18));
             else resolve();
           };
           step();
@@ -5064,7 +5213,7 @@ const CaseRunner = {
     const rows = labs.map(l => `
       <tr class="flag-${l.flag}">
         <td>${escapeText(l.name)}</td>
-        <td class="lab-val">${escapeText(String(l.value))} ${escapeText(l.unit || '')}</td>
+        <td class="lab-val"><span>${escapeText(String(l.value))}</span> <span data-no-i18n>${escapeText(l.unit || '')}</span></td>
         <td class="lab-ref">${escapeText(l.ref || '')}</td>
         <td><span class="lab-pill">${escapeText((l.flag || 'normal').toUpperCase())}</span></td>
       </tr>
@@ -5132,7 +5281,7 @@ const CaseRunner = {
     const revision = session.explainRevision || 0;
     const ans = Object.fromEntries(Object.entries(session.explainAnswers).map(([k, v]) => [k, v.trim()]));
     if (!Object.values(ans).some(Boolean)) {
-      alert('Fill at least one field.');
+      alert(I18N.t('Fill at least one field.'));
       return;
     }
     const controller = session.explainRequest = new AbortController();
@@ -5169,7 +5318,7 @@ const CaseRunner = {
       const note = r.note ? `<span class="fb-note">${escapeText(r.note)}</span>` : '';
       return `<div class="feedback-row ${cls}">
         <span class="fb-key">${escapeText(k)}</span>
-        <span class="fb-val"><strong>${escapeText(this.state.explainAnswers[k] || '—')}</strong>${note}</span>
+        <span class="fb-val"><strong data-user-content>${escapeText(this.state.explainAnswers[k] || '—')}</strong>${note}</span>
         <span class="fb-mark">${mark}</span>
       </div>`;
     }).join('');
@@ -5289,7 +5438,7 @@ const CaseRunner = {
     if (ans) {
       this.els.nextBtn.disabled = false;
       this.els.mcqExplain.hidden = false;
-      this.els.mcqExplain.textContent = q.explanation;
+      this.els.mcqExplain.textContent = q.explanation || q.expl || '';
       this.els.nextBtn.textContent = this.state.mcqIdx === total - 1 ? 'Show summary →' : 'Next question →';
     } else {
       this.els.mcqExplain.hidden = true;
@@ -5385,6 +5534,8 @@ const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (pendingCaseOpen) { e.preventDefault(); e.stopPropagation(); cancelPendingCaseOpen(true); return; }
+  if (coenzymesOpen()) { e.preventDefault(); e.stopPropagation(); closeCoenzymes(); return; }
+  if (document.getElementById('header-more').open && !activeModal) { e.preventDefault(); e.stopPropagation(); document.getElementById('header-more').open = false; document.querySelector('#header-more summary').focus(); return; }
   if (cmdPaletteOpen())   { e.preventDefault(); e.stopPropagation(); closeCmdPalette(); return; }
   if (helpOpen())         { e.preventDefault(); e.stopPropagation(); closeHelp(); return; }
   if (casesBrowserOpen()) { e.preventDefault(); e.stopPropagation(); closeCasesBrowser(); return; }
@@ -5410,16 +5561,19 @@ function buildCmdIndex() {
       type: 'case', pw: c.pathway,
       label: c.title,
       sub: `Case · ${info?.label || c.pathway}`,
-      keywords: (c.title + ' ' + c.blurb + ' ' + (info?.label || c.pathway) + ' case').toLowerCase(),
+      keywords: (c.title + ' ' + c.blurb + ' ' + (info?.label || c.pathway) + ' ' + I18N.thai(c.title) + ' ' + I18N.thai(c.blurb) + ' case กรณีศึกษา').toLowerCase(),
       action: () => CaseRunner.open(file)
     });
+  }
+  for (const c of BIOCHEM_COENZYMES) {
+    items.push({type:'coenzyme', label:c.name, sub:c.vitamin, ico:'◇', keywords:[c.name,c.fullName,I18N.thai(c.fullName),c.vitamin,c.role,...c.aliases,...c.enzymes,I18N.thai(c.name),I18N.thai(c.vitamin),I18N.thai(c.role)].join(' ').toLowerCase(), action:() => openCoenzymes(c.id)});
   }
   for (const [key, info] of Object.entries(PATHWAY_INFO)) {
     items.push({
       type: 'pathway', pw: key,
       label: info.label,
       sub: `Pathway · ${info.short || ''}`,
-      keywords: (info.label + ' ' + (info.short || '') + ' ' + (info.desc || '') + ' pathway focus dive').toLowerCase(),
+      keywords: (info.label + ' ' + (info.short || '') + ' ' + (info.desc || '') + ' ' + I18N.thai(info.label) + ' ' + I18N.thai(info.desc) + ' pathway วิถี').toLowerCase(),
       action: () => { enterDive(key); focusPathway(key); }
     });
   }
@@ -5429,7 +5583,7 @@ function buildCmdIndex() {
       type: 'metabolite', pw: m.pathway,
       label: name,
       sub: `Metabolite · ${pwLabel}`,
-      keywords: (name + ' ' + (m.info || '') + ' ' + pwLabel + ' metabolite').toLowerCase(),
+      keywords: (name + ' ' + (m.info || '') + ' ' + pwLabel + ' ' + I18N.thai(m.info || '') + ' metabolite เมแทบอไลต์').toLowerCase(),
       action: () => {
         if (selectedPathway) exitDive();
         selectedMetabolite = name;
@@ -5444,7 +5598,7 @@ function buildCmdIndex() {
       type: 'perturbation', ico: '⚡',
       label: p.name,
       sub: `Toggle · ${p.cat}`,
-      keywords: (p.name + ' ' + (p.desc || '') + ' ' + (p.cat || '') + ' ' + (p.inhibits || []).join(' ') + ' ' + (p.activates || []).join(' ') + ' perturbation drug condition').toLowerCase(),
+      keywords: (p.name + ' ' + (p.desc || '') + ' ' + (p.cat || '') + ' ' + I18N.thai(p.name) + ' ' + I18N.thai(p.desc || '') + ' ' + (p.inhibits || []).join(' ') + ' ' + (p.activates || []).join(' ') + ' perturbation drug condition').toLowerCase(),
       action: () => {
         if (activePerturbations.has(p.id)) activePerturbations.delete(p.id);
         else activePerturbations.add(p.id);
@@ -5572,19 +5726,20 @@ if (mapMain) {
   mapMain.addEventListener('touchcancel', resetPinch, { passive: true });
 }
 
+function normalizeStudySearch(value) { return String(value).normalize('NFKC').toLowerCase().trim(); }
 function renderCmdResults(q) {
-  const norm = q.toLowerCase().trim();
+  const norm = normalizeStudySearch(q);
   if (!norm) {
     // Pathway navigation lists every pathway without requiring a typed query.
     cmdResults = cmdIndex.filter(x => x.type === cmdDefaultType);
   } else {
-    cmdResults = cmdIndex.filter(x => x.keywords.includes(norm));
+    cmdResults = cmdIndex.filter(x => normalizeStudySearch(x.keywords).includes(norm));
     cmdResults.sort((a, b) => {
       const aL = a.label.toLowerCase(), bL = b.label.toLowerCase();
       const ax = aL === norm ? 0 : (aL.startsWith(norm) ? 1 : 2);
       const bx = bL === norm ? 0 : (bL.startsWith(norm) ? 1 : 2);
       if (ax !== bx) return ax - bx;
-      const tp = { case: 0, pathway: 1, perturbation: 2, metabolite: 3 };
+      const tp = { case: 0, coenzyme: 1, pathway: 2, perturbation: 3, metabolite: 4 };
       return (tp[a.type] ?? 9) - (tp[b.type] ?? 9);
     });
     cmdResults = cmdResults.slice(0, 60);
@@ -5592,9 +5747,9 @@ function renderCmdResults(q) {
   cmdActiveIdx = 0;
   const grouped = {};
   for (const r of cmdResults) (grouped[r.type] = grouped[r.type] || []).push(r);
-  const order = ['case', 'pathway', 'perturbation', 'metabolite'];
+  const order = ['case', 'coenzyme', 'pathway', 'perturbation', 'metabolite'];
   cmdResults = order.flatMap(type => grouped[type] || []);
-  const groupLabels = { case: 'Cases', pathway: 'Pathways · click to focus', perturbation: 'Perturbations · click to toggle', metabolite: 'Metabolites' };
+  const groupLabels = { case: 'Cases', coenzyme: 'Coenzymes', pathway: 'Pathways · click to focus', perturbation: 'Perturbations · click to toggle', metabolite: 'Metabolites' };
   const html = [];
   let globalIdx = 0;
   for (const type of order) {
@@ -5651,7 +5806,7 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     if (cmdPaletteOpen()) { closeCmdPalette(); return; }
     // Don't stack the palette on top of another modal / the intro / a case.
-    if (introOpen() || casesBrowserOpen() || helpOpen() || CaseRunner.state) return;
+    if (introOpen() || casesBrowserOpen() || helpOpen() || coenzymesOpen() || CaseRunner.state) return;
     openCmdPalette();
   }
 }, true);
@@ -5877,6 +6032,88 @@ document.getElementById('cases-browser').addEventListener('click', (e) => {
     h.appendChild(btn);
   });
 })();
+// Coenzyme explorer. Chemical identifiers are never translated or used as scores.
+function coenzymesOpen() { return document.getElementById('coenzymes-modal').classList.contains('open'); }
+function coenzymeEdges(id) {
+  const item = BIOCHEM_COENZYMES.find(c => c.id === id);
+  return item ? E.filter(edge => item.enzymes.includes(edge.e)) : [];
+}
+function renderCoenzymes() {
+  const query = normalizeStudySearch(document.getElementById('coenzyme-search').value);
+  const focused = document.activeElement?.dataset.coenzyme;
+  const items = BIOCHEM_COENZYMES.filter(c => normalizeStudySearch([c.name,c.fullName,c.vitamin,c.role,c.clinical,...c.aliases,...c.enzymes].filter(Boolean).flatMap(s => [s,I18N.thai(s)]).join(' ')).includes(query));
+  document.getElementById('coenzyme-list').innerHTML = items.length ? items.map(c => `<button class="coenzyme-card" type="button" data-coenzyme="${c.id}" aria-pressed="${c.id === coenzymeDetailId}"><strong>${escapeText(c.name)}</strong><span>${escapeText(c.vitamin)}</span></button>`).join('') : '<p role="status">No coenzymes match this search.</p>';
+  const c = BIOCHEM_COENZYMES.find(c => c.id === coenzymeDetailId);
+  const edges = coenzymeEdges(c.id);
+  document.getElementById('coenzyme-detail').innerHTML = `<div class="coenzyme-eyebrow">${escapeText(c.family)}</div><h3>${escapeText(c.name)}</h3><p>${escapeText(c.fullName)}</p><div class="coenzyme-vitamin">${escapeText(c.vitamin)}</div><h4>What it carries / does</h4><p>${escapeText(c.role)}</p><h4>Study connection</h4><p>${escapeText(c.clinical)}</p><button class="btn btn-primary coenzyme-highlight-btn" data-highlight-coenzyme="${c.id}">Highlight linked reactions</button><h4>Linked steps on this map</h4><div class="coenzyme-step-list">${edges.map(edge => `<button type="button" class="coenzyme-step" data-coenzyme-edge="${escapeAttr(`${edge.e}:${edge.from}->${edge.to}`)}"><strong>${escapeText(edge.e)}</strong><small>${escapeText(edge.from)} → ${escapeText(edge.to)}</small></button>`).join('')}</div><a class="coenzyme-source" href="${escapeAttr(c.source)}" target="_blank" rel="noopener noreferrer">Reference ↗</a>`;
+  if (focused) [...document.querySelectorAll('[data-coenzyme]')].find(el => el.dataset.coenzyme === focused)?.focus({preventScroll:true});
+  I18N.apply(document.getElementById('coenzymes-modal'));
+}
+function openCoenzymes(id) {
+  hideNodePopover();
+  if (id) coenzymeDetailId = id;
+  document.getElementById('coenzyme-search').value = '';
+  renderCoenzymes();
+  const root = document.getElementById('coenzymes-modal');
+  root.classList.add('open'); root.setAttribute('aria-hidden','false');
+  beginModal(root, '#coenzyme-search');
+}
+function closeCoenzymes() {
+  const root = document.getElementById('coenzymes-modal');
+  root.classList.remove('open'); root.setAttribute('aria-hidden','true');
+  endModal(root);
+}
+function highlightCoenzyme(id, edgeId) {
+  closeCoenzymes();
+  if (selectedPathway) exitDive();
+  selectedCoenzymeId = id;
+  renderAll();
+  const status = document.getElementById('coenzyme-map-status');
+  status.hidden = false;
+  status.querySelector('span').textContent = BIOCHEM_COENZYMES.find(c => c.id === id).name + ' · Linked reactions highlighted';
+  if (edgeId) {
+    const edge = E.find(e => `${e.e}:${e.from}->${e.to}` === edgeId);
+    if (edge) { if (mapZoom < .72) applyZoom(.95); scrollMapTo((M[edge.from].x + M[edge.to].x)/2, (M[edge.from].y + M[edge.to].y)/2); }
+  } else zoomFit();
+}
+document.getElementById('coenzymes-btn').addEventListener('click', () => openCoenzymes());
+document.getElementById('coenzymes-close').addEventListener('click', closeCoenzymes);
+document.getElementById('coenzymes-modal').addEventListener('click', e => { if (e.target.id === 'coenzymes-modal') closeCoenzymes(); });
+document.getElementById('coenzyme-search').addEventListener('input', renderCoenzymes);
+document.getElementById('coenzyme-list').addEventListener('click', e => { const card = e.target.closest('[data-coenzyme]'); if (card) { coenzymeDetailId = card.dataset.coenzyme; renderCoenzymes(); } });
+document.getElementById('coenzyme-detail').addEventListener('click', e => {
+  const highlight = e.target.closest('[data-highlight-coenzyme]');
+  const step = e.target.closest('[data-coenzyme-edge]');
+  if (highlight || step) highlightCoenzyme(coenzymeDetailId, step?.dataset.coenzymeEdge);
+});
+document.getElementById('clear-coenzyme').addEventListener('click', () => { selectedCoenzymeId = null; document.getElementById('coenzyme-map-status').hidden = true; renderEdges(); document.getElementById('coenzymes-btn').focus(); });
+document.getElementById('search-btn').addEventListener('click', () => openCmdPalette());
+document.addEventListener('click', e => { if (!e.target.closest('#header-more')) document.getElementById('header-more').open = false; });
+document.querySelector('.header-menu').addEventListener('click', e => {
+  if (!e.target.closest('button')) return;
+  document.getElementById('header-more').open = false;
+  if (!activeModal) document.querySelector('#header-more summary').focus();
+});
+for (const item of Object.values(BIOCHEM_CASES_TH)) for (const [en, th] of Object.entries(item.labText || {})) I18N.register(en, th);
+for (const item of CASES_INDEX) {
+  const th = BIOCHEM_CASES_TH[item.file];
+  if (th) { I18N.register(item.title, th.title); I18N.register(item.blurb, th.blurb); }
+}
+for (const [name, info] of Object.entries(BIOCHEM_STUDY_TH.metabolites)) I18N.register(M[name]?.info, info);
+for (const [id, fields] of Object.entries(BIOCHEM_STUDY_TH.perturbations)) I18N.register(P.find(p => p.id === id), fields);
+for (const [id, fields] of Object.entries(BIOCHEM_STUDY_TH.pathways)) {
+  I18N.register(PATHWAY_INFO[id], fields);
+  I18N.register(PATHWAY_INFO[id].label.toUpperCase(), fields.label);
+}
+for (const [id, fields] of Object.entries(BIOCHEM_STUDY_TH.coenzymes)) I18N.register(BIOCHEM_COENZYMES.find(c => c.id === id), fields);
+for (const [id, note] of Object.entries(BIOCHEM_STUDY_TH.cells)) I18N.register(CELL_TYPES.find(c => c.id === id)?.note, note);
+document.addEventListener('languagechange', () => {
+  cmdIndex = null;
+  if (cmdPaletteOpen()) { cmdIndex = buildCmdIndex(); renderCmdResults(document.getElementById('cmd-input').value); }
+  if (coenzymesOpen()) renderCoenzymes();
+});
+I18N.start();
+
 beginModal(document.getElementById('intro'), '#skip-intro');
 </script>
 </body>

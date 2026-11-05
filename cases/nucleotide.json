@@ -62,7 +62,7 @@
         "Hyperuricosuria"
       ],
       "correct": 0,
-      "explanation": "Allopurinol (and rasburicase) lowers uric acid by blocking xanthine oxidase — it prevents the gout, stones, and nephropathy. The CNS phenotype (self-mutilation, dystonia, intellectual disability) is uric-acid-independent and unfortunately is NOT reversed by uric-acid lowering."
+      "explanation": "Allopurinol lowers uric acid by inhibiting xanthine oxidase; rasburicase instead enzymatically degrades uric acid to allantoin. Uric-acid lowering helps prevent gout, stones and urate nephropathy. The CNS phenotype (self-injury, dystonia and intellectual disability) is not reversed by lowering uric acid."
     },
     {
       "stem": "Why is the disorder X-linked, with affected males and a maternal uncle's similar history?",

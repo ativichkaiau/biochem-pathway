@@ -44,7 +44,7 @@
   },
   "mcqs": [
     {
-      "stem": "Why are red blood cells uniquely vulnerable to G6PD deficiency compared to other tissues?",
+      "stem": "Which age-related property makes older red cells especially vulnerable during a G6PD-deficient hemolytic episode?",
       "choices": [
         "RBCs lack mitochondria, so the PPP is their ONLY source of NADPH — and NADPH is required to keep glutathione reduced",
         "RBCs do not express catalase",
@@ -52,7 +52,7 @@
         "RBCs cannot synthesize new G6PD protein"
       ],
       "correct": 3,
-      "explanation": "All true to some extent, but the deepest reason is choice D combined with all the others: mature RBCs are anucleate and CANNOT replace the G6PD enzyme as it ages and loses activity. Variant enzymes (e.g., G6PD A-) are unstable; old RBCs lose all activity. Plus no mitochondrial NADPH backup. Young reticulocytes have enough enzyme; older RBCs hemolyze."
+      "explanation": "Mature red cells cannot synthesize replacement G6PD. As unstable variant enzyme loses activity with cell age, older cells become more vulnerable than reticulocytes. The dependence on PPP-derived NADPH is also important, but does not by itself explain this age pattern. Red cells do express catalase."
     },
     {
       "stem": "Which classes of drugs / exposures are highest-risk for triggering hemolysis?",

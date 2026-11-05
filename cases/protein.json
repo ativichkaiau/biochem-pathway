@@ -38,7 +38,7 @@
   "pinpoint": {
     "prompt": "BCKDH belongs to the family of α-keto-acid dehydrogenases that also includes PDH. Click the TCA-cycle cousin that catalyzes the SAME reaction motif (α-keto acid + CoA → CoA-thioester + CO₂ + NADH).",
     "target": { "type": "edge", "edgeId": "α-KGDH:α-KG->Succinyl-CoA" },
-    "correctMsg": "Yes — α-KGDH. PDH, α-KGDH, and BCKDH are sister enzymes (same E1 / E2 / E3 architecture, all use TPP / lipoate / FAD / NAD / CoA). BCKDH is missing in MSUD, but the SAME motif is preserved at PDH and α-KGDH. That's also why arsenite, dichloroacetate, and certain lipoate disorders hit all three.",
+    "correctMsg": "Yes — α-KGDH. PDH, α-KGDH, and BCKDH are sister enzymes (same E1 / E2 / E3 architecture, all use TPP / lipoate / FAD / NAD / CoA). BCKDH is missing in MSUD, but the SAME motif is preserved at PDH and α-KGDH. Their shared cofactor requirements explain why arsenite and some lipoate disorders can affect several of these complexes. Dichloroacetate instead activates PDH by inhibiting PDH kinase; it is not a shared inhibitor of all three.",
     "wrongMsg":   "Not quite. Look in the TCA cycle for the other α-keto-acid dehydrogenase (the one that turns a 5-carbon α-keto acid into a 4-carbon CoA-thioester).",
     "revealMsg":  "Target: α-KGDH (α-KG → Succinyl-CoA). PDH (pyruvate → acetyl-CoA) is the other cousin. All three share the E1-E2-E3 subunit family, use thiamine + lipoate, and are coordinately regulated."
   },
