@@ -955,10 +955,10 @@ body.light #case-overlay {
               radial-gradient(120% 120% at 96% 96%, color-mix(in srgb, var(--purple) 12%, transparent), transparent 55%),
               linear-gradient(180deg, rgba(243,246,251,0.86), rgba(228,234,243,0.96));
 }
-#case-overlay.open { display: grid; place-items: start center; }
+#case-overlay.open { display: grid; grid-template-columns: minmax(0, 1fr); place-items: start center; }
 
 .case-shell {
-  width: min(960px, 100%); margin: 0 auto;
+  width: min(960px, 100%); min-width: 0; margin: 0 auto;
   background: var(--clay-surface);
   border: none; border-radius: 32px;
   box-shadow: var(--clay-card);
@@ -1014,7 +1014,7 @@ body.light #case-overlay {
 .chat-hint { font-size: 11px; color: var(--text-2); margin-top: 10px; font-style: italic; }
 
 /* Labs */
-.labs-wrap { border: 1px solid var(--glass-brd); border-radius: 12px; overflow: hidden; background: var(--glass-2); }
+.labs-wrap { overflow-x: auto; border: 1px solid var(--glass-brd); border-radius: 12px; background: var(--glass-2); }
 .labs-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .labs-table th, .labs-table td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--glass-brd); }
 .labs-table tr:last-child td { border-bottom: none; }
@@ -1067,6 +1067,9 @@ body.light #case-overlay {
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   font-size: 12.5px; line-height: 1.55; color: var(--text);
 }
+
+.request-error { margin: 12px 0; color: var(--text-2); font-size: 13px; line-height: 1.5; }
+.request-error .btn { min-height: 44px; margin-top: 6px; }
 
 /* Summary */
 .score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
@@ -1600,7 +1603,8 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
   .cases-close, .case-close { min-height: 44px; }
   .case-strip { overflow-x: auto; justify-content: flex-start; }
   .case-phase-chip { flex-shrink: 0; }
-  .case-footer { position: sticky; bottom: 0; background: var(--panel); padding: 12px 16px; gap: 8px; }
+  .case-header > div, .case-body, .explain-field { min-width: 0; }
+  .case-footer { flex-wrap: wrap; position: sticky; bottom: 0; background: var(--panel); padding: 12px 16px; gap: 8px; }
   .case-footer .btn { min-height: 44px; }
   #intro { overflow-y: auto; }
   .intro-card { margin-top: 34px; }
@@ -2107,6 +2111,7 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
           <input type="text" class="chat-text" id="case-chat-text" placeholder="Ask history, exam, vitals, or share your differential…" />
           <button type="submit" class="btn btn-primary" id="case-chat-send">Send</button>
         </form>
+        <div class="request-error" id="case-chat-error" role="status" hidden><span></span> <button class="btn" id="case-chat-retry" type="button">Retry reply</button></div>
         <div class="chat-hint">Tip: when you’re ready, hit <em>Continue →</em> to see the labs.</div>
       </section>
 
@@ -2120,6 +2125,7 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--a
         <h3 class="pane-title">Explain your read</h3>
         <p class="pane-sub">Three short answers. Be specific — single words / short phrases.</p>
         <form class="explain-grid" id="case-explain-form"></form>
+        <div class="request-error" id="case-explain-error" role="status" hidden></div>
         <div class="feedback-card" id="case-feedback-card" hidden></div>
       </section>
 
@@ -4179,12 +4185,13 @@ function exitDive() {
 
 // Click-on-pathway dispatcher.
 //   plain click  →  deep-dive (focus + pathway detail card)
-//   shift+click  →  open the case (when /cases/<pw>.json exists)
+//   shift+click  →  open the first registered case for this pathway
 // Callers pass { shift: e.shiftKey } when forwarding the event.
 function openPathway(pw, opts) {
   opts = opts || {};
-  if (opts.shift && typeof AVAILABLE_CASES !== 'undefined' && AVAILABLE_CASES.includes(pw)) {
-    CaseRunner.open(pw);
+  const primaryCase = opts.shift && CASES_INDEX.find(c => c.pathway === pw);
+  if (primaryCase) {
+    CaseRunner.open(primaryCase.file);
     return;
   }
   enterDive(pw);
@@ -4417,9 +4424,7 @@ document.addEventListener('keydown', (e) => {
 // caseMode === 'pinpoint'.
 // ------------------------------------------------------------
 
-// Which pathways have a case JSON shipped today. Add to this list
-// when a new /cases/<pathway>.json drops.
-const AVAILABLE_CASES = ['glycolysis', 'sugar', 'tca', 'etc', 'heme', 'urea', 'onecarbon', 'fa-ketones', 'nucleotide', 'catechol', 'sterol', 'protein', 'ethanol', 'glycogen-ppp', 'creatine', 'sphingo', 'bilirubin', 'polyol', 'glutathione', 'eicosanoid', 'tryptophan', 'tyrosine'];
+// Pathway case availability is derived from CASES_INDEX below.
 
 // Mode flag read by the pathway-svg click handler. null | 'pinpoint'.
 let caseMode = null;
@@ -4427,44 +4432,54 @@ let caseMode = null;
 // Whether reduced motion is preferred — kills streaming + caret.
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// ---------------- Mock backend (replace with Carlos's endpoints) ----------------
-// Frontend always tries POST first; falls back to canned reply on 4xx/5xx/network.
-async function caseApiChat(payload) {
+// ---------------- Case requests and static fallback ----------------
+// Keep the existing offline teaching fallback, but surface timeouts for retry.
+const CASE_REQUEST_TIMEOUT_MS = 15000;
+async function requestCaseApi(path, payload, format, signal) {
+  const controller = new AbortController();
+  const abort = () => controller.abort(signal.reason);
+  if (signal?.aborted) abort();
+  else signal?.addEventListener('abort', abort, { once: true });
+  const timer = setTimeout(() => controller.abort(new DOMException('Request timed out.', 'TimeoutError')), CASE_REQUEST_TIMEOUT_MS);
   try {
-    const res = await fetch('/api/case/chat', {
+    const res = await fetch(path, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
     if (!res.ok) throw new Error('fallback');
-    if (res.body && res.body.getReader) {
-      // Stream-style backend: collect into a string here, the renderer fakes streaming locally too.
-      const reader = res.body.getReader();
-      const dec = new TextDecoder();
-      let out = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        out += dec.decode(value, { stream: true });
-      }
-      return out;
-    }
-    return await res.text();
+    // The timeout also covers reading a stalled response body.
+    return await (format === 'json' ? res.json() : res.text());
   } catch (e) {
+    if (controller.signal.aborted) throw controller.signal.reason;
+    throw e;
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', abort);
+  }
+}
+
+async function caseApiChat(payload, signal) {
+  try {
+    return await requestCaseApi('/api/case/chat', payload, 'text', signal);
+  } catch (e) {
+    if (signal?.aborted || e.name === 'TimeoutError') throw e;
     return mockChatReply(payload);
   }
 }
 
-async function caseApiGrade(payload) {
+async function caseApiGrade(payload, signal) {
   try {
-    const res = await fetch('/api/case/grade', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error('fallback');
-    return await res.json();
+    const fb = await requestCaseApi('/api/case/grade', payload, 'json', signal);
+    const keys = Object.keys(payload.caseData.explain.rubric);
+    if (!fb || !Number.isFinite(fb._score) || fb._score < 0 || fb._score > 1 ||
+        keys.some(k => typeof fb[k]?.correct !== 'boolean' || (fb[k].note != null && typeof fb[k].note !== 'string'))) {
+      throw new Error('Invalid grading response');
+    }
+    return Object.fromEntries([...keys.map(k => [k, fb[k]]), ['_score', fb._score]]);
   } catch (e) {
+    if (signal?.aborted || e.name === 'TimeoutError') throw e;
     return mockGrade(payload);
   }
 }
@@ -4550,8 +4565,7 @@ const CaseRunner = {
     });
   },
 
-  // `file` is the case JSON slug (without .json). For a pathway's primary
-  // case the slug equals the pathway key; secondary cases use their own slug.
+  // `file` is a registered case JSON slug (without .json).
   async open(file) {
     this.cacheEls();
     const requestId = this.openRequestId = (this.openRequestId || 0) + 1;
@@ -4627,6 +4641,8 @@ const CaseRunner = {
   close() {
     this.openRequestId = (this.openRequestId || 0) + 1;
     if (this.state?.timerHandle) clearInterval(this.state.timerHandle);
+    this.state?.chatRequest?.abort();
+    this.state?.explainRequest?.abort();
     this.els.overlay.classList.remove('open');
     this.els.overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('case-open', 'case-pinpoint');
@@ -4641,6 +4657,7 @@ const CaseRunner = {
   goTo(phase) {
     if (!this.state) return;
     if (!PHASES.includes(phase)) return;
+    if (this.state.phase === 'explain') this.captureExplainAnswers();
     this.state.phase = phase;
     this.state.phaseStartedAt = Date.now();
 
@@ -4663,6 +4680,7 @@ const CaseRunner = {
     const cur = this.state.phase;
     const i = PHASES.indexOf(cur);
     if (i === PHASES.length - 1) { this.close(); return; }
+    if (cur === 'explain') this.captureExplainAnswers();
     if (cur === 'explain' && !this.state.explainFeedback) {
       // require grade before leaving explain
       this.submitExplain();
@@ -4704,6 +4722,9 @@ const CaseRunner = {
     this.els.backBtn.disabled = curIdx === 0;
     this.els.nextBtn.textContent = PHASE_LABELS[this.state.phase];
     this.els.nextBtn.disabled = this.state.phase === 'explain' && !!this.state.explainPending;
+    if (this.state.phase === 'explain' && !this.state.explainFeedback) {
+      this.els.nextBtn.textContent = this.state.explainPending ? 'Grading…' : this.state.explainError ? 'Retry grading →' : 'Grade answers →';
+    }
 
     const r = ({
       chat: () => this.renderChat(),
@@ -4733,63 +4754,63 @@ const CaseRunner = {
     this.els.chatText.disabled = capped || !!this.state.chatPending;
     this.els.chatText.placeholder = capped ? 'Turn cap reached — continue to labs.' : 'Ask history, exam, vitals, or share your differential…';
     document.getElementById('case-chat-send').disabled = capped || !!this.state.chatPending;
+    const error = document.getElementById('case-chat-error');
+    error.hidden = !this.state.chatError;
+    error.querySelector('span').textContent = this.state.chatError || '';
+    document.getElementById('case-chat-retry').disabled = !!this.state.chatPending;
   },
 
-  async sendChat() {
+  async sendChat(retry = false) {
     if (!this.state || this.state.chatPending) return;
     const session = this.state;
-    const txt = this.els.chatText.value.trim();
-    if (!txt) return;
-    const max = this.state.caseData.scoring?.chatMaxTurns || 20;
-    if (this.state.chatTurns >= max) return;
+    if (retry && !session.chatRetry) return;
+    if (!retry) {
+      const txt = this.els.chatText.value.trim();
+      const max = session.caseData.scoring?.chatMaxTurns || 20;
+      if (!txt || session.chatTurns >= max) return;
+      session.chatTurns++;
+      session.chatMessages.push({ role: 'user', content: txt });
+      session.chatRetry = {
+        caseId: session.caseData.id, caseData: session.caseData,
+        message: txt, history: session.chatMessages.slice(-10)
+      };
+      this.els.chatText.value = '';
+    }
     session.chatPending = true;
-    this.state.chatTurns++;
-    this.state.chatMessages.push({ role: 'user', content: txt });
-    this.els.chatText.value = '';
+    session.chatError = '';
+    const controller = session.chatRequest = new AbortController();
     this.renderChat();
-
-    // Streaming placeholder
     const placeholder = document.createElement('div');
     placeholder.className = 'chat-msg assistant streaming';
-    placeholder.textContent = '';
     this.els.chatLog.appendChild(placeholder);
     this.els.chatLog.scrollTop = this.els.chatLog.scrollHeight;
-
-    const reply = await caseApiChat({
-      caseId: this.state.caseData.id,
-      caseData: this.state.caseData,
-      message: txt,
-      history: this.state.chatMessages.slice(-10)
-    });
-
-    if (this.state !== session) return;
-    const finish = () => {
+    try {
+      const reply = await caseApiChat(session.chatRetry, controller.signal);
+      if (this.state !== session) return;
+      if (!REDUCED_MOTION) {
+        await new Promise(resolve => {
+          let i = 0;
+          const chunk = Math.max(1, Math.ceil(reply.length / 60));
+          const step = () => {
+            if (this.state !== session) { resolve(); return; }
+            i += chunk;
+            placeholder.textContent = reply.slice(0, i);
+            this.els.chatLog.scrollTop = this.els.chatLog.scrollHeight;
+            if (i < reply.length) requestAnimationFrame(() => setTimeout(step, 18));
+            else resolve();
+          };
+          step();
+        });
+      }
+      if (this.state !== session) return;
       session.chatMessages.push({ role: 'assistant', content: reply });
+      session.chatRetry = null;
+    } catch (e) {
+      if (this.state !== session || controller.signal.aborted) return;
+      session.chatError = 'The reply could not be completed. Retry your last question.';
+    } finally {
       session.chatPending = false;
-      if (session.phase === 'chat') this.renderChat();
-    };
-    if (REDUCED_MOTION) {
-      placeholder.classList.remove('streaming');
-      placeholder.textContent = reply;
-      finish();
-    } else {
-      // Local fake-stream so it FEELS like Carlos's streaming endpoint
-      let i = 0;
-      const chunk = Math.max(1, Math.ceil(reply.length / 60));
-      const step = () => {
-        if (this.state !== session) return;
-        i += chunk;
-        placeholder.textContent = reply.slice(0, i);
-        this.els.chatLog.scrollTop = this.els.chatLog.scrollHeight;
-        if (i < reply.length) {
-          requestAnimationFrame(() => setTimeout(step, 18));
-        } else {
-          placeholder.classList.remove('streaming');
-          placeholder.textContent = reply;
-          finish();
-        }
-      };
-      step();
+      if (this.state === session && session.phase === 'chat') this.renderChat();
     }
   },
 
@@ -4822,13 +4843,38 @@ const CaseRunner = {
     `).join('');
     this.els.explainForm.innerHTML = html;
   },
+  captureExplainAnswers() {
+    if (!this.state) return;
+    const ans = {};
+    for (const k of ['diagnosis', 'cause', 'mechanism']) {
+      ans[k] = document.getElementById(`explain-${k}`)?.value || '';
+    }
+    if (Object.keys(ans).every(k => ans[k] === this.state.explainAnswers[k])) return;
+    this.state.explainAnswers = ans;
+    this.state.explainRevision = (this.state.explainRevision || 0) + 1;
+    this.state.explainFeedback = null;
+    this.state.score.explain = null;
+    this.state.explainError = '';
+    this.state.explainRequest?.abort();
+    this.state.explainRequest = null;
+    this.state.explainPending = false;
+    this.els.feedbackCard.hidden = true;
+    document.getElementById('case-explain-error').hidden = true;
+    if (this.state.phase === 'explain') {
+      this.els.nextBtn.disabled = false;
+      this.els.nextBtn.textContent = 'Grade answers →';
+    }
+  },
   renderExplain() {
-    // restore values + feedback if previously graded
+    // Restore the latest draft and any feedback for that exact revision.
     const ans = this.state.explainAnswers;
     for (const k of Object.keys(ans)) {
       const el = document.getElementById(`explain-${k}`);
       if (el) el.value = ans[k];
     }
+    const error = document.getElementById('case-explain-error');
+    error.hidden = !this.state.explainError;
+    error.textContent = this.state.explainError || '';
     if (this.state.explainFeedback) {
       this.renderFeedbackCard();
       this.els.feedbackCard.hidden = false;
@@ -4838,26 +4884,35 @@ const CaseRunner = {
   },
   async submitExplain() {
     if (!this.state || this.state.explainPending) return;
+    this.captureExplainAnswers();
     const session = this.state;
-    const ans = {};
-    for (const k of ['diagnosis', 'cause', 'mechanism']) {
-      const el = document.getElementById(`explain-${k}`);
-      ans[k] = el ? el.value.trim() : '';
-    }
-    this.state.explainAnswers = ans;
-    if (!ans.diagnosis && !ans.cause && !ans.mechanism) {
+    const revision = session.explainRevision || 0;
+    const ans = Object.fromEntries(Object.entries(session.explainAnswers).map(([k, v]) => [k, v.trim()]));
+    if (!Object.values(ans).some(Boolean)) {
       alert('Fill at least one field.');
       return;
     }
+    const controller = session.explainRequest = new AbortController();
     session.explainPending = true;
-    this.els.nextBtn.disabled = true;
-    const fb = await caseApiGrade({ caseId: this.state.caseData.id, caseData: this.state.caseData, answers: ans });
-    if (this.state !== session) return;
-    session.explainPending = false;
-    this.state.explainFeedback = fb;
-    this.state.score.explain = fb._score ?? null;
+    session.explainError = '';
     this.render();
+    try {
+      const fb = await caseApiGrade({ caseId: session.caseData.id, caseData: session.caseData, answers: ans }, controller.signal);
+      if (this.state !== session || (session.explainRevision || 0) !== revision) return;
+      session.explainFeedback = fb;
+      session.score.explain = fb._score;
+    } catch (e) {
+      if (this.state !== session || controller.signal.aborted) return;
+      session.explainError = 'Grading could not be completed. Your answers are saved; choose Retry grading.';
+    } finally {
+      if (session.explainRequest === controller) {
+        session.explainRequest = null;
+        session.explainPending = false;
+        if (this.state === session && session.phase === 'explain') this.render();
+      }
+    }
   },
+
   renderFeedbackCard() {
     const fb = this.state.explainFeedback;
     if (!fb) return;
@@ -5009,10 +5064,8 @@ const CaseRunner = {
     }
     const w = this.state.caseData.scoring?.weights || { explain: 0.4, pinpoint: 0.3, mcq: 0.3 };
     const composite = Object.keys(w).reduce((s, k) => s + ((this.state.score[k] ?? 0) * (w[k] || 0)), 0);
-    if (!this.state.resultSaved) {
-      saveCaseResult(this.state.file, this.state.caseData, this.state.score, composite);
-      this.state.resultSaved = true;
-    }
+    saveCaseResult(this.state.file, this.state.caseData, this.state.score, composite, !this.state.resultSaved);
+    this.state.resultSaved = true;
     const dt = Math.floor((Date.now() - this.state.startedAt) / 1000);
     const mm = Math.floor(dt / 60), ss = dt % 60;
     const fmt = v => v == null ? '—' : `${Math.round(v * 100)}%`;
@@ -5043,6 +5096,8 @@ const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).
     if (CaseRunner.state.phase === 'mcq') { CaseRunner.mcqAdvance(); return; }
     CaseRunner.next();
   });
+  document.getElementById('case-chat-retry').addEventListener('click', () => CaseRunner.sendChat(true));
+  document.getElementById('case-explain-form').addEventListener('input', () => CaseRunner.captureExplainAnswers());
   document.getElementById('case-chat-form').addEventListener('submit', (e) => {
     e.preventDefault();
     CaseRunner.sendChat();
@@ -5161,10 +5216,13 @@ let zoomFrame = 0;
 let zoomTarget = 1;
 const mapMain = document.querySelector('main');
 const mapSvg = document.getElementById('pathway-svg');
+function minimumMapZoom() {
+  return Math.min(0.32, mapMain.clientWidth / MAP_W * 0.98, mapMain.clientHeight / MAP_H * 0.98);
+}
 function applyZoom(z, focalClientX, focalClientY) {
   cancelAnimationFrame(zoomFrame);
-  zoomTarget = Math.max(0.32, Math.min(2.2, z));
-  const nz = Math.max(0.32, Math.min(2.2, z));
+  zoomTarget = Math.max(minimumMapZoom(), Math.min(2.2, z));
+  const nz = Math.max(minimumMapZoom(), Math.min(2.2, z));
   if (!mapMain || !mapSvg || nz === mapZoom) return;
   const rect = mapMain.getBoundingClientRect();
   const fx = focalClientX == null ? rect.width / 2 : focalClientX - rect.left;
@@ -5180,7 +5238,7 @@ function applyZoom(z, focalClientX, focalClientY) {
 // Ease button/keyboard steps; direct trackpad and pinch gestures stay immediate.
 function animateZoom(z) {
   cancelAnimationFrame(zoomFrame);
-  const target = Math.max(0.32, Math.min(2.2, z));
+  const target = Math.max(minimumMapZoom(), Math.min(2.2, z));
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     applyZoom(target);
     return;
@@ -5397,7 +5455,7 @@ const CASES_INDEX = [
 // ---------------- Learner progress (localStorage) ----------------
 const PROGRESS_KEY = 'biochem-progress';
 function loadProgress() { try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; } catch (e) { return {}; } }
-function saveCaseResult(key, caseData, score, composite) {
+function saveCaseResult(key, caseData, score, composite, newAttempt = true) {
   if (!key) return;
   try {
     const all = loadProgress();
@@ -5407,7 +5465,7 @@ function saveCaseResult(key, caseData, score, composite) {
       best: Math.max((prev && prev.best) || 0, composite),
       last: composite,
       phases: { explain: score.explain, pinpoint: score.pinpoint, mcq: score.mcq },
-      attempts: ((prev && prev.attempts) || 0) + 1,
+      attempts: ((prev && prev.attempts) || 0) + (newAttempt ? 1 : 0),
       ts: Date.now()
     };
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(all));
@@ -5529,7 +5587,7 @@ document.getElementById('cases-browser').addEventListener('click', (e) => {
 (function injectCaseButtons() {
   document.querySelectorAll('.sub-header[data-pw]').forEach(h => {
     const pw = h.dataset.pw;
-    if (!AVAILABLE_CASES.includes(pw)) return;
+    if (!CASES_INDEX.some(c => c.pathway === pw)) return;
     if (h.querySelector('.case-enter-btn')) return;
     h.classList.add('has-case');
     h.title = 'Click to focus this pathway · Shift+click to start the case';
