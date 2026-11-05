@@ -1268,8 +1268,9 @@ body.light #cases-browser {
   padding: 17px 20px 17px 28px;
   cursor: pointer;
   box-shadow: var(--clay);
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+.case-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .case-card::before {
   content: ''; position: absolute; top: 14px; bottom: 14px; left: 12px;
   width: 4px; border-radius: 3px;
@@ -1278,7 +1279,7 @@ body.light #cases-browser {
   opacity: 0.85;
 }
 .case-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: var(--clay-card), 0 22px 44px -22px color-mix(in srgb, var(--pw, var(--accent)) 55%, transparent);
 }
 .case-card-pw {
@@ -1375,6 +1376,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   box-shadow: var(--clay-card);
   overflow: hidden;
 }
+#cmd-close { float: right; margin: 10px 12px 0; min-height: 44px; }
 .cmd-input {
   width: 100%; padding: 16px 22px;
   font-size: 15px; font-family: inherit;
@@ -1416,7 +1418,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 /* ============================================================
    RESPONSIVE — tablet (iPad) & mobile
    ============================================================ */
-@media (max-width: 900px) {
+@media (max-width: 1100px), (hover: none) and (pointer: coarse) {
   header { height: 56px; padding: 0 12px; }
   #cell-select { top: 62px; }
   #cell-note { top: 104px; font-size: 11px; padding: 6px 12px; }
@@ -1509,7 +1511,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); transition: background-color 0.3s, color 0.3s; }
 .cv-status.alarm { background: color-mix(in srgb, var(--down) 18%, transparent); color: var(--down); }
 @media (prefers-reduced-motion: reduce) { .cv-fill { transition: none; } .cv-dot { animation: none; } }
-@media (max-width: 900px) { #cell-vitals { bottom: 12px; left: 10px; width: 178px; padding: 10px 12px 11px; } }
+@media (max-width: 1100px), (hover: none) and (pointer: coarse) { #cell-vitals { bottom: 12px; left: 10px; width: 178px; padding: 10px 12px 11px; } }
 @media (max-width: 560px) { #cell-vitals { display: none; } }
 
 /* ===== Map zoom controls ===== */
@@ -1540,8 +1542,83 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 .mt-chip.active { color: var(--accent); box-shadow: var(--clay-pressed); }
 .mt-reset { color: var(--down); }
 @media (prefers-reduced-motion: reduce) { .mt-chip { transition: none; } }
-@media (max-width: 900px) { #metabolic-timeline { width: 300px; bottom: 12px; } }
+@media (max-width: 1100px), (hover: none) and (pointer: coarse) { #metabolic-timeline { width: 300px; bottom: 12px; } }
 @media (max-width: 640px) { #metabolic-timeline { display: none; } }
+
+
+/* Touch navigation: labelled destinations, room for safe areas and the map. */
+#touch-nav, .panel-close { display: none; }
+button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 1100px), (hover: none) and (pointer: coarse) {
+  :root { --touch-bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
+  #touch-nav {
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 48;
+    padding: 8px max(8px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+    background: var(--panel); border-top: 1px solid var(--border);
+  }
+  #touch-nav button {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    min-height: 54px; min-width: 0; border: 0; border-radius: 12px;
+    font-family: inherit; font-size: 11px; font-weight: 600; line-height: 1.2;
+    background: transparent; color: var(--text-2); cursor: pointer; touch-action: manipulation;
+    transition: background-color .18s, color .18s;
+  }
+  #touch-nav .nav-icon { font-size: 20px; line-height: 22px; }
+  #touch-nav button.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+  body.case-open #touch-nav { display: none; }
+  header { z-index: 47; }
+  .layout { z-index: auto; }
+  .header-actions { overflow: visible; }
+  .header-btns { gap: 6px; }
+  #cases-btn, #toggle-left { display: none; }
+  #toggle-right .lbl { display: inline; font-size: 0; }
+  #toggle-right .lbl::after { content: "Details"; font-size: 12px; }
+  #toggle-right .ico { display: none; }
+  #help-btn { display: inline-flex; }
+  header button, .panel-close, #cell-select-btn { min-height: 44px; }
+  header .mode-toggle, #help-btn, #toggle-right { min-width: 44px; justify-content: center; }
+  .layout, .layout.hide-left, .layout.hide-right, .layout.hide-left.hide-right { height: calc(100dvh - 56px - var(--touch-bottom)); }
+  aside { bottom: var(--touch-bottom); width: min(90vw, 390px); overscroll-behavior: contain; }
+  .panel-close { display: flex; margin: 0 0 14px auto; align-items: center; justify-content: center; }
+  #panel-scrim { bottom: var(--touch-bottom); }
+  #cell-vitals { display: flex; position: static; width: auto; margin: 0 0 16px; }
+  #metabolic-timeline { display: block; position: static; width: auto; transform: none; margin: 0 0 16px; }
+  #map-zoom { bottom: calc(var(--touch-bottom) + 12px); }
+  #map-zoom button { width: 44px; height: 44px; }
+  .category-header, .sub-header { min-height: 44px; }
+  .collapse-chev { min-width: 44px; min-height: 44px; display: inline-flex; justify-content: center; align-items: center; }
+  .perturbation, .metabolite-row, .cmd-item, .cell-menu-item { min-height: 44px; }
+  #cmd-palette { padding: max(18px, env(safe-area-inset-top, 0px)) 12px 12px; }
+  #cmd-close { align-self: flex-end; flex-shrink: 0; }
+  .cmd-box { max-height: calc(100dvh - 36px); display: flex; flex-direction: column; }
+  .cmd-results { min-height: 0; max-height: 60dvh; overscroll-behavior: contain; }
+  .cmd-input, .chat-text, .explain-field input { font-size: 16px; }
+  .cmd-hint { display: none; }
+  .cases-head { padding: 20px; gap: 12px; }
+  .cases-head > div { min-width: 0; }
+  .cases-close, .case-close { min-height: 44px; }
+  .case-strip { overflow-x: auto; justify-content: flex-start; }
+  .case-phase-chip { flex-shrink: 0; }
+  .case-footer { position: sticky; bottom: 0; background: var(--panel); padding: 12px 16px; gap: 8px; }
+  .case-footer .btn { min-height: 44px; }
+  #intro { overflow-y: auto; }
+  .intro-card { margin-top: 34px; }
+  .intro-skip { min-height: 44px; }
+}
+@media (min-width: 650px) and (max-width: 1100px), (min-width: 650px) and (hover: none) and (pointer: coarse) {
+  .cases-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 430px) {
+  header .vestrippn-wordmark { display: none; }
+  .brand { flex-shrink: 0; }
+  .header-actions { gap: 6px; }
+  .cases-head { flex-wrap: wrap; }
+  .cases-close { margin-left: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #touch-nav button, aside, #panel-scrim { transition: none; }
+}
 
 </style>
 </head>
@@ -1758,19 +1835,28 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
   <div class="header-actions">
     <div class="header-btns">
       <button class="btn" id="cases-btn" title="Browse all clinical cases"><span class="ico">📋</span><span class="lbl">Cases</span></button>
-      <button class="btn" id="help-btn" title="Help &amp; shortcuts  ( ? )"><span class="ico">?</span><span class="lbl">Help</span></button>
+      <button class="btn" id="help-btn" aria-label="Help and navigation tips" title="Help &amp; shortcuts  ( ? )"><span class="ico">?</span><span class="lbl">Help</span></button>
       <button class="btn toggle-btn" id="toggle-left" title="Show / hide perturbations panel  ( [ )"><span class="ico">◧</span><span class="lbl">Perturbations</span></button>
-      <button class="btn toggle-btn" id="toggle-right" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Metabolites</span><span class="ico">◨</span></button>
+      <button class="btn toggle-btn" id="toggle-right" aria-label="Metabolite details" aria-controls="metabolites-aside" title="Show / hide metabolite panel  ( ] )"><span class="lbl">Metabolites</span><span class="ico">◨</span></button>
       <button class="btn" id="focus-btn" title="Focus mode — hide both panels  ( f )"><span class="ico">⤢</span><span class="lbl">Focus</span></button>
       <button class="btn" id="reset-btn">Reset <span class="count-badge zero" id="active-count">0</span></button>
     </div>
     <div class="branch-identity">Biochem Met</div>
     <div class="mode-cluster">
       <span class="mode-label">Mode</span>
-      <button class="mode-toggle" id="theme-btn" title="Toggle day / night mode  ( t )"><span class="ico">☀️</span><span class="lbl">Day</span></button>
+      <button class="mode-toggle" id="theme-btn" aria-label="Switch color theme" title="Toggle day / night mode  ( t )"><span class="ico">☀️</span><span class="lbl">Day</span></button>
     </div>
   </div>
 </header>
+
+<nav id="touch-nav" aria-label="Main navigation">
+  <button id="nav-map" class="active" aria-label="Return to map"><span class="nav-icon" aria-hidden="true">⌖</span><span>Map</span></button>
+  <button id="nav-pathways"><span class="nav-icon" aria-hidden="true">↗</span><span>Pathways</span></button>
+  <button id="nav-search"><span class="nav-icon" aria-hidden="true">⌕</span><span>Search</span></button>
+  <button id="nav-changes" aria-controls="perturbations-aside" aria-expanded="false"><span class="nav-icon" aria-hidden="true">±</span><span>Changes</span></button>
+  <button id="nav-cases"><span class="nav-icon" aria-hidden="true">▤</span><span>Cases</span></button>
+</nav>
+
 
 <div id="cell-select">
   <button class="cell-select-btn" id="cell-select-btn" aria-haspopup="listbox" aria-expanded="false"></button>
@@ -1798,6 +1884,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 
 <div class="layout hide-left hide-right">
   <aside id="perturbations-aside">
+    <button class="btn panel-close" data-close-panel>Back to map ✕</button>
     <h2>Perturbations / Integrations</h2>
     <div id="pert-summary"></div>
     <div id="perturbations-list"></div>
@@ -1827,8 +1914,8 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <text x="20" y="240" class="pathway-label" data-pw="glycogen-ppp" style="--pw: var(--pw-glycogen-ppp)">PPP</text>
       <text x="320" y="42" class="pathway-label" data-pw="glycolysis" style="--pw: var(--pw-glycolysis)">GLYCOLYSIS</text>
       <text x="320" y="60" class="pathway-label" style="font-size:10px;--pw: var(--pw-glycolysis)" data-pw="glycolysis">// gluconeogenesis</text>
-      <text x="480" y="450" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones)">LIPIDS</text>
-      <text x="480" y="468" class="pathway-label" data-pw="fa-ketones" style="font-size:9px;opacity:0.6;--pw: var(--pw-fa-ketones)">lipolysis · β-ox · lipogenesis</text>
+      <text x="480" y="438" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones)">LIPIDS</text>
+      <text x="480" y="456" class="pathway-label" data-pw="fa-ketones" style="font-size:9px;opacity:0.6;--pw: var(--pw-fa-ketones)">lipolysis · β-ox · lipogenesis</text>
       <text x="660" y="540" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones)">β-OXIDATION</text>
       <text x="880" y="995" class="pathway-label faint" data-pw="tca" style="--pw: var(--pw-tca)" text-anchor="middle">TCA</text>
       <text x="150" y="1198" class="pathway-label" data-pw="fa-ketones" style="--pw: var(--pw-fa-ketones);font-size:11px">KETOGENESIS</text>
@@ -1845,7 +1932,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <text x="745" y="1592" class="pathway-label" data-pw="catechol" style="--pw: var(--pw-catechol)">CATECHOLAMINES</text>
       <text x="1560" y="1146" class="pathway-label" data-pw="creatine" style="--pw: var(--pw-creatine)">CREATINE</text>
       <text x="442" y="114" class="pathway-label" data-pw="polyol" style="--pw: var(--pw-polyol);font-size:10px">POLYOL</text>
-      <text x="1740" y="1360" class="pathway-label" data-pw="bilirubin" style="--pw: var(--pw-bilirubin)">BILIRUBIN / HEME DEGRADATION</text>
+      <text x="1740" y="1310" class="pathway-label" data-pw="bilirubin" style="--pw: var(--pw-bilirubin)">BILIRUBIN / HEME DEGRADATION</text>
       <text x="430" y="1808" class="pathway-label" data-pw="sphingo" style="--pw: var(--pw-sphingo)">SPHINGOLIPIDS · lysosomal storage</text>
       <text x="1100" y="1706" class="pathway-label" data-pw="tryptophan" style="--pw: var(--pw-tryptophan)">TRYPTOPHAN</text>
       <text x="1545" y="1532" class="pathway-label" data-pw="glutathione" style="--pw: var(--pw-glutathione)">GLUTATHIONE</text>
@@ -1858,7 +1945,8 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
     </svg>
   </main>
 
-  <aside class="right">
+  <aside class="right" id="metabolites-aside">
+    <button class="btn panel-close" data-close-panel>Back to map ✕</button>
     <h2>Metabolite States</h2>
     <div class="legend">
       <div class="legend-item"><div class="legend-box" style="background:rgba(46,160,67,0.30);border-color:#2ea043"></div>↑↑</div>
@@ -1924,7 +2012,8 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
 <div id="panel-scrim"></div>
 
 <div id="cmd-palette" aria-hidden="true">
-  <div class="cmd-box" role="dialog" aria-label="Command palette">
+  <div class="cmd-box" role="dialog" aria-label="Search cases and pathways">
+    <button class="btn" id="cmd-close" aria-label="Close search">Close ✕</button>
     <input id="cmd-input" class="cmd-input" type="text" placeholder="Find a case, pathway, metabolite, or perturbation…" autocomplete="off" spellcheck="false">
     <div id="cmd-results" class="cmd-results"></div>
     <div class="cmd-hint">
@@ -1949,6 +2038,10 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <div class="help-row"><span class="help-keys"><kbd class="help-key">Click</kbd></span><span class="help-desc">a pathway label / sidebar group → focus that pathway (dim the rest)</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">⇧</kbd><span style="margin:0 4px">+</span><kbd class="help-key">Click</kbd></span><span class="help-desc">a pathway → start its 5-phase clinical case</span></div>
       <div class="help-row"><span class="help-keys"><kbd class="help-key">Click</kbd></span><span class="help-desc">a perturbation in the left panel → toggle it on / off; effects stack</span></div>
+    </div>
+    <div class="help-card-section">
+      <h4>Phone &amp; iPad</h4>
+      <p class="help-desc">Use the bottom bar to jump to a pathway, search the map, change conditions, or browse cases. Drag with one finger to pan; pinch or use + / − to zoom. The Details button opens metabolite information. Changes also contains cell vitals and the metabolic-state timeline. Tap Back to map to close a panel.</p>
     </div>
     <div class="help-card-section">
       <h4>Keyboard</h4>
@@ -1977,7 +2070,7 @@ body.light #cmd-palette { background: linear-gradient(180deg, rgba(243,246,251,0
       <div>
         <div class="cases-head-eyebrow">📋 CLINICAL CASES</div>
         <h2 class="cases-head-title">Pick a <span>case</span></h2>
-        <p class="cases-head-sub">34 teaching cases across 18 pathways. Click any card to start the 5-phase loop.</p>
+        <p class="cases-head-sub">Choose a teaching case to start the case loop.</p>
       </div>
       <button class="btn cases-close" id="cases-close" title="Close (Esc)">Close ✕</button>
     </div>
@@ -2076,7 +2169,7 @@ const M = {
   'Ribulose-5-P':    { x: 70, y: 360, pathway: 'glycogen-ppp', info: 'Ru5P. Product of 6PGD; entry to non-oxidative PPP (which interconnects with F6P/GAP).' },
   'Ribose-5-P':      { x: 70, y: 440, pathway: 'glycogen-ppp', info: 'R5P. Precursor for nucleotide and nucleic acid synthesis.' },
   'NADPH':           { x: 185, y: 310, pathway: 'glycogen-ppp', cofactor: true, info: 'Reducing power for biosynthesis (fatty acids, cholesterol, steroids) and antioxidant defense (glutathione regeneration). Major source: PPP oxidative branch.' },
-  'NADP+':           { x: 185, y: 385, pathway: 'glycogen-ppp', cofactor: true, info: 'Oxidized form. Used by G6PD and 6PGD.' },
+  'NADP+':           { x: 185, y: 365, pathway: 'glycogen-ppp', cofactor: true, info: 'Oxidized form. Used by G6PD and 6PGD.' },
 
   // ==== GLYCOLYSIS ====
   'Glucose':         { x: 320, y: 80, pathway: 'glycolysis', info: 'Primary carbohydrate fuel; enters cell via GLUT transporters.' },
@@ -2447,10 +2540,10 @@ const E = [
   { e: 'AGAT', from: 'Arginine', to: 'Guanidinoacetate', curved: true },
   { e: '+Gly', from: 'Glycine', to: 'Guanidinoacetate', cofactor: true, curved: true, noLabel: true },
   { e: 'GAMT (SAM)', from: 'Guanidinoacetate', to: 'Creatine' },
-  { e: 'creatine kinase', from: 'Creatine', to: 'Phosphocreatine' },
+  { e: 'creatine kinase', from: 'Creatine', to: 'Phosphocreatine', labelOff: -26 },
 
   // ==== POLYOL (SORBITOL) ====
-  { e: 'Aldose reductase', from: 'Glucose', to: 'Sorbitol', curved: true, labelT: 0.42, labelOff: -16 },
+  { e: 'Aldose reductase', from: 'Glucose', to: 'Sorbitol', curved: true, labelT: 0.65, labelDX: 12, labelDY: -30 },
   { e: 'Sorbitol DH', from: 'Sorbitol', to: 'Fructose', curved: true, labelT: 0.55 },
 
   // ==== BILIRUBIN / HEME DEGRADATION ====
@@ -2479,7 +2572,7 @@ const E = [
   { e: '+Cys', from: 'Cysteine', to: 'γ-Glu-Cys', noLabel: true, curved: true },
   { e: 'GSH synthase', from: 'γ-Glu-Cys', to: 'GSH', labelOff: 30 },
   { e: '+Gly', from: 'Glycine', to: 'GSH', noLabel: true, curved: true },
-  { e: 'GPx', from: 'GSH', to: 'GSSG', curved: true, labelOff: -22 },
+  { e: 'GPx', from: 'GSH', to: 'GSSG', curved: true, labelOff: 24 },
   { e: 'GR · NADPH', from: 'GSSG', to: 'GSH', curved: true, labelOff: 24 },
   { e: 'CYP2E1', from: 'Acetaminophen', to: 'NAPQI' },
   { e: 'GST', from: 'GSH', to: 'NAPQI', curved: true, labelOff: 24 },
@@ -3731,7 +3824,7 @@ const COMPARTMENTS = [
     nodes: ['NADH','NAD+','FADH2','FAD','CoQH2','CoQ','Cyt c (red)','O2','H2O','H⁺ gradient','ADP','ATP'] },
   { label: 'ENDOPLASMIC RETICULUM · sterols', cc: 'var(--pw-sterol)', pw: 'sterol', pad: 26, tab: 'tr',
     nodes: ['Mevalonate','Squalene','Cholesterol','Bile acids','Vitamin D','Steroid hormones'] },
-  { label: 'LYSOSOME · sphingolipid degradation', cc: 'var(--pw-sphingo)', pw: 'sphingo', pad: 26, tab: 'bl',
+  { label: 'LYSOSOME · sphingolipid degradation', cc: 'var(--pw-sphingo)', pw: 'sphingo', pad: 42, tab: 'bl',
     nodes: ['Ceramide','Sphingomyelin','Glucocerebroside','GM2 ganglioside','Galactocerebroside','Sulfatide'] }
 ];
 
@@ -4095,6 +4188,7 @@ function openPathway(pw, opts) {
     return;
   }
   enterDive(pw);
+  if (isMobileLayout()) { closePanels(); focusPathway(pw); }
 }
 
 // ---- Day / night theme ----
@@ -4222,11 +4316,34 @@ const focusBtn = document.getElementById('focus-btn');
 function syncToggleButtons() {
   tlBtn.classList.toggle('active', !layoutEl.classList.contains('hide-left'));
   trBtn.classList.toggle('active', !layoutEl.classList.contains('hide-right'));
-  focusBtn.classList.toggle('active', layoutEl.classList.contains('hide-left') && layoutEl.classList.contains('hide-right'));
+  const leftOpen = !layoutEl.classList.contains('hide-left');
+  const rightOpen = !layoutEl.classList.contains('hide-right');
+  focusBtn.classList.toggle('active', !leftOpen && !rightOpen);
+  tlBtn.setAttribute('aria-expanded', String(leftOpen));
+  trBtn.setAttribute('aria-expanded', String(rightOpen));
+  document.getElementById('perturbations-aside').inert = !leftOpen;
+  document.getElementById('metabolites-aside').inert = !rightOpen;
+  document.getElementById('nav-changes').setAttribute('aria-expanded', String(leftOpen));
+  document.getElementById('nav-changes').classList.toggle('active', leftOpen);
+  document.getElementById('nav-map').classList.toggle('active', !leftOpen && !rightOpen);
 }
 
 // On small screens the panels slide in as overlays — only one at a time.
-const isMobileLayout = () => window.matchMedia('(max-width: 900px)').matches;
+const compactLayout = window.matchMedia('(max-width: 1100px), (hover: none) and (pointer: coarse)');
+const isMobileLayout = () => compactLayout.matches;
+// Keep the map clear while retaining the monitors and scenarios in Changes.
+const touchTools = ['cell-vitals', 'metabolic-timeline'].map(id => {
+  const el = document.getElementById(id), home = document.createComment(id + ' home');
+  el.before(home);
+  return { el, home };
+});
+function placeTouchTools() {
+  for (const { el, home } of touchTools) {
+    if (isMobileLayout()) document.getElementById('perturbations-list').before(el);
+    else home.after(el);
+  }
+}
+placeTouchTools();
 tlBtn.addEventListener('click', () => {
   const opening = layoutEl.classList.contains('hide-left');
   layoutEl.classList.toggle('hide-left');
@@ -4243,6 +4360,24 @@ document.getElementById('panel-scrim').addEventListener('click', () => {
   layoutEl.classList.add('hide-left', 'hide-right');
   syncToggleButtons();
 });
+function closePanels() {
+  layoutEl.classList.add('hide-left', 'hide-right');
+  syncToggleButtons();
+}
+document.querySelectorAll('[data-close-panel]').forEach(btn => btn.addEventListener('click', () => {
+  const trigger = btn.closest('aside').id === 'perturbations-aside' ? document.getElementById('nav-changes') : trBtn;
+  closePanels();
+  trigger.focus();
+}));
+compactLayout.addEventListener('change', () => {
+  placeTouchTools();
+  if (isMobileLayout()) closePanels();
+});
+document.getElementById('nav-map').addEventListener('click', () => { closePanels(); hideNodePopover(); exitDive(); });
+document.getElementById('nav-changes').addEventListener('click', () => tlBtn.click());
+document.getElementById('nav-pathways').addEventListener('click', () => { closePanels(); openCmdPalette('pathway'); });
+document.getElementById('nav-search').addEventListener('click', () => { closePanels(); openCmdPalette(); });
+document.getElementById('nav-cases').addEventListener('click', () => { closePanels(); openCasesBrowser(); });
 // Both panels start collapsed by default — reflect that on the header buttons.
 syncToggleButtons();
 focusBtn.addEventListener('click', () => {
@@ -4264,8 +4399,8 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'f' || e.key === 'F') { focusBtn.click(); }
   else if (e.key === 't' || e.key === 'T') { themeBtn.click(); }
   else if (e.key === 'x' || e.key === 'X') { fluxEnabled = !fluxEnabled; try { localStorage.setItem('biochem-flux', fluxEnabled ? '1' : '0'); } catch (e2) {} renderEdges(); }
-  else if (e.key === '+' || e.key === '=') { applyZoom(mapZoom * 1.2); }
-  else if (e.key === '-' || e.key === '_') { applyZoom(mapZoom / 1.2); }
+  else if (e.key === '+' || e.key === '=') { animateZoom(zoomTarget * 1.2); }
+  else if (e.key === '-' || e.key === '_') { animateZoom(zoomTarget / 1.2); }
   else if (e.key === '0') { zoomFit(); }
   else if (e.key === '?') { e.preventDefault(); openHelp(); }
   else if (e.key === '/') { e.preventDefault(); openCmdPalette(); }
@@ -4342,10 +4477,14 @@ function mockChatReply(payload) {
   if (u.match(/sex|gender|boy|girl/)) return `Sex: ${c.patient?.sex || 'unknown'}.`;
   if (u.match(/history|past|prior|sibling|family/)) return c.history || 'History unremarkable.';
   if (u.match(/exam|vital|hr|rr|temp|liver|abdomen/)) return c.exam || 'Exam unremarkable.';
-  if (u.match(/glucose|sugar|hypoglyc/)) return 'Bedside glucose was 38 mg/dL. We’ll show the full lab panel next.';
+  if (u.match(/glucose|sugar|hypoglyc/)) {
+    const glucose = (c.labs || []).find(l => /glucose/i.test(l.name));
+    return glucose
+      ? `${glucose.name}: ${glucose.value} ${glucose.unit || ''}. Continue to labs for the full panel.`
+      : 'No glucose result is provided in this case. Continue to labs for the available results.';
+  }
   if (u.match(/lab|cbc|lytes|chem|panel/)) return 'Hit Continue → to see the full lab panel.';
-  if (u.match(/differen|think|suspect|likely/)) return 'Good — keep going. What metabolic disorder fits hepatomegaly + fasting hypoglycemia + lactic acidosis in an infant?';
-  if (u.match(/von gierke|gsd|glycogen storage/)) return 'Strong call. Hold that thought — we’ll grade your reasoning in the Explain phase.';
+  if (u.match(/differen|think|suspect|likely/)) return 'Which findings in this case support your differential? Connect them to the affected pathway.';
   return 'Noted. Ask another question or move on to labs when you’re ready.';
 }
 
@@ -4415,6 +4554,7 @@ const CaseRunner = {
   // case the slug equals the pathway key; secondary cases use their own slug.
   async open(file) {
     this.cacheEls();
+    const requestId = this.openRequestId = (this.openRequestId || 0) + 1;
     if (selectedPathway) exitDive();
     let caseData;
     try {
@@ -4422,13 +4562,16 @@ const CaseRunner = {
       if (!res.ok) throw new Error('case not found');
       caseData = await res.json();
     } catch (e) {
+      if (requestId !== this.openRequestId) return;
       alert(`No case available.\n(Tried /cases/${file}.json)`);
       return;
     }
+    if (requestId !== this.openRequestId) return;
     this.init(caseData, file);
   },
 
   init(caseData, file) {
+    if (this.state) this.close();
     const now = Date.now();
     this.state = {
       caseData,
@@ -4471,17 +4614,21 @@ const CaseRunner = {
 
     // Show overlay
     this.els.overlay.classList.add('open');
+    this.els.overlay.setAttribute('aria-hidden', 'false');
     document.body.classList.add('case-open');
 
     // Timer tick
     this.state.timerHandle = setInterval(() => this.tickTimer(), 1000);
 
+    this.tickTimer();
     this.goTo('chat');
   },
 
   close() {
+    this.openRequestId = (this.openRequestId || 0) + 1;
     if (this.state?.timerHandle) clearInterval(this.state.timerHandle);
     this.els.overlay.classList.remove('open');
+    this.els.overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('case-open', 'case-pinpoint');
     caseMode = null;
     document.getElementById('pathway-svg').classList.remove('case-mode');
@@ -4556,6 +4703,7 @@ const CaseRunner = {
     // Nav buttons
     this.els.backBtn.disabled = curIdx === 0;
     this.els.nextBtn.textContent = PHASE_LABELS[this.state.phase];
+    this.els.nextBtn.disabled = this.state.phase === 'explain' && !!this.state.explainPending;
 
     const r = ({
       chat: () => this.renderChat(),
@@ -4582,17 +4730,19 @@ const CaseRunner = {
     this.els.chatTurn.textContent = this.state.chatTurns;
     const max = +this.els.chatMax.textContent;
     const capped = this.state.chatTurns >= max;
-    this.els.chatText.disabled = capped;
+    this.els.chatText.disabled = capped || !!this.state.chatPending;
     this.els.chatText.placeholder = capped ? 'Turn cap reached — continue to labs.' : 'Ask history, exam, vitals, or share your differential…';
-    document.getElementById('case-chat-send').disabled = capped;
+    document.getElementById('case-chat-send').disabled = capped || !!this.state.chatPending;
   },
 
   async sendChat() {
-    if (!this.state) return;
+    if (!this.state || this.state.chatPending) return;
+    const session = this.state;
     const txt = this.els.chatText.value.trim();
     if (!txt) return;
     const max = this.state.caseData.scoring?.chatMaxTurns || 20;
     if (this.state.chatTurns >= max) return;
+    session.chatPending = true;
     this.state.chatTurns++;
     this.state.chatMessages.push({ role: 'user', content: txt });
     this.els.chatText.value = '';
@@ -4612,14 +4762,22 @@ const CaseRunner = {
       history: this.state.chatMessages.slice(-10)
     });
 
+    if (this.state !== session) return;
+    const finish = () => {
+      session.chatMessages.push({ role: 'assistant', content: reply });
+      session.chatPending = false;
+      if (session.phase === 'chat') this.renderChat();
+    };
     if (REDUCED_MOTION) {
       placeholder.classList.remove('streaming');
       placeholder.textContent = reply;
+      finish();
     } else {
       // Local fake-stream so it FEELS like Carlos's streaming endpoint
       let i = 0;
       const chunk = Math.max(1, Math.ceil(reply.length / 60));
       const step = () => {
+        if (this.state !== session) return;
         i += chunk;
         placeholder.textContent = reply.slice(0, i);
         this.els.chatLog.scrollTop = this.els.chatLog.scrollHeight;
@@ -4628,8 +4786,7 @@ const CaseRunner = {
         } else {
           placeholder.classList.remove('streaming');
           placeholder.textContent = reply;
-          this.state.chatMessages.push({ role: 'assistant', content: reply });
-          this.renderChat();
+          finish();
         }
       };
       step();
@@ -4680,6 +4837,8 @@ const CaseRunner = {
     }
   },
   async submitExplain() {
+    if (!this.state || this.state.explainPending) return;
+    const session = this.state;
     const ans = {};
     for (const k of ['diagnosis', 'cause', 'mechanism']) {
       const el = document.getElementById(`explain-${k}`);
@@ -4690,11 +4849,14 @@ const CaseRunner = {
       alert('Fill at least one field.');
       return;
     }
+    session.explainPending = true;
+    this.els.nextBtn.disabled = true;
     const fb = await caseApiGrade({ caseId: this.state.caseData.id, caseData: this.state.caseData, answers: ans });
+    if (this.state !== session) return;
+    session.explainPending = false;
     this.state.explainFeedback = fb;
     this.state.score.explain = fb._score ?? null;
-    this.renderFeedbackCard();
-    this.els.feedbackCard.hidden = false;
+    this.render();
   },
   renderFeedbackCard() {
     const fb = this.state.explainFeedback;
@@ -4805,6 +4967,7 @@ const CaseRunner = {
       return `<button class="${cls}" data-i="${i}" ${ans ? 'disabled' : ''}>${escapeText(c)}</button>`;
     }).join('');
     if (ans) {
+      this.els.nextBtn.disabled = false;
       this.els.mcqExplain.hidden = false;
       this.els.mcqExplain.textContent = q.explanation;
       this.els.nextBtn.textContent = this.state.mcqIdx === total - 1 ? 'Show summary →' : 'Next question →';
@@ -4823,6 +4986,7 @@ const CaseRunner = {
     this.renderMcq();
   },
   mcqAdvance() {
+    if (!this.state?.mcqAnswers[this.state.mcqIdx]) return;
     const total = this.state.caseData.mcqs.length;
     if (this.state.mcqIdx < total - 1) {
       this.state.mcqIdx++;
@@ -4845,7 +5009,10 @@ const CaseRunner = {
     }
     const w = this.state.caseData.scoring?.weights || { explain: 0.4, pinpoint: 0.3, mcq: 0.3 };
     const composite = Object.keys(w).reduce((s, k) => s + ((this.state.score[k] ?? 0) * (w[k] || 0)), 0);
-    saveCaseResult(this.state.file, this.state.caseData, this.state.score, composite);
+    if (!this.state.resultSaved) {
+      saveCaseResult(this.state.file, this.state.caseData, this.state.score, composite);
+      this.state.resultSaved = true;
+    }
     const dt = Math.floor((Date.now() - this.state.startedAt) / 1000);
     const mm = Math.floor(dt / 60), ss = dt % 60;
     const fmt = v => v == null ? '—' : `${Math.round(v * 100)}%`;
@@ -4859,7 +5026,7 @@ const CaseRunner = {
     this.els.summaryRecap.innerHTML = `
       <p><strong>Time:</strong> ${mm}:${String(ss).padStart(2,'0')} · <strong>Chat turns:</strong> ${this.state.chatTurns} · <strong>MCQs:</strong> ${got} / ${this.state.caseData.mcqs.length}</p>
       <p><strong>Pinpoint:</strong> ${this.state.pinpointResolved ? (this.state.pinpointWasRight ? 'Correct on attempt ' + this.state.pinpointAttempts : 'Revealed after ' + this.state.pinpointAttempts + ' tries') : 'Not resolved'}.</p>
-      <p style="color:var(--text-2)">This case loop is a teaching scaffold. Stack the perturbations panel after closing to model the disorder on the live map: try <strong>von Gierke (GSD I)</strong> in the left sidebar.</p>
+      <p style="color:var(--text-2)">This case loop is a teaching scaffold. Stack the perturbations panel after closing to model the disorder on the live map: choose a perturbation relevant to this case in the left sidebar.</p>
     `;
   }
 };
@@ -4962,16 +5129,26 @@ function buildCmdIndex() {
   return items;
 }
 
-function openCmdPalette() {
+let cmdDefaultType = 'case';
+let cmdReturnFocus = null;
+function openCmdPalette(defaultType = 'case') {
+  cmdDefaultType = defaultType;
+  cmdReturnFocus = document.activeElement;
   if (!cmdIndex) cmdIndex = buildCmdIndex();
   const input = document.getElementById('cmd-input');
   input.value = '';
   cmdActiveIdx = 0;
   renderCmdResults('');
   document.getElementById('cmd-palette').classList.add('open');
-  setTimeout(() => input.focus(), 30);
+  document.getElementById('cmd-palette').setAttribute('aria-hidden', 'false');
+  input.focus();
 }
-function closeCmdPalette() { document.getElementById('cmd-palette').classList.remove('open'); }
+function closeCmdPalette() {
+  document.getElementById('cmd-palette').classList.remove('open');
+  document.getElementById('cmd-palette').setAttribute('aria-hidden', 'true');
+  if (cmdReturnFocus?.isConnected) cmdReturnFocus.focus();
+}
+document.getElementById('cmd-close').addEventListener('click', closeCmdPalette);
 function cmdPaletteOpen() { return document.getElementById('cmd-palette').classList.contains('open'); }
 
 // ===== Map zoom + search-to-focus =====
@@ -4980,11 +5157,15 @@ function cmdPaletteOpen() { return document.getElementById('cmd-palette').classL
 // keeps the focal point fixed; focus scrolls a node/pathway to centre.
 const MAP_W = 3264, MAP_H = 2624, MAP_VBX = -72, MAP_VBY = -24;
 let mapZoom = 1;
+let zoomFrame = 0;
+let zoomTarget = 1;
 const mapMain = document.querySelector('main');
 const mapSvg = document.getElementById('pathway-svg');
 function applyZoom(z, focalClientX, focalClientY) {
+  cancelAnimationFrame(zoomFrame);
+  zoomTarget = Math.max(0.32, Math.min(2.2, z));
   const nz = Math.max(0.32, Math.min(2.2, z));
-  if (!mapMain || !mapSvg || Math.abs(nz - mapZoom) < 0.001) return;
+  if (!mapMain || !mapSvg || nz === mapZoom) return;
   const rect = mapMain.getBoundingClientRect();
   const fx = focalClientX == null ? rect.width / 2 : focalClientX - rect.left;
   const fy = focalClientY == null ? rect.height / 2 : focalClientY - rect.top;
@@ -4995,6 +5176,24 @@ function applyZoom(z, focalClientX, focalClientY) {
   mapSvg.style.minWidth = (MAP_W * nz) + 'px';
   mapMain.scrollLeft = cx * nz - fx;
   mapMain.scrollTop = cy * nz - fy;
+}
+// Ease button/keyboard steps; direct trackpad and pinch gestures stay immediate.
+function animateZoom(z) {
+  cancelAnimationFrame(zoomFrame);
+  const target = Math.max(0.32, Math.min(2.2, z));
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    applyZoom(target);
+    return;
+  }
+  const from = mapZoom, started = performance.now();
+  const step = now => {
+    const t = Math.min(1, (now - started) / 180);
+    applyZoom(from + (target - from) * (1 - Math.pow(1 - t, 3)));
+    zoomTarget = target;
+    if (t < 1) zoomFrame = requestAnimationFrame(step);
+  };
+  zoomTarget = target;
+  zoomFrame = requestAnimationFrame(step);
 }
 function zoomFit() {
   if (!mapMain) return;
@@ -5015,11 +5214,12 @@ function focusNode(name) {
 function focusPathway(pw) {
   const ns = Object.values(M).filter(m => m.pathway === pw);
   if (!ns.length || !mapMain) return;
+  if (mapZoom < 0.72) applyZoom(0.95);
   scrollMapTo(ns.reduce((s, m) => s + m.x, 0) / ns.length, ns.reduce((s, m) => s + m.y, 0) / ns.length);
 }
 if (mapMain) {
-  document.getElementById('zoom-in').addEventListener('click', () => applyZoom(mapZoom * 1.25));
-  document.getElementById('zoom-out').addEventListener('click', () => applyZoom(mapZoom / 1.25));
+  document.getElementById('zoom-in').addEventListener('click', () => animateZoom(zoomTarget * 1.25));
+  document.getElementById('zoom-out').addEventListener('click', () => animateZoom(zoomTarget / 1.25));
   document.getElementById('zoom-fit').addEventListener('click', zoomFit);
   mapMain.addEventListener('wheel', (e) => {
     if (!e.ctrlKey) return;      // trackpad pinch / ctrl+wheel zooms; plain wheel scrolls (pans)
@@ -5037,13 +5237,16 @@ if (mapMain) {
     if (pinchDist) applyZoom(mapZoom * d / pinchDist, mid.x, mid.y);
     pinchDist = d;
   }, { passive: false });
+  const resetPinch = () => { pinchDist = 0; };
+  mapMain.addEventListener('touchend', resetPinch, { passive: true });
+  mapMain.addEventListener('touchcancel', resetPinch, { passive: true });
 }
 
 function renderCmdResults(q) {
   const norm = q.toLowerCase().trim();
   if (!norm) {
-    // Empty query: suggest all 15 cases as the most useful default
-    cmdResults = cmdIndex.filter(x => x.type === 'case');
+    // Pathway navigation lists every pathway without requiring a typed query.
+    cmdResults = cmdIndex.filter(x => x.type === cmdDefaultType);
   } else {
     cmdResults = cmdIndex.filter(x => x.keywords.includes(norm));
     cmdResults.sort((a, b) => {
@@ -5123,8 +5326,8 @@ document.addEventListener('keydown', (e) => {
 }, true);
 
 // ---------------- Help modal (header "?" button) ----------------
-function openHelp()  { document.getElementById('help-modal').classList.add('open'); }
-function closeHelp() { document.getElementById('help-modal').classList.remove('open'); }
+function openHelp() { document.getElementById('help-modal').classList.add('open'); document.getElementById('help-modal').setAttribute('aria-hidden', 'false'); }
+function closeHelp() { document.getElementById('help-modal').classList.remove('open'); document.getElementById('help-modal').setAttribute('aria-hidden', 'true'); }
 function helpOpen()  { return document.getElementById('help-modal').classList.contains('open'); }
 
 document.getElementById('help-btn').addEventListener('click', openHelp);
@@ -5266,7 +5469,7 @@ function renderCasesGrid() {
     const label = (info && info.label) ? info.label : c.pathway;
     const p = prog[c.file];
     const badge = p ? `<span class="case-badge ${scoreTier(p.best || 0)}">${Math.round((p.best || 0) * 100)}%</span>` : '';
-    return `<div class="case-card${p ? ' attempted' : ''}" data-file="${escapeAttr(c.file)}" data-pathway="${escapeAttr(c.pathway)}" style="--pw: var(--pw-${c.pathway})">
+    return `<div role="button" tabindex="0" class="case-card${p ? ' attempted' : ''}" data-file="${escapeAttr(c.file)}" data-pathway="${escapeAttr(c.pathway)}" style="--pw: var(--pw-${c.pathway})">
       ${badge}
       <div class="case-card-pw">${escapeText(label)}</div>
       <h3 class="case-card-title">${escapeText(c.title)}</h3>
@@ -5277,14 +5480,25 @@ function renderCasesGrid() {
 }
 
 function openCasesBrowser() {
+  document.querySelector('.cases-head-sub').textContent = `${CASES_INDEX.length} teaching cases across ${new Set(CASES_INDEX.map(c => c.pathway)).size} pathways. Select a card to start the case loop.`;
   renderProgressDashboard();
   renderCasesGrid();
   document.getElementById('cases-browser').classList.add('open');
+  document.getElementById('cases-browser').setAttribute('aria-hidden', 'false');
 }
 function closeCasesBrowser() {
   document.getElementById('cases-browser').classList.remove('open');
+  document.getElementById('cases-browser').setAttribute('aria-hidden', 'true');
 }
 function casesBrowserOpen() { return document.getElementById('cases-browser').classList.contains('open'); }
+
+document.getElementById('cases-grid').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const card = e.target.closest('.case-card');
+  if (!card) return;
+  e.preventDefault();
+  card.click();
+});
 
 document.getElementById('cases-btn').addEventListener('click', openCasesBrowser);
 document.getElementById('cases-close').addEventListener('click', closeCasesBrowser);
