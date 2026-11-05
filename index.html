@@ -1117,6 +1117,14 @@ body.case-pinpoint .case-pane[data-pane="pinpoint"] { display: block; }
 #pathway-svg.case-mode g.node.pinpoint-correct rect { stroke: var(--up); stroke-width: 3; filter: drop-shadow(0 0 14px var(--up)); }
 #pathway-svg.case-mode g.node.pinpoint-wrong rect { stroke: var(--down); stroke-width: 3; filter: drop-shadow(0 0 12px var(--down)); }
 
+.pinpoint-picker { margin-top: 12px; font-size: 13px; }
+.pinpoint-picker summary { cursor: pointer; padding: 8px 0; }
+.pinpoint-picker label { display: block; margin: 8px 0; }
+.pinpoint-picker select { width: 100%; min-width: 0; min-height: 44px; padding: 8px; border-radius: 8px; background: var(--panel); color: var(--text); border: 1px solid var(--border); font: inherit; font-size: 16px; }
+.pinpoint-picker .btn { min-height: 44px; margin-top: 8px; }
+#case-load-status { position: fixed; z-index: 80; left: 50%; bottom: calc(var(--touch-bottom, 0px) + 18px); transform: translateX(-50%); display: flex; align-items: center; gap: 16px; max-width: calc(100vw - 24px); padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--panel); color: var(--text); box-shadow: var(--clay-sm); font-size: 13px; }
+#case-load-status[hidden] { display: none; }
+#case-load-cancel { min-height: 44px; }
 .pinpoint-feedback { font-size: 13px; line-height: 1.55; padding: 12px 14px; border-radius: 11px; margin-top: 12px; }
 .pinpoint-feedback.ok { background: color-mix(in srgb, var(--up) 16%, transparent); color: var(--up); border: 1px solid color-mix(in srgb, var(--up) 40%, transparent); }
 .pinpoint-feedback.bad { background: color-mix(in srgb, var(--down) 16%, transparent); color: var(--down); border: 1px solid color-mix(in srgb, var(--down) 40%, transparent); }
@@ -1881,8 +1889,8 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
 
 
 <div id="cell-select">
-  <button class="cell-select-btn" id="cell-select-btn" aria-haspopup="listbox" aria-expanded="false"></button>
-  <div class="cell-select-menu" id="cell-select-menu" role="listbox"></div>
+  <button class="cell-select-btn" id="cell-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="cell-select-menu"></button>
+  <div class="cell-select-menu" id="cell-select-menu" role="listbox" aria-label="Cell type"></div>
 </div>
 <div id="cell-note"></div>
 <div id="cell-vitals" aria-label="Cell vitals monitor"></div>
@@ -2160,14 +2168,20 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
       <section class="case-pane" data-pane="pinpoint">
         <h3 class="pane-title" id="case-pinpoint-prompt">Click the failing step.</h3>
         <p class="pane-sub" id="case-pinpoint-status">The overlay shrank so the metabolism map underneath is interactive. Click an enzyme arrow or a node.</p>
-        <div id="case-pinpoint-feedback"></div>
+        <details class="pinpoint-picker" id="case-pinpoint-picker">
+          <summary>Choose a step from a list</summary>
+          <label for="case-pinpoint-choice">Enzyme step or metabolite</label>
+          <select id="case-pinpoint-choice"></select>
+          <button class="btn" id="case-pinpoint-submit" type="button" disabled>Submit step</button>
+        </details>
+        <div id="case-pinpoint-feedback" role="status"></div>
       </section>
 
       <section class="case-pane" data-pane="mcq">
         <div class="mcq-prog" id="case-mcq-prog">Question 1 of 3</div>
         <h3 class="pane-title" id="case-mcq-stem"></h3>
         <div class="mcq-choices" id="case-mcq-choices"></div>
-        <div class="mcq-explain" id="case-mcq-explain" hidden></div>
+        <div class="mcq-explain" id="case-mcq-explain" role="status" hidden></div>
       </section>
 
       <section class="case-pane" data-pane="summary">
@@ -2187,11 +2201,23 @@ button.pert-active-chip-x { border: 0; color: inherit; font-family: inherit; }
   </div>
 </div>
 
+<div id="case-load-status" hidden><span role="status">Loading case…</span><button class="btn" id="case-load-cancel" type="button">Cancel</button></div>
+
 <script>
+
+let pendingCaseOpen = null;
+function cancelPendingCaseOpen(restoreFocus = false) {
+  if (!pendingCaseOpen) return;
+  const request = pendingCaseOpen;
+  pendingCaseOpen = null;
+  request.controller.abort();
+  document.getElementById('case-load-status').hidden = true;
+  if (restoreFocus && request.returnFocus?.isConnected && !request.returnFocus.closest('[inert]')) request.returnFocus.focus({ preventScroll: true });
+}
 
 // Modal focus is shared across the intro, search, Help, Cases and case workup.
 let activeModal = null;
-const MODAL_FOCUSABLE = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+const MODAL_FOCUSABLE = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], summary, [tabindex]:not([tabindex="-1"])';
 function modalFocusable() {
   if (!activeModal) return [];
   return [activeModal.root, ...activeModal.allowed].flatMap(root => [...root.querySelectorAll(MODAL_FOCUSABLE)])
@@ -2220,6 +2246,7 @@ function updateModalAccess(root, allowed = []) {
   root.querySelector('[role="dialog"]')?.setAttribute('aria-modal', String(!allowed.length));
 }
 function beginModal(root, initialFocus) {
+  cancelPendingCaseOpen();
   if (activeModal?.root === root) return;
   if (activeModal) endModal(activeModal.root);
   activeModal = { root, allowed: [], inertBefore: new Map(), returnFocus: document.activeElement };
@@ -3983,7 +4010,7 @@ function renderCellMenu() {
   if (!btn || !menu) return;
   btn.innerHTML = `<span class="eyebrow">Cell</span><span class="cell-cur">${escapeText(currentCell().tab)}</span><span class="caret">▾</span>`;
   menu.innerHTML = CELL_TYPES.map(c =>
-    `<button class="cell-menu-item${c.id === selectedCell ? ' active' : ''}" data-cell="${c.id}" title="${escapeAttr(c.note)}">${escapeText(c.tab)}</button>`).join('');
+    `<button class="cell-menu-item${c.id === selectedCell ? ' active' : ''}" role="option" aria-selected="${c.id === selectedCell}" tabindex="-1" data-cell="${c.id}" title="${escapeAttr(c.note)}">${escapeText(c.tab)}</button>`).join('');
 }
 
 // Cell-specific rendering, via one generated stylesheet (targets the persistent
@@ -4141,17 +4168,35 @@ renderAll();
 renderCellMenu();
 applyCellFilter();
 const cellSelectEl = document.getElementById('cell-select');
+function setCellMenuOpen(open, restoreFocus = false) {
+  cellSelectEl.classList.toggle('open', open);
+  document.getElementById('cell-select-btn').setAttribute('aria-expanded', String(open));
+  if (open) document.querySelector('#cell-select-menu [aria-selected="true"]')?.focus();
+  else if (restoreFocus) document.getElementById('cell-select-btn').focus();
+}
 document.getElementById('cell-select-btn').addEventListener('click', (e) => {
   e.stopPropagation();
-  const open = cellSelectEl.classList.toggle('open');
-  document.getElementById('cell-select-btn').setAttribute('aria-expanded', open);
+  setCellMenuOpen(!cellSelectEl.classList.contains('open'));
 });
 document.getElementById('cell-select-menu').addEventListener('click', (e) => {
   const item = e.target.closest('.cell-menu-item');
-  if (item) { selectCell(item.dataset.cell); cellSelectEl.classList.remove('open'); }
+  if (item) { selectCell(item.dataset.cell); setCellMenuOpen(false, true); }
 });
-document.addEventListener('click', (e) => { if (!cellSelectEl.contains(e.target)) cellSelectEl.classList.remove('open'); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cellSelectEl.classList.remove('open'); });
+cellSelectEl.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && cellSelectEl.classList.contains('open')) {
+    e.preventDefault(); e.stopPropagation(); setCellMenuOpen(false, true); return;
+  }
+  if (e.key === 'Tab' && cellSelectEl.classList.contains('open')) { setCellMenuOpen(false, true); return; }
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+  e.preventDefault();
+  if (!cellSelectEl.classList.contains('open')) { setCellMenuOpen(true); return; }
+  const items = [...document.querySelectorAll('#cell-select-menu [role="option"]')];
+  const index = items.indexOf(document.activeElement);
+  const next = e.key === 'Home' ? 0 : e.key === 'End' ? items.length - 1 : (index + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+  items[next]?.focus();
+});
+document.addEventListener('click', e => { if (!cellSelectEl.contains(e.target)) setCellMenuOpen(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setCellMenuOpen(false); });
 
 // Quick-start chips + active chips at top of left panel
 document.getElementById('pert-summary').addEventListener('click', (e) => {
@@ -4491,12 +4536,14 @@ function placeTouchTools() {
 }
 placeTouchTools();
 tlBtn.addEventListener('click', () => {
+  cancelPendingCaseOpen();
   const opening = layoutEl.classList.contains('hide-left');
   layoutEl.classList.toggle('hide-left');
   if (opening && isMobileLayout()) layoutEl.classList.add('hide-right');
   syncToggleButtons();
 });
 trBtn.addEventListener('click', () => {
+  cancelPendingCaseOpen();
   const opening = layoutEl.classList.contains('hide-right');
   layoutEl.classList.toggle('hide-right');
   if (opening && isMobileLayout()) layoutEl.classList.add('hide-left');
@@ -4516,10 +4563,13 @@ document.querySelectorAll('[data-close-panel]').forEach(btn => btn.addEventListe
   trigger.focus();
 }));
 compactLayout.addEventListener('change', () => {
+  const modal = activeModal;
+  if (modal) restoreModalBackground();
   placeTouchTools();
   if (isMobileLayout()) closePanels();
+  if (modal) updateModalAccess(modal.root, modal.allowed);
 });
-document.getElementById('nav-map').addEventListener('click', () => { closePanels(); hideNodePopover(); exitDive(); });
+document.getElementById('nav-map').addEventListener('click', () => { cancelPendingCaseOpen(); closePanels(); hideNodePopover(); exitDive(); });
 document.getElementById('nav-changes').addEventListener('click', () => tlBtn.click());
 document.getElementById('nav-pathways').addEventListener('click', () => { closePanels(); openCmdPalette('pathway'); });
 document.getElementById('nav-search').addEventListener('click', () => { closePanels(); openCmdPalette(); });
@@ -4716,6 +4766,7 @@ const CaseRunner = {
       pinpointPrompt: $('case-pinpoint-prompt'),
       pinpointStatus: $('case-pinpoint-status'),
       pinpointFeedback: $('case-pinpoint-feedback'),
+      pinpointChoice: $('case-pinpoint-choice'), pinpointSubmit: $('case-pinpoint-submit'),
       mcqProg: $('case-mcq-prog'), mcqStem: $('case-mcq-stem'),
       mcqChoices: $('case-mcq-choices'), mcqExplain: $('case-mcq-explain'),
       scoreGrid: $('case-score-grid'), summaryRecap: $('case-summary-recap')
@@ -4725,19 +4776,30 @@ const CaseRunner = {
   // `file` is a registered case JSON slug (without .json).
   async open(file) {
     this.cacheEls();
+    cancelPendingCaseOpen();
     const requestId = this.openRequestId = (this.openRequestId || 0) + 1;
+    const request = { controller: new AbortController(), returnFocus: document.activeElement };
+    pendingCaseOpen = request;
+    document.getElementById('case-load-status').hidden = false;
+    const timer = setTimeout(() => request.controller.abort(new DOMException('Case loading timed out.', 'TimeoutError')), CASE_REQUEST_TIMEOUT_MS);
     if (selectedPathway) exitDive();
     let caseData;
     try {
-      const res = await fetch(`/cases/${file}.json`);
+      const res = await fetch(`/cases/${file}.json`, { signal: request.controller.signal });
       if (!res.ok) throw new Error('case not found');
       caseData = await res.json();
     } catch (e) {
-      if (requestId !== this.openRequestId) return;
-      alert(`No case available.\n(Tried /cases/${file}.json)`);
+      if (requestId !== this.openRequestId || pendingCaseOpen !== request) return;
+      alert(request.controller.signal.reason?.name === 'TimeoutError' ? 'Case loading timed out. Please select the case again to retry.' : `No case available.\n(Tried /cases/${file}.json)`);
       return;
+    } finally {
+      clearTimeout(timer);
+      if (pendingCaseOpen === request) {
+        pendingCaseOpen = null;
+        document.getElementById('case-load-status').hidden = true;
+      }
     }
-    if (requestId !== this.openRequestId) return;
+    if (requestId !== this.openRequestId || request.controller.signal.aborted) return;
     this.init(caseData, file);
   },
 
@@ -4783,6 +4845,12 @@ const CaseRunner = {
 
     // Explain form
     this.buildExplainForm();
+    document.getElementById('case-pinpoint-picker').open = false;
+    this.els.pinpointChoice.innerHTML = '<option value="">Select a step…</option>'
+      + '<optgroup label="Enzyme steps">' + E.map((edge, i) => `<option value="edge:${i}">${escapeText(`${edge.e} · ${edge.from} → ${edge.to}`)}</option>`).join('') + '</optgroup>'
+      + '<optgroup label="Metabolites">' + Object.keys(M).sort().map(name => `<option value="node:${escapeAttr(name)}">${escapeText(name)}</option>`).join('') + '</optgroup>';
+    this.els.pinpointChoice.disabled = false;
+    this.els.pinpointSubmit.disabled = true;
 
     // Show overlay
     this.els.overlay.classList.add('open');
@@ -4810,6 +4878,7 @@ const CaseRunner = {
   },
 
   close() {
+    cancelPendingCaseOpen();
     this.openRequestId = (this.openRequestId || 0) + 1;
     if (this.state?.timerHandle) clearInterval(this.state.timerHandle);
     this.state?.chatRequest?.abort();
@@ -4862,7 +4931,7 @@ const CaseRunner = {
     }
     if (cur === 'pinpoint' && !this.state.pinpointResolved) {
       // can leave only after correct OR retry+reveal
-      this.els.pinpointStatus.textContent = 'Make a click on the map first — pick an enzyme arrow or a node.';
+      this.els.pinpointStatus.textContent = 'Pick an enzyme arrow or node on the map, or submit a step from the list first.';
       return;
     }
     this.goTo(PHASES[i + 1]);
@@ -5118,17 +5187,33 @@ const CaseRunner = {
   // ---- PINPOINT (dual-mode SVG handler is at the bottom of this object) ----
   renderPinpoint() {
     const p = this.state.caseData.pinpoint;
+    this.els.pinpointChoice.disabled = this.state.pinpointResolved;
+    this.els.pinpointSubmit.disabled = this.state.pinpointResolved || !this.els.pinpointChoice.value;
     this.els.pinpointPrompt.textContent = p.prompt;
     if (!this.state.pinpointResolved) {
-      this.els.pinpointStatus.textContent = `The overlay shrank so the map underneath is interactive. Click an enzyme arrow or a node. (Attempt ${this.state.pinpointAttempts + 1} of 2.)`;
+      this.els.pinpointStatus.textContent = `Click an enzyme arrow or node on the map, or choose a step from the list. (Attempt ${this.state.pinpointAttempts + 1} of 2.)`;
       this.els.pinpointFeedback.innerHTML = '';
     } else {
       this.els.pinpointStatus.textContent = 'Step locked in — hit Continue → for the MCQs.';
     }
   },
 
+  submitPinpointChoice() {
+    const value = this.els.pinpointChoice.value;
+    let target;
+    if (value.startsWith('edge:')) {
+      const edge = E[Number(value.slice(5))];
+      if (edge) target = { type: 'edge', edgeId: `${edge.e}:${edge.from}->${edge.to}` };
+    } else if (value.startsWith('node:')) {
+      target = { type: 'node', name: value.slice(5) };
+    }
+    const el = target && this.locateTarget(target);
+    if (el) this.onPinpointClick({ target: el });
+  },
+
   onPinpointClick(e) {
-    if (!this.state || this.state.pinpointResolved) return;
+    if (!this.state || this.state.phase !== 'pinpoint' || this.state.pinpointResolved) return;
+    const focusInPicker = document.getElementById('case-pinpoint-picker').contains(document.activeElement);
     const target = this.state.pinpointTarget;
     let kind = null, id = null, hitEl = null;
     const edgeGroup = e.target.closest('.edge-group');
@@ -5169,6 +5254,9 @@ const CaseRunner = {
       this.els.pinpointFeedback.innerHTML = `<div class="pinpoint-feedback bad">${escapeText(this.state.caseData.pinpoint.revealMsg)}</div>`;
       this.els.pinpointStatus.textContent = 'Continue → for the MCQs.';
     }
+    this.els.pinpointChoice.disabled = this.state.pinpointResolved;
+    this.els.pinpointSubmit.disabled = this.state.pinpointResolved || !this.els.pinpointChoice.value;
+    if (focusInPicker && this.state.pinpointResolved) this.els.nextBtn.focus({ preventScroll: true });
   },
 
   locateTarget(target) {
@@ -5183,6 +5271,7 @@ const CaseRunner = {
 
   // ---- MCQ ----
   renderMcq() {
+    const restoreFocus = this.els.mcqChoices.contains(document.activeElement) || document.activeElement === this.els.nextBtn;
     const q = this.state.caseData.mcqs[this.state.mcqIdx];
     if (!q) return this.goTo('summary');
     const total = this.state.caseData.mcqs.length;
@@ -5207,6 +5296,7 @@ const CaseRunner = {
       this.els.nextBtn.textContent = 'Pick an answer';
       this.els.nextBtn.disabled = true;
     }
+    if (restoreFocus) (ans ? this.els.nextBtn : this.els.mcqChoices.querySelector('button'))?.focus({ preventScroll: true });
   },
   pickMcq(idx) {
     const cur = this.state.mcqIdx;
@@ -5266,6 +5356,11 @@ const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).
 
 // ---------------- Wire up event listeners ----------------
 (function bindCaseEvents() {
+  document.getElementById('case-load-cancel').addEventListener('click', () => cancelPendingCaseOpen(true));
+  document.getElementById('case-pinpoint-choice').addEventListener('change', () => {
+    CaseRunner.els.pinpointSubmit.disabled = !CaseRunner.els.pinpointChoice.value || !!CaseRunner.state?.pinpointResolved;
+  });
+  document.getElementById('case-pinpoint-submit').addEventListener('click', () => CaseRunner.submitPinpointChoice());
   document.getElementById('case-close').addEventListener('click', () => CaseRunner.requestClose());
   document.getElementById('case-back').addEventListener('click', () => CaseRunner.back());
   document.getElementById('case-next').addEventListener('click', () => {
@@ -5289,6 +5384,7 @@ const cssEscape = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).
 // ESC closes the topmost overlay
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
+  if (pendingCaseOpen) { e.preventDefault(); e.stopPropagation(); cancelPendingCaseOpen(true); return; }
   if (cmdPaletteOpen())   { e.preventDefault(); e.stopPropagation(); closeCmdPalette(); return; }
   if (helpOpen())         { e.preventDefault(); e.stopPropagation(); closeHelp(); return; }
   if (casesBrowserOpen()) { e.preventDefault(); e.stopPropagation(); closeCasesBrowser(); return; }
